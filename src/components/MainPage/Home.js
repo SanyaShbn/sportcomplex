@@ -1,4 +1,5 @@
 import React,  { useEffect } from 'react';
+import { useLocation } from 'react-router-dom'
 import 
 { BsFillArchiveFill, BsFillGrid3X3GapFill, BsPeopleFill, BsFillBellFill}
  from 'react-icons/bs'
@@ -11,6 +12,16 @@ const Home = ({ setSelectedLink, link }) => {
   useEffect(() => {
     setSelectedLink(link);
   }, []);
+
+  
+  const location = useLocation();
+
+  useEffect(() => {
+    window.history.pushState(null, document.title, window.location.href);
+    window.addEventListener('popstate', function(event) {
+      window.history.pushState(null, document.title, window.location.href);
+    });
+  }, [location]);
 
     const data = [
         {

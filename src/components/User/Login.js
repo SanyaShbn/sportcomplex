@@ -164,7 +164,7 @@ const Login = () => {
   };
 
   if (isAuthenticated) {
-    return navigate("dashboard");
+    return navigate("dashboard/main");
   }
   else {  
     return(

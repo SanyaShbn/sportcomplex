@@ -59,8 +59,8 @@ function App() {
           <Route path="main" element={<Main />} /> */}
 
           <Route path="*" element={<Dashboard/>} />
-{/* 
-          <Route path="/" element={[<NavBar/>, <Login/>]} /> */}
+
+          {/* <Route path="/" element={[<NavBar/>, <Login/>]} /> */}
       </Routes>
     </BrowserRouter>
    </div>

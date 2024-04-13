@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import 'dhtmlx-scheduler';
 import 'dhtmlx-scheduler/codebase/dhtmlxscheduler.css';
+import './Scheduler.css'
 import { SERVER_URL } from '../../constants.js';
  
 const scheduler = window.scheduler
@@ -93,105 +94,7 @@ export default class ScheduleCalendar extends Component {
             return true;
         });
 
-        // scheduler.attachEvent("onLightbox", function(){
-        //     var node = scheduler.formSection("Тип события").node;
-        //     var radios = node.getElementsByTagName("input");
-        //     for(var i = 0; i < radios.length; i++){
-        //         radios[i].onclick = function() {
-        //             console.log("Clicked" + i);
-        //         };
-        //       }
-        // });
-
-        // document.getElementById('radio1').addEventListener('change', function() {
-        //     if(this.checked) {
-        //         // Code to change the lightbox when 'radio1' is selected
-        //         fetch(SERVER_URL + '/api/view_trainings', {
-        //             headers: {
-        //                 //   'Authorization' : token
-        //                 }
-        //               })
-        //               .then(response => response.json())
-        //               .then(data => {
-        //                 const options = data.map(item => ({
-        //                     key: item.idTraining,
-        //                     label: "Тренировка №" + item.idTraining,
-        //                 }));
-        //                   scheduler.config.lightbox.sections = [
-        //                       { 
-        //                           name:"Событие", 
-        //                           height:21, 
-        //                           inputWidth:400, 
-        //                           map_to:"text", 
-        //                           type:"select", 
-        //                           options: scheduler.serverList("options", options)
-        //                       },
-        //                       {
-        //                         name: "Тип события",
-        //                         height: 70,
-        //                         type: "radio",
-        //                         map_to: "data_type",
-        //                         options: [
-        //                             { id: "radio1", key: "тренировочное занятие", label: "Тренировочные занятия"} , 
-        //                             { id: "radio2", key: "уборка и обслуживание", label: "Уборка/обслуживание сооружений и помещений комплекса" }
-        //                         ],
-        //                         vertical:true
-        //                       },
-        //                       {name:"recurring", height:115, type:"recurring", map_to:"rec_type", 
-        //                       button:"recurring"},
-        //                       {name:"time", height:72, type:"time", map_to:"auto"},
-        //                   ];
-        //               })
-        //         .catch(err => console.error(err));
-        //         scheduler.resetLightbox();
-        //     }
-        // });
-        // document.getElementById('radio2').addEventListener('change', function() {
-        //     if(this.checked) {
-        //         // Code to change the lightbox when 'radio2' is selected
-        //         fetch(SERVER_URL + '/api/view_facilities', {
-        //             headers: {
-        //                 //   'Authorization' : token
-        //                 }
-        //               })
-        //               .then(response => response.json())
-        //               .then(data => {
-        //                 const options = data.map(item => ({
-        //                     key: item.idComplexFacility,
-        //                     label: item.facilityType + "№" +item.idComplexFacility,
-        //                 }));
-        //                   scheduler.config.lightbox.sections = [
-        //                       { 
-        //                           name:"Событие", 
-        //                           height:21, 
-        //                           inputWidth:400, 
-        //                           map_to:"text", 
-        //                           type:"select", 
-        //                           options: scheduler.serverList("options", options)
-        //                       },
-        //                       {
-        //                         name: "Тип события",
-        //                         height: 70,
-        //                         type: "radio",
-        //                         map_to: "data_type",
-        //                         options: [
-        //                             { id: "radio1", key: "тренировочное занятие", label: "Тренировочные занятия"} , 
-        //                             { id: "radio2", key: "уборка и обслуживание", label: "Уборка/обслуживание сооружений и помещений комплекса" }
-        //                         ],
-        //                         vertical:true
-        //                       },
-        //                       {name:"recurring", height:115, type:"recurring", map_to:"rec_type", 
-        //                       button:"recurring"},
-        //                       {name:"time", height:72, type:"time", map_to:"auto"},
-        //                   ];
-        //               })
-        //         .catch(err => console.error(err));
-        //         scheduler.resetLightbox();
-        //     }
-        // });
-
-        scheduler.attachEvent("onLightbox", function() {
-
+        scheduler.attachEvent("onLightbox", function(id) {
             setTimeout(function() {
             var node = scheduler.formSection("Тип события").node;
             var radios = node.getElementsByTagName("input");
@@ -214,21 +117,26 @@ export default class ScheduleCalendar extends Component {
                     })
                     .then(response => response.json())
                     .then(data => {
+                        var options;
                         if(data_type === "тренировочное занятие") {
-                        const training_options = data.map(item => ({
-                            key: item.idTraining,
+                        options = data.map(item => ({
+                            key: "Тренировка №" + item.idTraining,
                             label: "Тренировка №" + item.idTraining,
                          }));
-                         scheduler.config.lightbox.sections[0].options = scheduler.serverList("options", training_options);
                         }
                         else{
-                            const facilities_options = data.map(item => ({
-                                key: item.idComplexFacility,
-                                label: item.facilityType + "№" +item.idComplexFacility,
+                            options = data.map(item => ({
+                                key: item.facilityType + " №" + item.idComplexFacility,
+                                label: item.facilityType + " №" +item.idComplexFacility,
                              }));
-                             scheduler.config.lightbox.sections[0].options = scheduler.serverList("options", facilities_options);
                         }
-                        scheduler.resetLightbox();
+                        scheduler.formSection("Событие").control.options.length = 0;
+                        options.forEach(function(option) {
+                            scheduler.formSection("Событие").control.options.add(new Option(option.label, option.key));
+                        });
+                        var event = scheduler.getEvent(id)
+                        scheduler.formSection("Событие").setValue(event.text)
+                        scheduler.renderCalendar()
                     })
                     .catch(err => console.error(err));
                 });
@@ -266,7 +174,7 @@ export default class ScheduleCalendar extends Component {
               .then(response => response.json())
               .then(data => {
                 const options = data.map(item => ({
-                    key: item.idTraining,
+                    key: "Тренировка №" + item.idTraining,
                     label: "Тренировка №" + item.idTraining,
                 }));
                 
@@ -277,7 +185,7 @@ export default class ScheduleCalendar extends Component {
                           inputWidth:400, 
                           map_to:"text", 
                           type:"select", 
-                          options: scheduler.serverList("options", options)
+                          options: options,
                       },
                     {
                         name: "Тип события",
@@ -308,18 +216,6 @@ export default class ScheduleCalendar extends Component {
         ];
  
         this.initSchedulerEvents();
-         
-        scheduler.templates.event_text = scheduler.templates.event_bar_text = function(start, end, event){
-            var options = scheduler.serverList("options");
-         
-            for(var i = 0; i < options.length; i++){
-                if(options[i].key == event.text){
-                    return options[i].label;
-                }
-            }
-         
-            return "";
-        };
 
         scheduler.config.repeat_date = "%m/%d/%Y";
         scheduler.config.include_end_by = true;

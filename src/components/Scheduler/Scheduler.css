@@ -3,3 +3,27 @@
     height: calc(100vh - 50px - 200px);
     width: 90vw;
 }
+
+.dhtmlx_popup_text {
+    width: 500px;
+}
+
+.dhtmlx_popup_controls {
+    width: 450px !important;
+}
+
+.dhtmlx_отменить_button {
+    width: 80px;
+    font-size: 12px !important;
+}
+
+.dhtmlx_редактировать_серию_button {
+    width: 130px;
+    font-size: 12px !important;
+
+}
+.dhtmlx_редактировать_экземпляр_button {
+    width: 130px;
+    font-size: 12px !important;
+}
+
