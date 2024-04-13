@@ -1,0 +1,436 @@
+/* .admin_main_body{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-family: Comic Sans MS, Impact, fantasy, 'Times New Roman', Times, serif;
+    font-weight: 500;
+    text-align: center;
+    word-spacing: 10px;
+    text-shadow: 4px 4px 3px black;
+    background-image: url("./nav_images/new_main_back_darked.jpg");
+    background-size: cover;
+}
+
+.top{
+	position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+	height: 115px;
+	border-bottom: 2px solid white;
+}
+
+.logout{
+    height: 80px;
+    width: 80px;
+    border-radius: 50%;
+    background-color: white; 
+    margin-top: 5px; 
+    position: absolute;
+    right: 5px;
+    background-image: url("./nav_images/user.jpg"); 
+    background-position: center;
+    background-size: 150px 150px;
+}
+
+.logout_link {
+    position: absolute;
+    top: 80px;
+    right: 17px;
+    font-size: 15px;
+    color: white;
+    text-shadow: 1px 1px black;
+    letter-spacing: 1px;
+    border-bottom: 2px solid transparent;
+}
+
+.logout_link:hover {
+    color: rgb(0, 128, 255);
+    border-bottom: 2px solid rgb(0, 128, 255);
+    box-shadow: 0 1px 0 white, 0 2px 0 #969696;
+}
+
+.logo_div{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 15%;
+	height: 115px;
+	border-right: 2px solid white;
+}
+
+.logo{
+	position: absolute;
+    top: 30px;
+    left: 35%;
+}
+
+.welcome_phrase{
+    color: rgb(0, 128, 255);
+	text-align: center;
+	font-family: "PT serif", sans-serif;
+	font-size: 24px;
+}
+
+.info{
+    color: rgb(0, 128, 255);
+	margin-top: 50px;
+	font-size: 36px;
+}
+
+.company_title{
+	font-family: "Pacifico", bold;
+	color: white;
+	font-size: 50px;
+}
+
+.welcome_text{
+	margin-top: 15%;
+    width: 100%;
+}
+
+.about_us{
+	position: fixed;
+    top: 60%;
+    left: 0;
+    width: 100%;
+	height: 115px;
+	border-top: 2px solid white;
+	border-bottom: 2px solid white;
+}
+
+.element_1{
+	position: fixed;
+    top: 60%;
+    left: 0;
+    width: 33.3333%;
+	height: 115px;
+	border-right: 2px solid white;
+}
+.element_2{
+	position: fixed;
+    top: 60%;
+    left: 33.3333%;
+    width: 33.3333%;
+	height: 115px;
+	border-right: 2px solid white;
+}
+.element_3{
+	position: fixed;
+    top: 60%;
+    left: 66.6666%;
+    width: 33.3333%;
+	height: 115px;
+	border-right: 2px solid white;
+}
+
+.admin_logos{
+	display: inline;
+	margin-right: 350px;
+	margin-top: 20px;
+	height: 80px;
+	width: 80px;
+}
+
+.image1_text{
+	position: fixed;
+    top: 65%;
+    left: 10%;
+    color: white;
+    font-size: 18px;
+}
+
+.image2_text{
+	position: fixed;
+    top: 65%;
+    left:42%;
+    color: white;
+    font-size: 18px;
+}
+
+.image3_text{
+	position: fixed;
+    top: 65%;
+    left: 77%;
+    color: white;
+    font-size: 18px;
+}
+
+.nav_div_1{
+	position: fixed;
+	top: 78%;
+	left: 20%;
+	height: 150px;
+	width: 150px;
+	background-color: white;
+	border-radius: 15%;
+}
+
+.nav_div_1:hover {
+	background-color: rgb(66,170,255);
+}
+
+.nav_div_2{
+	position: fixed;
+	top: 78%;
+	left: 45%;
+	height: 150px;
+	width: 150px;
+	background-color: white;
+	border-radius: 15%;
+}
+
+.nav_div_2:hover {
+	background-color: rgb(66,170,255);
+}
+
+.nav_div_3{
+	position: fixed;
+	top: 78%;
+	left: 70%;
+	height: 150px;
+	width: 150px;
+	background-color: white;
+	border-radius: 15%;
+}
+
+.nav_div_3:hover {
+	background-color: rgb(66,170,255);
+}
+
+.navigation_element{
+	font-family: 'PT Sans', sans-serif;
+	margin-top: 15px;
+	font-size: 18px;
+	transition: none;
+	text-shadow: none;
+}
+
+.navigation_element_corp{
+    font-family: 'PT Sans', sans-serif;
+	margin-top: none;
+	font-size: 18px;
+	transition: none;
+	text-shadow: none;
+}
+
+.navigation_element:hover {
+	color: white;
+    border-bottom: 2px solid rgb(0, 128, 255);
+    box-shadow: 0 1px 0 white, 0 2px 0 #969696;
+}
+
+.navigation_element_corp:hover {
+	color: white;
+    border-bottom: 2px solid rgb(0, 128, 255);
+    box-shadow: 0 1px 0 white, 0 2px 0 #969696;
+}
+
+.link_logo{
+	margin-bottom: 0;
+	height: 80px;
+	width: 80px;
+}
+
+@media screen and (max-width: 1366px){
+    .admin_logos{
+    	display: inline;
+	    margin-left: 5%;
+	    margin-top: 10px;
+	    height: 90px;
+	    width: 90px;
+    }
+}
+
+@media screen and (max-width: 1024px){
+	.top{
+    	height: 150px;
+    }
+    .logo_div{
+    	height: 150px;
+    	width: 30%
+    }
+    .logo{
+    	position: absolute;
+        top: 25px;
+        left: 33%;
+        height: 100px;
+        width: 100px;
+	}
+	.link_logo
+	{
+    	height: 100px;
+    	width: 100px;
+    }
+    .navigation_element{
+        font-size: 25px;
+    }
+    .logout_link
+    {
+       top: 100px;
+       right: none;
+       left: 89%;
+       font-size: 24px;
+    }
+    .logout
+    {
+    	height: 100px;
+        width: 100px;
+        border-radius: 50%;
+        background-color: white; 
+        background-size: 200px 200px;
+    }
+    .welcome_text{
+    	margin-top: 300px;
+    }
+	.nav_div_1{
+    	position: fixed;
+	    top: 78%;
+	    left: 6%;
+	    height: 200px;
+	    width: 200px;
+	    background-color: white;
+	    border-radius: 15%;
+    }
+    .nav_div_2{
+    	position: fixed;
+	    top: 78%;
+	    left: 39%;
+	    height: 200px;
+	    width: 200px;
+	    background-color: white;
+	    border-radius: 15%;
+    }
+    .nav_div_3{
+    	position: fixed;
+	    top: 78%;
+	    left: 72%;
+	    height: 200px;
+	    width: 200px;
+	    background-color: white;
+	    border-radius: 15%;
+    }
+	.image1_text
+	{
+        top: 63%;
+        left: 13%;
+        font-size: 14px;
+    }
+    .image2_text
+    {
+        top: 63%;
+        left: 46%;
+        font-size: 14px;
+    }
+    .image3_text
+    {
+        top: 63%;
+        left: 80%;
+        font-size: 14px;
+    }
+    .admin_logos{
+    	display: inline;
+	    margin-left: 5%;
+	    margin-top: 10px;
+	    height: 90px;
+	    width: 90px;
+    }
+}
+
+@media screen and (max-width: 500px){
+	.top{
+    	height: 80px;
+    }
+    .logo_div{
+    	height: 80px;
+    	width: 20%
+    }
+    .logo{
+    	position: absolute;
+        top: 15px;
+        left: 20%;
+        height: 50px;
+        width: 50px;
+	}
+	.link_logo
+	{
+    	height: 50%;
+    	width: 50%;
+    }
+    .logout_link
+    {
+       top: 55px;
+       right: none;
+       left: 86%;
+       font-size: 15px;
+    }
+    .logout
+    {
+    	height: 50px;
+        width: 50px;
+        border-radius: 50%;
+        background-color: white; 
+        background-size: 85px 85px;
+    }
+    .welcome_text{
+    	margin-top: 35%;
+    }
+	.nav_div_1{
+    	position: fixed;
+	    top: 78%;
+	    left: 0.5%;
+	    height: 135px;
+	    width: 135px;
+	    background-color: white;
+	    border-radius: 15%;
+    }
+    .nav_div_2{
+    	position: fixed;
+	    top: 78%;
+	    left: 34.25%;
+	    height: 135px;
+	    width: 135px;
+	    background-color: white;
+	    border-radius: 15%;
+    }
+    .nav_div_3{
+    	position: fixed;
+	    top: 78%;
+	    left: 68%;
+	    height: 135px;
+	    width: 135px;
+	    background-color: white;
+	    border-radius: 15%;
+    }
+	.image1_text
+	{
+        top: 68%;
+        left: 5%;
+        font-size: 10px;
+    }
+    .image2_text
+    {
+        top: 68%;
+        left: 35%;
+        font-size: 10px;
+    }
+    .image3_text
+    {
+        top: 68%;
+        left: 70%;
+        font-size: 10px;
+    }
+    .admin_logos{
+    	display: inline;
+	    margin-left: 27%;
+	    margin-top: 5px;
+	    height: 65px;
+	    width: 65px;
+    }
+    .navigation_element{
+        font-size: 18px;
+    }
+
+} */
