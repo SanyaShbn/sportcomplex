@@ -12,6 +12,7 @@ import { grey } from '@mui/material/colors';
 import EditEmployee from './EditEmployee';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Registration from "../User/Registration.js";
 
 function CustomToolbar() {
   return (
@@ -27,24 +28,24 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
     setSelectedLink(link);
   }, []);
 
-    const [employees, setEmployees] = useState([]);
+    const [users, setUsers] = useState([]);
     const [open, setOpen] = useState(false);
   
     useEffect(() => {
-      fetchEmployees();
+      fetchUsers();
     }, []);
   
-    const fetchEmployees = () => {
+    const fetchUsers = () => {
       // const token = sessionStorage.getItem("jwt");
-      fetch(SERVER_URL + '/api/serviceEmployees', {
+      fetch(SERVER_URL + '/api/users', {
         // headers: { 'Authorization' : token }
       })
       .then(response => response.json())
-      .then(data => setEmployees(data._embedded.serviceEmployees))
+      .then(data => setUsers(data._embedded.users))
       .catch(err => console.error(err));    
     }
     const onDelClick = (url) => {
-      if (window.confirm("ВЫ уверены, что хотите удалить запись о сотруднике обслуживающего персонала?")) {
+      if (window.confirm("ВЫ уверены, что хотите удалить запись о сотруднике?")) {
 
         // const token = sessionStorage.getItem("jwt");
 
@@ -54,7 +55,7 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
           })
         .then(response => {
           if (response.ok) {
-            fetchEmployees();
+            fetchUsers();
             setOpen(true);
           }
           else {
@@ -64,20 +65,20 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
         .catch(err => console.error(err))
       }
     }
-    const addEmployee = (employee) => {
+    const addEmployee = (user) => {
 
       // const token = sessionStorage.getItem("jwt");
 
-      fetch(SERVER_URL + '/api/serviceEmployees',
+      fetch(SERVER_URL + '/api/users',
         { method: 'POST', headers: {
           'Content-Type':'application/json',
           // 'Authorization' : token
         },
-        body: JSON.stringify(employee)
+        body: JSON.stringify(user)
       })
       .then(response => {
         if (response.ok) {
-          fetchEmployees();
+          fetchUsers();
         }
         else {
           alert('Что-то пошло не так!');
@@ -87,7 +88,7 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
     }
   
 
-    const updateEmployee = (employee, link) => {
+    const updateEmployee = (user, link) => {
 
       // const token = sessionStorage.getItem("jwt");
 
@@ -98,11 +99,11 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
           'Content-Type':  'application/json',
           // 'Authorization' : token
         },
-        body: JSON.stringify(employee)
+        body: JSON.stringify(user)
       })
       .then(response => {
         if (response.ok) {
-          fetchEmployees();
+          fetchUsers();
         }
         else {
           alert('Что-то пошло не так!');
@@ -115,16 +116,16 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
       {field: 'firstName', headerName: 'Имя', width: 100},
       {field: 'surName', headerName: 'Фамилия', width: 150},
       {field: 'patrSurName', headerName: 'Отчество', width: 150},
+      {field: 'email', headerName: 'Email', width: 200},
       {field: 'phoneNumber', headerName: 'Номер телефона', width: 200},
       {field: 'birthDate', headerName: 'Дата рождения', width: 170},
-      {field: 'salary', headerName: 'Оклад(бел.руб.)', width: 200},
-      {field: 'additionalSalary', headerName: 'Премиальные(бел.руб.)', width: 200},
+      {field: 'post', headerName: 'Должность', width: 220},
       {
         field: '_links.employee.href', 
         headerName: '', 
         sortable: false,
         filterable: false,
-        width: 100,
+        width: 50,
         renderCell: row => <EditEmployee 
                               data={row} 
                               updateEmployee={updateEmployee} />
@@ -132,7 +133,7 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
       {
         field: '_links.self.href', 
         headerName: '', 
-        width:120,
+        width:50,
         sortable: false,
         filterable: false,
         renderCell: row => 
@@ -140,6 +141,15 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
           (row.id)}>
           <DeleteIcon color="error" />
         </IconButton>
+      },
+      {
+        field: 'account', 
+        headerName: 'Учётная запись', 
+        width:150,
+        sortable: false,
+        filterable: false,
+        renderCell: row =>
+        row.row.role !== "CLEANER" ? <Registration data={row} /> : null
       }
     ];
     
@@ -163,12 +173,12 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
       <div className="container" style={{ height: 400, width: "100%"}}>
         <StyledDataGrid localeText={ruRU.components.MuiDataGrid.defaultProps.localeText} className="grid_component" 
           columns={columns} 
-          rows={employees} 
+          rows={users} 
           disableSelectionOnClick={true}
           getRowId={row => row._links.self.href}
-          {...employees}
+          {...users}
           initialState={{
-            ...employees.initialState,
+            ...users.initialState,
             pagination: { paginationModel: { pageSize: 5 } },
           }}
           pageSizeOptions={[5, 10, 25]}

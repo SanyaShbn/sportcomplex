@@ -29,6 +29,7 @@ const ClientTable = ({ setSelectedLink, link }) => {
 
     const [clients, setClients] = useState([]);
     const [open, setOpen] = useState(false);
+    
 
     useEffect(() => {
       fetchClients();
@@ -116,7 +117,7 @@ const ClientTable = ({ setSelectedLink, link }) => {
           (row.id)}>
           <DeleteIcon color="error" />
         </IconButton>
-      }
+      },
     ];
     
   return (

@@ -8,7 +8,22 @@
     width: 500px;
 }
 
-.dhtmlx_popup_controls {
+.scheduler_modal_box,
+.dhtmlx_modal_box,
+.scheduler-alert,
+.dhtmlx-alert {
+width: 500px !important;
+}
+
+.dhtmlx_ok_button {
+    width: 180px !important;
+}
+
+.dhtmlx_cancel_button {
+    width: 180px !important;
+}
+
+ .dhtmlx_popup_controls {
     width: 450px !important;
 }
 

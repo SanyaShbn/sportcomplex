@@ -34,6 +34,7 @@ import TrainingTable from "../Training/TrainingTable"
 import SportComplexMembershipTable from "../SportComplexMembership/SportComplexMembershipTable"
 import ReceptionButtonsList from "./ReceptionButtonsList"
 import SetTheme from "../Scheduler/SetTheme"
+import Registration from "../User/Registration"
 // import { jwtDecode } from 'jwt-decode';
   
   const drawerWidth = 250;
@@ -119,7 +120,7 @@ import SetTheme from "../Scheduler/SetTheme"
           title: 'Клиенты',
           icon: <BsFillPersonVcardFill/>,
           link: 'clients',
-          component: <ClientTable {...{ setSelectedLink, link: 'clients' }}/>,
+          component: [<ClientTable {...{ setSelectedLink, link: 'clients' }}/>, <Registration/>],
         },
         {
           title: 'Сооружения комплекса',

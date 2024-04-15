@@ -3,12 +3,15 @@ import 'dhtmlx-scheduler';
 import 'dhtmlx-scheduler/codebase/dhtmlxscheduler.css';
 import './Scheduler.css'
 import { SERVER_URL } from '../../constants.js';
+import { width } from '@mui/system';
  
 const scheduler = window.scheduler
 scheduler.plugins({
     recurring: true,
     editors: true 
 });
+scheduler.config.wide_form = true;
+scheduler.config.buttons_left.push("add_field_btn");
 
 export default class ScheduleCalendar extends Component {
 
@@ -94,10 +97,77 @@ export default class ScheduleCalendar extends Component {
             return true;
         });
 
+        scheduler.attachEvent("onLightboxButton", function(button_id, node, e){
+            if(button_id === "add_field_btn"){
+                var clients
+
+                fetch(SERVER_URL + '/api/view_clients', {
+                    // headers: { 'Authorization' : token }
+                  })
+                  .then(response => response.json())
+                  .then(data => {
+                    clients = data.map(item => ({
+                        key: item.surName + " " + item.firstName + " " + item.patrSurName,
+                        label: item.surName + " " + item.firstName + " " + item.patrSurName,
+                     }))
+                   }
+                   )
+                  .catch(err => console.error(err));   
+
+                var section = scheduler.formSection('Клиенты');
+ 
+                var newField = document.createElement('input');
+                newField.type = 'select'
+                newField.height = 21
+                newField.inputWidth = 400
+                newField.name = "Клиенты"
+                newField.options = clients
+        
+                // Add the new field to the section
+                section.node.appendChild(newField);
+                
+                // Adjust the lightbox size
+                scheduler.setLightboxSize();
+            }
+        });
+
         scheduler.attachEvent("onLightbox", function(id) {
             setTimeout(function() {
+                fetch(SERVER_URL + '/api/serviceEmployees', {
+                    // headers: { 'Authorization' : token }
+                  })
+                  .then(response => response.json())
+                  .then(data => {
+                    var coaches = data._embedded.serviceEmployees.map(item => ({
+                        key: item.surName + " " + item.firstName + " " + item.patrSurName,
+                        label: item.surName + " " + item.firstName + " " + item.patrSurName,
+                     }))
+                     scheduler.formSection("Тренер").control.options.length = 0;
+                     coaches.forEach(function(option) {
+                         scheduler.formSection("Тренер").control.options.add(new Option(option.label, option.key));
+                     });
+                   }
+                   )
+                  .catch(err => console.error(err));    
+                  fetch(SERVER_URL + '/api/view_clients', {
+                    // headers: { 'Authorization' : token }
+                  })
+                  .then(response => response.json())
+                  .then(data => {
+                    var clients = data.map(item => ({
+                        key: item.surName + " " + item.firstName + " " + item.patrSurName,
+                        label: item.surName + " " + item.firstName + " " + item.patrSurName,
+                     }))
+                     scheduler.formSection("Клиенты").control.options.length = 0;
+                     clients.forEach(function(option) {
+                         scheduler.formSection("Клиенты").control.options.add(new Option(option.label, option.key));
+                     });
+                   }
+                   )
+                  .catch(err => console.error(err));   
             var node = scheduler.formSection("Тип события").node;
             var radios = node.getElementsByTagName("input");
+            
             for (var i = 0; i < radios.length; i++) {
                   
                 radios[i].addEventListener("change", function() {
@@ -123,20 +193,26 @@ export default class ScheduleCalendar extends Component {
                             key: "Тренировка №" + item.idTraining,
                             label: "Тренировка №" + item.idTraining,
                          }));
+                         scheduler.formSection("Тренер").control.style.display = ""
+                         scheduler.formSection("Клиенты").control.style.display = ""
                         }
                         else{
                             options = data.map(item => ({
                                 key: item.facilityType + " №" + item.idComplexFacility,
                                 label: item.facilityType + " №" +item.idComplexFacility,
                              }));
+                             scheduler.formSection("Тренер").control.style.display = "none"
+                             scheduler.formSection("Клиенты").control.style.display = "none"
                         }
+
                         scheduler.formSection("Событие").control.options.length = 0;
                         options.forEach(function(option) {
                             scheduler.formSection("Событие").control.options.add(new Option(option.label, option.key));
                         });
                         var event = scheduler.getEvent(id)
                         scheduler.formSection("Событие").setValue(event.text)
-                        scheduler.renderCalendar()
+                        scheduler.formSection("Тренер").setValue(event.coach)
+                        scheduler.formSection("Клиенты").setValue(event.clients)
                     })
                     .catch(err => console.error(err));
                 });
@@ -166,44 +242,57 @@ export default class ScheduleCalendar extends Component {
         })
         .catch(error => console.error(error));
 
-        fetch(SERVER_URL + '/api/view_trainings', {
-            headers: {
-                //   'Authorization' : token
-                }
-              })
-              .then(response => response.json())
-              .then(data => {
-                const options = data.map(item => ({
-                    key: "Тренировка №" + item.idTraining,
-                    label: "Тренировка №" + item.idTraining,
-                }));
-                
-                  scheduler.config.lightbox.sections = [
-                      {   
-                          name:"Событие", 
-                          height:21, 
-                          inputWidth:400, 
-                          map_to:"text", 
-                          type:"select", 
-                          options: options,
-                      },
-                    {
-                        name: "Тип события",
-                        height: 70,
-                        type: "radio",
-                        map_to: "data_type",
-                        options: [
-                            { id: "radio1", key: "тренировочное занятие", label: "Тренировочные занятия"} , 
-                            { id: "radio2", key: "уборка и обслуживание", label: "Уборка/обслуживание сооружений и помещений комплекса" }
-                        ],
-                        vertical:true
-                      },
-                      {name:"recurring", height:115, type:"recurring", map_to:"rec_type", 
-                      button:"recurring"},
-                      {name:"time", height:72, type:"time", map_to:"auto"},
-                  ];
-              })
-        .catch(err => console.error(err));
+        scheduler.config.lightbox.sections = [
+            {   
+                name:"Событие", 
+                height:21, 
+                inputWidth:400, 
+                map_to:"text", 
+                type:"select", 
+                options:"",
+            },
+            {
+                name:"Тренер", 
+                height:21, 
+                inputWidth:400, 
+                map_to:"coach", 
+                type:"select", 
+                options: "",
+            },
+            {
+                name:"Клиенты", 
+                height:21, 
+                inputWidth:400, 
+                map_to:"clients", 
+                type:"select", 
+                options: "",
+            },
+            {
+                name: "Тип тренировки",
+                height: 70,
+                type: "radio",
+                map_to: "training_type",
+                options: [
+                    { key: "групповая", label: "групповая"} , 
+                    { key: "индивидуальная", label: "индивидуальная" }
+                ],
+                vertical:true
+                },
+            {
+                name: "Тип события",
+                height: 70,
+                type: "radio",
+                map_to: "data_type",
+                options: [
+                    { id: "radio1", key: "тренировочное занятие", label: "Тренировочные занятия"} , 
+                    { id: "radio2", key: "уборка и обслуживание", label: "Уборка/обслуживание сооружений и помещений комплекса" }
+                ],
+                vertical:true
+                },
+                {name:"recurring", height:115, type:"recurring", map_to:"rec_type", 
+                button:"recurring"},
+                {name:"time", height:72, type:"time", map_to:"auto"},
+            ];
 
         scheduler.config.header = [
             'day',
@@ -221,6 +310,7 @@ export default class ScheduleCalendar extends Component {
         scheduler.config.include_end_by = true;
         scheduler.config.hour_date = '%g:%i %A';
         scheduler.xy.scale_width = 70;
+        scheduler.locale.labels["add_field_btn"] = "Добавить";
 
         scheduler.init(this.schedulerContainer, new Date());
     }

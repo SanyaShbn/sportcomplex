@@ -9,12 +9,14 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
+import { MenuItem, FormControl, InputLabel } from '@mui/material';
+import Select from '@mui/material/Select';
 
 function EditEmployee(props) {
   const [open, setOpen] = useState(false);
   const [employee, setEmployees] = useState({
-    firstName: '', surName: '', patrSurName: '',  
-    phoneNumber: '', birthDate:'', salary:  '', additionalSalary: ''
+    firstName: '', surName: '', patrSurName: '', email: '', 
+    phoneNumber: '', birthDate:'', post: '', role: ''
   });
     
   const handleClickOpen = () => {
@@ -22,10 +24,10 @@ function EditEmployee(props) {
       firstName: props.data.row.firstName,
       surName: props.data.row.surName,
       patrSurName: props.data.row.patrSurName,
+      email: props.data.row.email,
       phoneNumber: props.data.row.phoneNumber,
       birthDate: props.data.row.birthDate,
-      salary: props.data.row.salary,
-      additionalSalary: props.data.row.additionalSalary
+      post: props.data.row.post
      })      
     setOpen(true);
   }
@@ -40,6 +42,25 @@ function EditEmployee(props) {
   }
 
   const handleSave = () => {
+    switch (employee.post) {
+      case 'Сотрудник тренерского персонала':
+        employee.role = "COACH";
+        break;
+      case 'Бухгалтер':
+        employee.role = "ACCOUNTANT";
+        break;
+      case 'Менеджер по клиентам':
+        employee.role = "MANAGER";
+        break;
+      case 'Сотрудник отдела маркетинга':
+        employee.role = "MARKETER";
+        break;
+      case 'Сотрудник обслуживающего персонала':
+        employee.role = "CLEANER";
+        break;
+      default:
+        employee.role = "CLEANER";
+    }
     props.updateEmployee(employee, props.data.id);
     handleClose();
   }
@@ -52,21 +73,24 @@ function EditEmployee(props) {
       <Dialog open={open} onClose={handleClose}>
           <DialogTitle className='dialog'>Обновление информации о сотруднике</DialogTitle>
           <DialogContent className='dialog'>
-            <Stack spacing={2} mt={1}>
-            <TextField label="Имя" name="firstName" autoFocus
-            variant="standard" value={employee.firstName} 
+        <Stack spacing={2} mt={1}>
+          <TextField label="Имя" name="firstName" autoFocus
+            variant="standard" value={employee.firstName} required
             onChange={handleChange}/>
-          <TextField label="Фамилия" name="surName"
-            variant="standard" value={employee.surName} 
+           <TextField label="Фамилия" name="surName"
+            variant="standard" value={employee.surName} required
             onChange={handleChange}/>
           <TextField label="Отчество" name="patrSurName" 
-            variant="standard" value={employee.patrSurName} 
+            variant="standard" value={employee.patrSurName} required
+            onChange={handleChange}/>
+          <TextField label="Email" name="email" type="email"
+            variant="standard" value={employee.email} required
             onChange={handleChange}/>
           <TextField label="Номер телефона" name="phoneNumber" 
-            variant="standard" value={employee.phoneNumber} 
+            variant="standard" value={employee.phoneNumber} required
             onChange={handleChange}/>
-          <TextField type="date" label="Дата рождения" name="birthDate" 
-            variant="standard" value={employee.birthDate} 
+          <TextField type='date' label="Дата рождения" name="birthDate" 
+            variant="standard" value={employee.birthDate} required
             onChange={handleChange} InputProps={{
               inputProps: {
                 inputMode: 'numeric',
@@ -75,14 +99,24 @@ function EditEmployee(props) {
                 <InputAdornment position="start"> </InputAdornment>
               ),
             }}/>
-          <TextField label="Оклад" name="salary"
-            variant="standard" value={employee.salary} 
-            onChange={handleChange}/>
-           <TextField label="Премиальные" name="additionalSalary"
-            variant="standard" value={employee.additionalSalary} 
-            onChange={handleChange}/>
-            </Stack>         
-          </DialogContent>
+          <FormControl fullWidth>
+            <InputLabel>Должность</InputLabel>
+             <Select
+              name="post"
+              value={employee.post}
+              autoFocus variant="standard"
+              label="Должность"
+              required
+              onChange={handleChange}>
+              <MenuItem value={"Сотрудник тренерского персонала"}>Сотрудник тренерского персонала</MenuItem>
+              <MenuItem value={"Бухгалтер"}>Бухгалтер</MenuItem>
+              <MenuItem value={"Менеджер по клиентам"}>Менеджер по клиентам</MenuItem>
+              <MenuItem value={"Сотрудник отдела маркетинга"}>Сотрудник отдела маркетинга</MenuItem>
+              <MenuItem value={"Сотрудник обслуживающего персонала"}>Сотрудник обслуживающего персонала</MenuItem>
+            </Select>
+        </FormControl>
+        </Stack>
+      </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Отмена</Button>
             <Button onClick={handleSave}>Сохранить</Button>
