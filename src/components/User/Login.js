@@ -13,7 +13,6 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom'
 import { useValue } from '../../context/ContextProvider';
-import PasswordField from './PasswordField';
 import { SERVER_URL } from '../../constants';
 import { useNavigate } from 'react-router-dom';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -23,21 +22,13 @@ const Login = () => {
     state: { openLogin },
     dispatch,
   } = useValue();
-  const [title, setTitle] = useState('Login');
-  const [isRegister, setIsRegister] = useState(false);
-  const nameRef = useRef();
   const emailRef = useRef();
   const passwordRef = useRef();
-  const confirmPasswordRef = useRef();
   let navigate = useNavigate();
 
   const handleClose = () => {
     dispatch({ type: 'CLOSE_LOGIN' });
   };
-
-  useEffect(() => {
-    isRegister ? setTitle('Регистрация') : setTitle('Аутентификация');
-  }, [isRegister]);
 
   const location = useLocation();
 
@@ -67,18 +58,6 @@ const Login = () => {
   const handleChange = (event) => {
     setUser({...user, [event.target.name] : event.target.value});
   }
-
-  const clearValues = () => {
-    if (nameRef.current) {
-      nameRef.current.value = '';
-    }
-    if (emailRef.current) {
-      emailRef.current.value = '';
-    }
-    if (passwordRef.current) {
-      passwordRef.current.value = '';
-    }
-  };
   
   const login = () => {
     dispatch({ type: 'START_LOADING' });
@@ -109,56 +88,6 @@ const Login = () => {
     .catch(err => console.error(err))
   }
 
-  const register = () => {
-    const password = passwordRef.current.value;
-    const confirmPassword = confirmPasswordRef.current.value;
-    if (password !== confirmPassword)
-      return dispatch({
-        type: 'UPDATE_ALERT',
-        payload: {
-          open: true,
-          severity: 'error',
-          message: 'Пароли не совпадают',
-        },
-      });
-    else{
-    dispatch({ type: 'START_LOADING' });
-    fetch(SERVER_URL + '/register', {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify(user)
-    })
-    .then(response => {
-      dispatch({ type: 'END_LOADING' });
-      if (!response.ok) {
-        dispatch({
-        type: 'UPDATE_ALERT',
-        payload: {
-          open: true,
-          severity: 'error',
-          message: 'Логин или пароль уже испольуются в системе',
-        },});
-      }
-      else {
-        dispatch({
-          type: 'UPDATE_ALERT',
-          payload: {
-            open: true,
-            severity: 'success',
-            message: 'Новая учётная запись успешно создана',
-          },});
-          setIsRegister(false)
-          clearValues()
-      }
-    })
-    .catch(err => console.error(err))
-  }
-  }
-
-  const handleRegisterClick = () => {
-    register();
-  };
-
   const handleLoginClick = () => {
     login();
   };
@@ -171,7 +100,7 @@ const Login = () => {
       <div>
       <Dialog open={openLogin} onClose={handleClose}>
       <DialogTitle>
-        {title}
+        Аутентификация
         <IconButton
           sx={{
             position: 'absolute',
@@ -190,7 +119,6 @@ const Login = () => {
             Пожалуйста, заполните следующие поля:
           </DialogContentText>
           <TextField
-            autoFocus={!isRegister}
             margin="normal"
             variant="standard"
             name="userLogin"
@@ -223,15 +151,8 @@ const Login = () => {
         ),
       }}
     />
-          {isRegister && (
-            <PasswordField
-              passwordRef={confirmPasswordRef}
-              id="confirmPassword"
-              label="Подтверждение пароля"
-            />
-          )}
+        
         </DialogContent>
-        {!isRegister && (
         <DialogActions sx={{ px: '19px' }}>
            <Button variant="contained"
             endIcon={<Send />}
@@ -240,53 +161,13 @@ const Login = () => {
             Войти
           </Button>
         </DialogActions>
-        )}
-        {isRegister && (
-           <DialogActions sx={{ px: '19px' }}>
-           <Button variant="contained"
-            endIcon={<Send />}
-            color="primary" 
-            onClick={handleRegisterClick}>
-            Зарегистрировать
-          </Button>
-        </DialogActions>
-        )}
       </form>
       <DialogActions sx={{ justifyContent: 'left', p: '5px 24px' }}>
-        {isRegister
-          ? 'Вы зарегестрированы в системе? Войти '
-          : "Впервые используете систему? Создайте аккаунт "}
-        <Button onClick={() => setIsRegister(!isRegister)}>
-          {isRegister ? 'Назад' : 'Регистрация'}
+        <Button onClick={handleClose}>
+          Назад
         </Button>
       </DialogActions>
-      {/* <DialogActions sx={{ justifyContent: 'center', py: '24px' }}>
-        <GoogleOneTapLogin />
-      </DialogActions> */}
     </Dialog>
-        {/* <Stack spacing={2} alignItems='center' mt={2}>
-          <TextField 
-            name="userLogin"
-            label="Username" 
-            onChange={handleChange} />
-          <TextField 
-            type="password"
-            name="userPassword"
-            label="Password"
-            onChange={handleChange}/>
-          <Button 
-            variant="outlined" 
-            color="primary" 
-            onClick={login}>
-              Login
-          </Button>
-        </Stack>
-        <Snackbar 
-          open={open}
-          autoHideDuration={3000}
-          onClose={() => setOpen(false)}
-          message="Login failed: Check your username and password"
-        /> */}
       </div>
     );
   }

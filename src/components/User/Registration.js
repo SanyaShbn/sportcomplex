@@ -46,67 +46,72 @@ const Registration = (props) => {
     checked: initial_check,
   });
 
-  // const handleSwitchClick = () => {
-  //   if(user.status === "disabled"){
-  //     handleClickOpen()
-  //   }
-  //   else if(user.status === "active"){
-  //     props.data.row.status = "blocked"
-  //     fetch(SERVER_URL + "/api/users" + props.data.row.userId,
-  //       { 
-  //         method: 'PUT', 
-  //         headers: {
-  //         'Content-Type':  'application/json',
-  //         // 'Authorization' : token
-  //       },
-  //       body: JSON.stringify(props.data.row)
-  //     })
-  //     .then(response => {
-  //       if (response.ok) {
-  //         dispatch({
-  //           type: 'UPDATE_ALERT',
-  //           payload: {
-  //             open: true,
-  //             severity: 'info',
-  //             message: 'Учётная запись сотрудника заблокирована',
-  //           },});
-  //         setState({ ...state, checked: false });
-  //       }
-  //       else {
-  //         alert('Что-то пошло не так!');
-  //       }
-  //     })
-  //     .catch(err => console.error(err))
-  //   }
-  //   else if(user.status === "blocked"){
-  //     props.data.row.status = "active"
-  //     fetch(SERVER_URL + "/api/users" + props.data.row.userId,
-  //       { 
-  //         method: 'PUT', 
-  //         headers: {
-  //         'Content-Type':  'application/json',
-  //         // 'Authorization' : token
-  //       },
-  //       body: JSON.stringify(props.data.row)
-  //     })
-  //     .then(response => {
-  //       if (response.ok) {
-  //         dispatch({
-  //           type: 'UPDATE_ALERT',
-  //           payload: {
-  //             open: true,
-  //             severity: 'info',
-  //             message: 'Учётная запись сотрудника разблокирована',
-  //           },});
-  //         setState({ ...state, checked: false });
-  //       }
-  //       else {
-  //         alert('Что-то пошло не так!');
-  //       }
-  //     })
-  //     .catch(err => console.error(err))
-  //   }
-  // }
+  const handleSwitchClick = () => {
+    let updated_user = props.data.row
+    if(updated_user.status === "disabled"){
+      handleClickOpen()
+    }
+    else if(updated_user.status === "active"){
+      updated_user = { ...updated_user, status: "blocked" };
+      props.data.row.status = "blocked"
+      fetch(SERVER_URL + "/api/account_managing",
+        { 
+          method: 'POST', 
+          headers: {
+          'Content-Type':  'application/json',
+          // 'Authorization' : token
+        },
+        body: JSON.stringify(updated_user)
+      })
+      .then(response => {
+        if (response.ok) {
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'info',
+              message: 'Учётная запись сотрудника заблокирована',
+            },});
+          setState({ ...state, checked: false });
+        }
+        else {
+          alert('Что-то пошло не так!');
+        }
+      })
+      .catch(err => console.error(err))
+    }
+    else if(updated_user.status === "blocked"){
+      updated_user = { ...updated_user, status: "active" };
+      props.data.row.status = "active"
+      fetch(SERVER_URL + "/api/account_managing",
+        { 
+          method: 'POST', 
+          headers: {
+          'Content-Type':  'application/json',
+          // 'Authorization' : token
+        },
+        body: JSON.stringify(updated_user)
+      })
+      .then(response => {
+        if (response.ok) {
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'info',
+              message: 'Учётная запись сотрудника разблокирована',
+            },});
+          setState({ ...state, checked: true });
+        }
+        else {
+          alert('Что-то пошло не так!');
+        }
+      })
+      .catch(err => console.error(err))
+    }
+  }
+  
+
 
   const handleClickOpen = () => {
     setUser({
@@ -212,6 +217,7 @@ const Registration = (props) => {
           setIsRegister(false)
           clearValues()
           handleClose()
+          props.data.row.status = "active"
       }
     })
     .catch(err => console.error(err))
@@ -227,7 +233,7 @@ const Registration = (props) => {
       <Switch  
         checked={state.checked}
         onChange={handleSwitch}
-        onClick={handleClickOpen}
+        onClick={handleSwitchClick}
         inputProps={{ 'aria-label': 'controlled' }}
         />
       <Dialog open={open} onClose={handleCloseAndSwitchOff}>

@@ -51,13 +51,6 @@ function App() {
      <BrowserRouter>
       <Routes>
           <Route path="dashboard/*" element={<Dashboard/>} />
-          {/* <Route path="service_employees" element={<ServiceEmployeesPage />} />
-          <Route path="complex_facilities" element={<ComplexfacilitiesPage />} />
-          <Route path="trainings" element={<TrainingPage />} />
-          <Route path="clients" element={<ClientsPage  />} />
-          <Route path="test" element={<EmployeeFacilityPage  />} />
-          <Route path="main" element={<Main />} /> */}
-
           <Route path="*" element={<Dashboard/>} />
 
           {/* <Route path="/" element={[<NavBar/>, <Login/>]} /> */}
