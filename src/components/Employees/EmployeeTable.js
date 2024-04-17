@@ -36,9 +36,9 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
     }, []);
   
     const fetchUsers = () => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/users', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => response.json())
       .then(data => setUsers(data._embedded.users))
@@ -67,12 +67,12 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
     }
     const addEmployee = (user) => {
 
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
 
       fetch(SERVER_URL + '/api/users',
         { method: 'POST', headers: {
           'Content-Type':'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
         body: JSON.stringify(user)
       })

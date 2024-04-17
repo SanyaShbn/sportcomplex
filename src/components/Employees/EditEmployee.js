@@ -11,15 +11,28 @@ import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import { MenuItem, FormControl, InputLabel } from '@mui/material';
 import Select from '@mui/material/Select';
+import { useValue } from '../../context/ContextProvider';
 
 function EditEmployee(props) {
   const [open, setOpen] = useState(false);
   const [employee, setEmployees] = useState({
     firstName: '', surName: '', patrSurName: '', email: '', 
-    phoneNumber: '', birthDate:'', post: '', role: ''
+    phoneNumber: '', birthDate:'', post: '', role: '', status: ''
   });
+  const {
+    dispatch,
+  } = useValue();
     
   const handleClickOpen = () => {
+    if(props.data.row.status !== "disabled"){
+    dispatch({
+      type: 'UPDATE_ALERT',
+      payload: {
+        open: true,
+        severity: 'warning',
+        message: 'Внимание! При изменении данных сотрудника его учётная запись будет деактивирована. В дальнейшем сотруднику необходимо будет предоставить новый пароль для доступа к системе',
+      },});
+    }
     setEmployees({
       firstName: props.data.row.firstName,
       surName: props.data.row.surName,
@@ -61,6 +74,7 @@ function EditEmployee(props) {
       default:
         employee.role = "CLEANER";
     }
+    employee.status = "disabled"
     props.updateEmployee(employee, props.data.id);
     handleClose();
   }

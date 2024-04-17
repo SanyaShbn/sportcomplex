@@ -16,6 +16,7 @@ import { useValue } from '../../context/ContextProvider';
 import { SERVER_URL } from '../../constants';
 import { useNavigate } from 'react-router-dom';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { jwtDecode } from 'jwt-decode';
 
 const Login = () => {
   const {
@@ -70,8 +71,20 @@ const Login = () => {
       dispatch({ type: 'END_LOADING' });
       const jwtToken = res.headers.get('Authorization');
       if (jwtToken !== null) {
-        sessionStorage.setItem("jwt", jwtToken);
-        setAuth(true);
+        sessionStorage.setItem("jwt", jwtToken)
+        const decodedToken = jwtDecode(jwtToken)
+        const status = decodedToken.status
+        if(status === "blocked"){
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'error',
+              message: 'Данная учётная запись заблокирована пользователем с полными правами. Обратитесь к управляющему комплексом для получения дальнейшей информации',
+            },});
+          dispatch({ type: 'OPEN_LOGIN' });
+        } 
+        else{setAuth(true)};
       }
       else {
         // setOpen(true);
