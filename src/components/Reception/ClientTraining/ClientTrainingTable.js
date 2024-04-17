@@ -14,6 +14,7 @@ import EditClientTraining from './EditClientTraining.js';
 import { grey } from '@mui/material/colors';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useValue } from '../../../context/ContextProvider.js';
 
 function CustomToolbar() {
   return (
@@ -29,6 +30,9 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
     setSelectedButtonLink(link);
   }, []);
 
+  const {
+    dispatch,
+  } = useValue();
 
     const [client_trainings, setClientTrainings] = useState([]);
     const [open, setOpen] = useState(false);
@@ -81,10 +85,34 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
       })
       .then(response => {
         if (response.ok) {
-          fetchClientTrainings();
-        }
-        else {
+          response.json().then(data => {
+            if (data.clients_amount === data.capacity) {
+              dispatch({
+                type: 'UPDATE_ALERT',
+                payload: {
+                  open: true,
+                  severity: 'info',
+                  message: 'Достигнуто максимально допустимое количество клиентов для записи на тренировку №' + data.idTraining + 
+                  ". Для записи других клиентов необходимо будет отменить занятия для одного из уже записанных клиентов",
+                },
+              });
+            }
+            fetchClientTrainings();
+          });
+        } else {
+          if(response.status === 400){
+            dispatch({
+              type: 'UPDATE_ALERT',
+              payload: {
+                open: true,
+                severity: 'error',
+                message: 'Выбранный клиент уже записан на соответствующую выбранную тренировку. Проверьте корректность ввода данных',
+              },
+            });
+          }
+          else{
           alert('Что-то пошло не так!');
+          }
         }
       })
       .catch(err => console.error(err))
@@ -105,10 +133,34 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
       })
       .then(response => {
         if (response.ok) {
-          fetchClientTrainings();
-        }
-        else {
+          response.json().then(data => {
+            if (data.clients_amount === data.capacity) {
+              dispatch({
+                type: 'UPDATE_ALERT',
+                payload: {
+                  open: true,
+                  severity: 'info',
+                  message: 'Достигнуто максимально допустимое количество клиентов для записи на тренировку №' + data.idTraining + 
+                  '. Для записи других клиентов необходимо будет отменить занятия для одного из уже записанных клиентов',
+                },
+              });
+            }
+            fetchClientTrainings();
+          });
+        } else {
+          if(response.status === 400){
+            dispatch({
+              type: 'UPDATE_ALERT',
+              payload: {
+                open: true,
+                severity: 'error',
+                message: 'Выбранный клиент уже записан на соответствующую выбранную тренировку. Проверьте корректность ввода данных',
+              },
+            });
+          }
+          else{
           alert('Что-то пошло не так!');
+          }
         }
       })
       .catch(err => console.error(err))
@@ -125,7 +177,7 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
         const response = await axios.get(url, config);
         let facility = await fetchTrainingFacilities(response.data._links.complexFacility.href)
         let id = response.data._links.self.href;
-        return "Тренировка №" + id.slice(id.lastIndexOf("/") + 1) + ". Место проведения: "
+        return "Тренировка №" + id.slice(id.lastIndexOf("/") + 1) + ". " + response.data.name + ". Место проведения: "
          + facility;
       } catch (error) {
         console.error('Error fetching trainings:', error);

@@ -64,7 +64,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
       })
       .then(response => response.json())
       .then(data => setTrainings(data._embedded.trainings))
-      .catch(err => console.error(err));    
+      .catch(err => console.error(err)); 
   }
     const onDelClick = (url) => {
       
@@ -153,9 +153,12 @@ const TrainingTable = ({ setSelectedLink, link }) => {
 
 
     const columns = [
-      {field: 'trainingDateTime', headerName: 'Дата и время проведения', width: 300},
-      {field: 'cost', headerName: 'Стоимость (бел.руб.)', width: 300},
-      {field: 'complexFacility', headerName: 'Место проведения', width: 400},
+      {field: 'name', headerName: 'Наименование', width: 180},
+      {field: 'type', headerName: 'Тип занятия', width: 150},
+      {field: 'cost', headerName: 'Стоимость (бел.руб.)', width: 200},
+      {field: 'capacity', headerName: 'Емкость', width: 190},
+      {field: 'clients_amount', headerName: 'Количество записанных клиентов', width: 300},
+      {field: 'complexFacility', headerName: 'Место проведения', width: 200},
       {
         field: '_links.training.href', 
         headerName: '', 
@@ -184,7 +187,10 @@ const TrainingTable = ({ setSelectedLink, link }) => {
       const updateRows = async () => {
         const updatedRows = await Promise.all(trainings.map(async training => ({
           id: training._links.self.href,
-          trainingDateTime: training.trainingDateTime,
+          name: training.name,
+          type: training.type,
+          capacity: training.capacity,
+          clients_amount: training.clients_amount,
           cost: training.cost,
           complexFacility: await fetchComplexFacility(training._links.complexFacility.href),
         })));

@@ -4,11 +4,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Select from '@mui/material/Select';
-import { FormControl, InputLabel, MenuItem } from '@mui/material';
+import { FormControl, RadioGroup, FormControlLabel, Radio, InputLabel, MenuItem, FormLabel } from '@mui/material';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
-import InputAdornment from '@mui/material/InputAdornment';
 import { SERVER_URL } from '../../constants.js';
 import '../CSS/employeeCSS.css';
 import '../CSS/table.css';
@@ -20,8 +19,9 @@ function AddTraining(props){
   const [facilities, setFacilities] = useState([]);
   const [open, setOpen] = useState(false);
   const [training, setTraining] = useState({
-    trainingDateTime: '', cost: ''
+    name: '', type: 'групповое', capacity: '',  cost: '', clients_amount: 0
   });
+  const [isGroup, setIsGroup] = useState(true);
 
   useEffect(() => {
     fetchFacilities();
@@ -44,11 +44,14 @@ function AddTraining(props){
   const handleClose = () => {
     setOpen(false);
     setTraining({
-        trainingDateTime: '', cost: ''
+      name: '', type: '', capacity: '',  cost: ''
     })
   };
 
   const handleSave = () => {
+    if(training.type === 'персональное'){
+      training.capacity = 1
+    }
     props.addTraining(training, complexFacilityId);
     handleClose();
   }
@@ -56,6 +59,12 @@ function AddTraining(props){
   const handleChange = (event) => {
     setTraining({...training, [event.target.name]: event.target.value});
   }
+
+  const handleChangeType = (event) => {
+    setTraining({...training, type:event.target.value})
+    setIsGroup(event.target.value === 'групповое');
+  };
+
   return (
     <div>
     <Button className="shine-button" variant="contained" onClick={handleClickOpen}>
@@ -65,17 +74,26 @@ function AddTraining(props){
       <DialogTitle className='dialog'>Новая тренировка</DialogTitle>
       <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
-        <TextField type='datetime-local' label="Время проведения" name="trainingDateTime" 
-            variant="standard" value={training.trainingDateTime} 
-            onChange={handleChange} InputProps={{
-              inputProps: {
-                inputMode: 'numeric',
-              },
-              startAdornment: (
-                <InputAdornment position="start"> </InputAdornment>
-              ),
-            }}/>
-           <TextField label="Стоимость (бел.руб.)" name="cost"
+          <TextField label="Наименование" name="name"
+            variant="standard" value={training.name} 
+            onChange={handleChange}/>
+            <FormControl>
+            <FormLabel id="demo-radio-buttons-group-label">Тип занятия</FormLabel>
+            <RadioGroup
+              aria-labelledby="demo-radio-buttons-group-label"
+              name="radio-buttons-group"
+              value={training.type}
+              onChange={handleChangeType}
+            >
+            <FormControlLabel value="групповое" control={<Radio color="primary" />} label="Групповое" />
+            <FormControlLabel value="персональное" control={<Radio color="primary" />} label="Персональное" />
+            </RadioGroup>
+            </FormControl>
+            {isGroup && (<TextField label="Емкость (количество человек)" name="capacity"
+            variant="standard" value={training.capacity} 
+            onChange={handleChange}/>
+            )}
+            <TextField label="Стоимость (бел.руб.)" name="cost"
             variant="standard" value={training.cost} 
             onChange={handleChange}/>
             <FormControl fullWidth>

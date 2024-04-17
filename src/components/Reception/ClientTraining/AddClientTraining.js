@@ -46,6 +46,8 @@ function AddClientTraining(props){
       }
 
   const handleClickOpen = () => {
+    fetchTrainings();
+    fetchClients();
     setOpen(true);
   };
     
@@ -57,7 +59,6 @@ function AddClientTraining(props){
     props.addClientTraining(trainingId, clientId);
     handleClose();
   }
-
 
   return (
     <div>
@@ -75,11 +76,16 @@ function AddClientTraining(props){
              autoFocus variant="standard"
              label="Тренировки"
              onChange={(event) => { setTrainingId(event.target.value) }}>
-             {trainings.map(training => (
-               <MenuItem key={training.idTraining}
-                value={training.idTraining}>{"Тренировка №" + training.idTraining
-                + ". Место проведения: " + training.complexFacility.facilityType}</MenuItem>
-             ))}
+            {trainings.map(training => {
+              if (training.capacity > training.clients_amount) {
+                return (
+                  <MenuItem key={training.idTraining} value={training.idTraining}>
+                    {"Тренировка №" + training.idTraining + ". " + training.name + ". Место проведения: " + training.complexFacility.facilityType}
+                  </MenuItem>
+                );
+              }
+              return null;
+            })}
             </Select>
             </FormControl>
             <FormControl fullWidth>

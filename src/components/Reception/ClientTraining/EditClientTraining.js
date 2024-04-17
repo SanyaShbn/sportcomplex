@@ -57,6 +57,8 @@ function EditClientTraining(props) {
       client: parseInt(id_client),
       training: parseInt(id_training),
      })     
+    fetchTrainings();
+    fetchClients();
     setOpen(true);
   }
 
@@ -97,11 +99,16 @@ function EditClientTraining(props) {
              label="Тренировки"
              value={client_training.training}
              onChange={handleChangeTraining}>
-             {trainings.map(training => (
-               <MenuItem key={training.idTraining}
-                value={training.idTraining}>{"Тренировка №" + training.idTraining +
-                ". Место проведения: " + training.complexFacility.facilityType}</MenuItem>
-             ))}
+             {trainings.map(training => {
+              if (training.capacity > training.clients_amount) {
+                return (
+                  <MenuItem key={training.idTraining} value={training.idTraining}>
+                    {"Тренировка №" + training.idTraining + ". " + training.name + ". Место проведения: " + training.complexFacility.facilityType}
+                  </MenuItem>
+                );
+              }
+              return null;
+            })}
             </Select>
             </FormControl>
             <FormControl fullWidth>

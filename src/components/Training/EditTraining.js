@@ -8,8 +8,7 @@ import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import Select from '@mui/material/Select';
 import { SERVER_URL } from '../../constants.js';
-import {FormControl, InputLabel, MenuItem} from '@mui/material';
-import InputAdornment from '@mui/material/InputAdornment';
+import { FormControl, RadioGroup, FormControlLabel, Radio, InputLabel, MenuItem, FormLabel } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 
@@ -19,8 +18,9 @@ function EditTraining(props) {
   const [facilities, setFacilities] = useState([]);
   const [open, setOpen] = useState(false);
   const [training, setTraining] = useState({
-    trainingDateTime: '', cost: '', complexFacility: ''
+    name: '', type: '', capacity: '',  cost: '', complexFacility: '', clients_amount: ''
   });
+  const [isGroup, setIsGroup] = useState(true);
     
   useEffect(() => {
     fetchFacilities();
@@ -40,8 +40,11 @@ function EditTraining(props) {
     let id = props.data.row.complexFacility.slice(props.data.row.complexFacility.lastIndexOf("№") + 1)
     setComplexFacilityId(parseInt(id))
     setTraining({
-      trainingDateTime: props.data.row.trainingDateTime,
+      name: props.data.row.name,
+      type: props.data.row.type,
+      capacity: props.data.row.capacity,
       cost: props.data.row.cost,
+      clients_amount: props.data.row.clients_amount,
       complexFacility: parseInt(id),
      })      
     setOpen(true);
@@ -63,9 +66,17 @@ function EditTraining(props) {
   }
  
   const handleSave = () => {
+    if(training.type === 'персональное'){
+      training.capacity = 1
+    }
     props.updateTraining(training, props.data.id, complexFacilityId);
     handleClose();
   }
+
+  const handleChangeType = (event) => {
+    setTraining({...training, type:event.target.value})
+    setIsGroup(event.target.value === 'групповое');
+  };
 
   return(
     <div>
@@ -76,17 +87,26 @@ function EditTraining(props) {
           <DialogTitle className='dialog'>Обновление информации о тренировке</DialogTitle>
           <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
-        <TextField type='datetime-local' label="Время проведения" name="trainingDateTime" 
-            variant="standard" value={training.trainingDateTime} 
-            onChange={handleChange} InputProps={{
-              inputProps: {
-                inputMode: 'numeric',
-              },
-              startAdornment: (
-                <InputAdornment position="start"> </InputAdornment>
-              ),
-            }}/>
-           <TextField label="Стоимость (бел.руб.)" name="cost"
+        <TextField label="Наименование" name="name"
+            variant="standard" value={training.name} 
+            onChange={handleChange}/>
+            <FormControl fullWidth>
+            <FormLabel id="demo-radio-buttons-group-label">Тип занятия</FormLabel>
+            <RadioGroup
+              aria-labelledby="demo-radio-buttons-group-label"
+              value={training.type}
+              name="radio-buttons-group"
+              onChange={handleChangeType}
+            >
+            <FormControlLabel value="групповое" control={<Radio />} label="Групповое" />
+            <FormControlLabel value="персональное" control={<Radio />} label="Персональное" />
+            </RadioGroup>
+            </FormControl>
+            {isGroup && (<TextField label="Емкость (количество человек)" name="capacity"
+            variant="standard" value={training.capacity} 
+            onChange={handleChange}/>
+            )}
+            <TextField label="Стоимость (бел.руб.)" name="cost"
             variant="standard" value={training.cost} 
             onChange={handleChange}/>
             <FormControl fullWidth>
