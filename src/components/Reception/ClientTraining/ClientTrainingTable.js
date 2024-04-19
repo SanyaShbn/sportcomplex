@@ -180,7 +180,7 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
         return "Тренировка №" + id.slice(id.lastIndexOf("/") + 1) + ". " + response.data.name + ". Место проведения: "
          + facility;
       } catch (error) {
-        console.error('Error fetching trainings:', error);
+        console.error(error);
         return 'N/A';
       }
     };
@@ -196,7 +196,7 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
         const response = await axios.get(url, config);
         return response.data.facilityType;
       } catch (error) {
-        console.error('Error fetching facilities:', error);
+        console.error(error);
         return 'N/A';
       }
     }

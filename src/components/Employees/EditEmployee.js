@@ -12,6 +12,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import { MenuItem, FormControl, InputLabel } from '@mui/material';
 import Select from '@mui/material/Select';
 import { useValue } from '../../context/ContextProvider';
+import {
+  usePhoneInput
+} from 'react-international-phone';
+import { PhoneNumberUtil } from 'google-libphonenumber';
 
 function EditEmployee(props) {
   const [open, setOpen] = useState(false);
@@ -22,6 +26,27 @@ function EditEmployee(props) {
   const {
     dispatch,
   } = useValue();
+
+  const {
+    inputValue,
+    phone,
+    handlePhoneValueChange,
+  } = usePhoneInput({
+    defaultCountry: 'by',
+    forceDialCode: true,
+    value: props.data.row.phoneNumber,
+  });
+
+  const phoneUtil = PhoneNumberUtil.getInstance();
+
+  const isPhoneValid = (phone) => {
+    try {
+      return phoneUtil.isValidNumber(phoneUtil.parseAndKeepRawInput(phone));
+    } catch (error) {
+      return false;
+    }
+  };
+  const isValid = isPhoneValid(phone);
     
   const handleClickOpen = () => {
     if(props.data.row.status !== "disabled"){
@@ -66,17 +91,29 @@ function EditEmployee(props) {
         employee.role = "MANAGER";
         break;
       case 'Сотрудник отдела маркетинга':
-        employee.role = "MARKETER";
+        employee.role= "MARKETER";
         break;
       case 'Сотрудник обслуживающего персонала':
-        employee.role = "CLEANER";
+        employee.role= "CLEANER";
         break;
       default:
         employee.role = "CLEANER";
     }
     employee.status = "disabled"
+    employee.phoneNumber = phone
+    if(!isValid){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Проверьте корректность ввода данных',
+        },});
+    }
+    else{
     props.updateEmployee(employee, props.data.id);
     handleClose();
+    }
   }
 
   return(
@@ -100,9 +137,13 @@ function EditEmployee(props) {
           <TextField label="Email" name="email" type="email"
             variant="standard" value={employee.email} required
             onChange={handleChange}/>
-          <TextField label="Номер телефона" name="phoneNumber" 
-            variant="standard" value={employee.phoneNumber} required
-            onChange={handleChange}/>
+          <TextField
+           error={!isValid}
+           value={inputValue}
+           onChange={handlePhoneValueChange}
+           label="Номер телефона"
+           variant="outlined"
+          />
           <TextField type='date' label="Дата рождения" name="birthDate" 
             variant="standard" value={employee.birthDate} required
             onChange={handleChange} InputProps={{

@@ -61,6 +61,7 @@ function EditFacility(props) {
               <MenuItem value={"Спортивный зал"}>Спортивный зал</MenuItem>
               <MenuItem value={"Бассейн"}>Бассейн</MenuItem>
               <MenuItem value={"Велотрек"}>Велотрек</MenuItem>
+              <MenuItem value={"Открытый стадион"}>Открытый стадион</MenuItem>
             </Select>
             </FormControl>
             <TextField type='datetime-local' label="Время уборки и обслуживания" name="cleaningServiceTime" 

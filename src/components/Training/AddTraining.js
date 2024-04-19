@@ -16,7 +16,9 @@ import '../CSS/table.css';
 function AddTraining(props){
 
   const [complexFacilityId, setComplexFacilityId] = useState([]);
+  const [coachId, setCoachId] = useState([]);
   const [facilities, setFacilities] = useState([]);
+  const [coaches, setCoaches] = useState([]);
   const [open, setOpen] = useState(false);
   const [training, setTraining] = useState({
     name: '', type: 'групповое', capacity: '',  cost: '', clients_amount: 0
@@ -24,7 +26,8 @@ function AddTraining(props){
   const [isGroup, setIsGroup] = useState(true);
 
   useEffect(() => {
-    fetchFacilities();
+    fetchFacilities()
+    fetchCoaches()
   }, []);
 
   const fetchFacilities = () => {
@@ -34,6 +37,16 @@ function AddTraining(props){
       })
       .then(response => response.json())
       .then(data => setFacilities(data))
+      .catch(err => console.error(err));    
+    }
+
+    const fetchCoaches= () => {
+      // const token = sessionStorage.getItem("jwt");
+      fetch(SERVER_URL + '/api/view_coaches', {
+        // headers: { 'Authorization' : token }
+      })
+      .then(response => response.json())
+      .then(data => setCoaches(data))
       .catch(err => console.error(err));    
     }
 
@@ -52,7 +65,7 @@ function AddTraining(props){
     if(training.type === 'персональное'){
       training.capacity = 1
     }
-    props.addTraining(training, complexFacilityId);
+    props.addTraining(training, complexFacilityId, coachId);
     handleClose();
   }
 
@@ -106,6 +119,19 @@ function AddTraining(props){
              {facilities.map(facility => (
                <MenuItem key={facility.idComplexFacility}
                 value={facility.idComplexFacility}>{facility.facilityType + " №" + facility.idComplexFacility}</MenuItem>
+             ))}
+            </Select>
+            </FormControl>
+            <FormControl fullWidth>
+            <InputLabel>Тренер</InputLabel>
+             <Select
+             name='coach'
+             autoFocus variant="standard"
+             label="Тренер"
+             onChange={(event) => { setCoachId(event.target.value) }}>
+             {coaches.map(coach => (
+               <MenuItem key={coach.userId}
+                value={coach.userId}>{"Тренер №" + coach.userId + ": " + coach.firstName + " " + coach.surName}</MenuItem>
              ))}
             </Select>
             </FormControl>

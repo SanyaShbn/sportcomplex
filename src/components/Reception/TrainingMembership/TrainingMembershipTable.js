@@ -125,9 +125,10 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
         };
         const response = await axios.get(url, config);
         let facility = await fetchTrainingFacilities(response.data._links.complexFacility.href)
+        let facilityType = facility && facility ? facility : "не установлено"
         let id = response.data._links.self.href;
         return "Тренировка №" + id.slice(id.lastIndexOf("/") + 1) + ". Место проведения: "
-        + facility;
+        + facilityType;
       } catch (error) {
         console.error('Error fetching trainings:', error);
         return 'N/A';

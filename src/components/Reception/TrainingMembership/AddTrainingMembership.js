@@ -88,11 +88,14 @@ function AddTrainingMembership(props){
              autoFocus variant="standard"
              label="Тренировки"
              onChange={(event) => { setTrainingId(event.target.value) }}>
-             {trainings.map(training => (
+              {trainings.map(training => {
+              let facility = training.complexFacility && training.complexFacility.facilityType ? training.complexFacility.facilityType : "не установлено";
+              return (
                <MenuItem key={training.idTraining}
                 value={training.idTraining}>{"Тренировка №" + training.idTraining
-                + ". Место проведения: " + training.complexFacility.facilityType}</MenuItem>
-             ))}
+                + ". Место проведения: " + facility}</MenuItem>
+              );
+            })}
             </Select>
             </FormControl>
             <FormControl fullWidth>

@@ -13,6 +13,7 @@ import EditFacility from './EditFacility.js';
 import { grey } from '@mui/material/colors';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useValue } from '../../context/ContextProvider';
 
 function CustomToolbar() {
   return (
@@ -28,6 +29,9 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
     setSelectedLink(link);
   }, []);
 
+  const {
+    dispatch,
+  } = useValue();
 
     const [facilities, setFacilities] = useState([]);
     const [open, setOpen] = useState(false);
@@ -45,7 +49,7 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
       .then(data => setFacilities(data._embedded.complexFacilities))
       .catch(err => console.error(err));    
     }
-    const onDelClick = (url) => {
+    const onDelClick = (url, trainingsAmount) => {
       if (window.confirm("ВЫ уверены, что хотите удалить запись о сооружении комплекса?")) {
 
         // const token = sessionStorage.getItem("jwt");
@@ -58,6 +62,16 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
           if (response.ok) {
             fetchFacilities();
             setOpen(true);
+            if(trainingsAmount !== 0){
+            dispatch({
+              type: 'UPDATE_ALERT',
+              payload: {
+                open: true,
+                severity: 'info',
+                message: 'Необходимо назначить новые места проведения для занятий, которые планировалось провести в сооружении,' +
+                 'запись о котором была вами удалена',
+              },});
+            }
           }
           else {
             alert('Что-то пошло не так!');
@@ -135,7 +149,7 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
         filterable: false,
         renderCell: row => 
         <IconButton onClick={() => onDelClick
-          (row.id)}>
+          (row.id, row.trainingsAmount)}>
           <DeleteIcon color="error" />
         </IconButton>
       }

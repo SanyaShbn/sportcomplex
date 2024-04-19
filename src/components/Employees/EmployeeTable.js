@@ -13,6 +13,7 @@ import EditEmployee from './EditEmployee';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Registration from "../User/Registration.js";
+import { useValue } from '../../context/ContextProvider';
 
 function CustomToolbar() {
   return (
@@ -27,6 +28,10 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
   useEffect(() => {
     setSelectedLink(link);
   }, []);
+
+  const {
+    dispatch,
+  } = useValue();
 
     const [users, setUsers] = useState([]);
     const [open, setOpen] = useState(false);
@@ -43,6 +48,35 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
       .then(response => response.json())
       .then(data => setUsers(data._embedded.users))
       .catch(err => console.error(err));    
+    }
+    const onDelCoach = (id) => {
+      if (window.confirm("ВЫ уверены, что хотите удалить запись о сотруднике?")) {
+
+        // const token = sessionStorage.getItem("jwt");
+
+        fetch(SERVER_URL + '/api/delete_coach?coach_id=' + id.slice(id.lastIndexOf('/') + 1), {
+          method: 'DELETE',
+          // headers: { 'Authorization' : token }
+          })
+        .then(response => {
+          if (response.ok) {
+            fetchUsers();
+            setOpen(true);
+            dispatch({
+              type: 'UPDATE_ALERT',
+              payload: {
+                open: true,
+                severity: 'info',
+                message: 'Необходимо назначить новых сотрудников тренерского персонала для занятий, которые планировалось' + 
+                ' проводить под руководством сотрудника, запись о котором была вами удалена  (если таковые занятия имеются)',
+              },});
+          }
+          else {
+            alert('Что-то пошло не так!');
+          }
+        })
+        .catch(err => console.error(err))
+      }
     }
     const onDelClick = (url) => {
       if (window.confirm("ВЫ уверены, что хотите удалить запись о сотруднике?")) {
@@ -137,8 +171,12 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
         sortable: false,
         filterable: false,
         renderCell: row => 
-        <IconButton onClick={() => onDelClick
+        row.row.role !== "COACH" ? 
+         <IconButton onClick={() => onDelClick
           (row.id)}>
+          <DeleteIcon color="error" />
+        </IconButton> :  
+        <IconButton onClick={() => onDelCoach(row.id)}>
           <DeleteIcon color="error" />
         </IconButton>
       },

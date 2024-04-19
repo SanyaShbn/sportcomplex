@@ -15,15 +15,18 @@ import EditIcon from '@mui/icons-material/Edit';
 function EditTraining(props) {
 
   const [complexFacilityId, setComplexFacilityId] = useState([]);
+  const [coachId, setCoachId] = useState([]);
   const [facilities, setFacilities] = useState([]);
+  const [coaches, setCoaches] = useState([]);
   const [open, setOpen] = useState(false);
   const [training, setTraining] = useState({
-    name: '', type: '', capacity: '',  cost: '', complexFacility: '', clients_amount: ''
+    name: '', type: '', capacity: '',  cost: '', complexFacility: '', clients_amount: '', coach: ''
   });
   const [isGroup, setIsGroup] = useState(true);
     
   useEffect(() => {
-    fetchFacilities();
+    fetchFacilities()
+    fetchCoaches()
   }, []);
 
   const fetchFacilities = () => {
@@ -36,16 +39,29 @@ function EditTraining(props) {
       .catch(err => console.error(err));    
     }
 
+    const fetchCoaches= () => {
+      // const token = sessionStorage.getItem("jwt");
+      fetch(SERVER_URL + '/api/view_coaches', {
+        // headers: { 'Authorization' : token }
+      })
+      .then(response => response.json())
+      .then(data => setCoaches(data))
+      .catch(err => console.error(err));    
+    }
+
   const handleClickOpen = () => {
-    let id = props.data.row.complexFacility.slice(props.data.row.complexFacility.lastIndexOf("№") + 1)
-    setComplexFacilityId(parseInt(id))
+    let facilityId = props.data.row.complexFacility.slice(props.data.row.complexFacility.lastIndexOf("№") + 1)
+    let idCoach = props.data.row.coach.slice(props.data.row.coach.indexOf("№") + 1, props.data.row.coach.indexOf(":"))
+    setComplexFacilityId(parseInt(facilityId))
+    setCoachId(parseInt(idCoach))
     setTraining({
       name: props.data.row.name,
       type: props.data.row.type,
       capacity: props.data.row.capacity,
       cost: props.data.row.cost,
       clients_amount: props.data.row.clients_amount,
-      complexFacility: parseInt(id),
+      complexFacility: parseInt(facilityId),
+      coach: parseInt(idCoach),
      })      
     setOpen(true);
   }
@@ -65,11 +81,16 @@ function EditTraining(props) {
       [event.target.name]: event.target.value});
   }
  
+  const handleChangeCoach= (event) => {
+    setCoachId(event.target.value)
+    setTraining({...training, 
+      [event.target.name]: event.target.value});
+  }
   const handleSave = () => {
     if(training.type === 'персональное'){
       training.capacity = 1
     }
-    props.updateTraining(training, props.data.id, complexFacilityId);
+    props.updateTraining(training, props.data.id, complexFacilityId, coachId);
     handleClose();
   }
 
@@ -120,6 +141,20 @@ function EditTraining(props) {
              {facilities.map(facility => (
                <MenuItem key={facility.idComplexFacility}
                 value={facility.idComplexFacility}>{facility.facilityType + " №" + facility.idComplexFacility}</MenuItem>
+             ))}
+            </Select>
+            </FormControl>
+            <FormControl>
+            <InputLabel>Тренер</InputLabel>
+             <Select
+             name='coach'
+             autoFocus variant="standard"
+             label="Тренер"
+             value={training.coach}
+             onChange={handleChangeCoach}>
+             {coaches.map(coach => (
+               <MenuItem key={coach.userId}
+                value={coach.userId}>{"Тренер №" + coach.userId + ": " + coach.firstName + " " + coach.surName}</MenuItem>
              ))}
             </Select>
             </FormControl>

@@ -92,9 +92,9 @@ const TrainingTable = ({ setSelectedLink, link }) => {
 
       // }
     }
-    const addTraining = (training, complexFacilityId) => {
+    const addTraining = (training, complexFacilityId, userId) => {
 
-      fetch(SERVER_URL + '/api/save_trainings?complexFacilityId='+ complexFacilityId,
+      fetch(SERVER_URL + '/api/save_trainings?complexFacilityId='+ complexFacilityId + "&userId=" + userId,
         { method: 'POST', headers: {
           'Content-Type':'application/json',
           // 'Authorization' : token
@@ -113,9 +113,9 @@ const TrainingTable = ({ setSelectedLink, link }) => {
     }
   
 
-    const updateTraining = (training, link, complexFacilityId) => {
+    const updateTraining = (training, link, complexFacilityId, userId) => {
 
-      fetch(link + '?complexFacilityId='+ complexFacilityId,
+      fetch(link + '?complexFacilityId='+ complexFacilityId + "&userId=" + userId,
         { 
           method: 'PUT', 
           headers: {
@@ -146,8 +146,24 @@ const TrainingTable = ({ setSelectedLink, link }) => {
         let id = response.data._links.self.href;
         return response.data.facilityType + " №" + id.slice(id.lastIndexOf("/") + 1);
       } catch (error) {
-        console.error('Error fetching complex facility:', error);
-        return 'N/A';
+        console.error(error);
+        return 'не установлено';
+      }
+    };
+
+    const fetchCoach = async (url) => {
+      try {
+        const config = {
+          headers: {
+            // 'Authorization' : token
+          }
+        };
+        const response = await axios.get(url, config);
+        let id = response.data._links.self.href;
+        return "Тренер №" + id.slice(id.lastIndexOf("/") + 1) + ": " + response.data.surName + " " + response.data.firstName;
+      } catch (error) {
+        console.error(error);
+        return 'не назначен';
       }
     };
 
@@ -155,16 +171,17 @@ const TrainingTable = ({ setSelectedLink, link }) => {
     const columns = [
       {field: 'name', headerName: 'Наименование', width: 180},
       {field: 'type', headerName: 'Тип занятия', width: 150},
-      {field: 'cost', headerName: 'Стоимость (бел.руб.)', width: 200},
-      {field: 'capacity', headerName: 'Емкость', width: 190},
-      {field: 'clients_amount', headerName: 'Количество записанных клиентов', width: 300},
+      {field: 'cost', headerName: 'Стоимость (бел.руб.)', width: 180},
+      {field: 'capacity', headerName: 'Емкость', width: 150},
+      {field: 'clients_amount', headerName: 'Кол-во клиентов', width: 180},
       {field: 'complexFacility', headerName: 'Место проведения', width: 200},
+      {field: 'coach', headerName: 'Тренер', width: 290},
       {
         field: '_links.training.href', 
         headerName: '', 
         sortable: false,
         filterable: false,
-        width: 100,
+        width: 50,
         renderCell: row => <EditTraining
                               data={row} 
                               updateTraining={updateTraining} />
@@ -172,7 +189,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
       {
         field: '_links.self.href', 
         headerName: '', 
-        width:120,
+        width:60,
         sortable: false,
         filterable: false,
         renderCell: row => 
@@ -193,6 +210,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
           clients_amount: training.clients_amount,
           cost: training.cost,
           complexFacility: await fetchComplexFacility(training._links.complexFacility.href),
+          coach: await fetchCoach(training._links.coach.href),
         })));
         setRows(updatedRows);
       };

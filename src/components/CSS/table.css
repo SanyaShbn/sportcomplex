@@ -11,6 +11,10 @@
   text-shadow: none;
 }
 
+.my-phone-input .flag-dropdown {
+  display: none;
+}
+
 /* .grid_component{
   background-color: white;
 } */

@@ -136,7 +136,6 @@ export default class ScheduleCalendar extends Component {
                         var event = scheduler.getEvent(id)
                         scheduler.formSection("Событие").setValue(event.text)
                         scheduler.formSection("Описание").setValue(event.text)
-                        scheduler.renderCalendar()
                     })
                     .catch(err => console.error(err));
                 });

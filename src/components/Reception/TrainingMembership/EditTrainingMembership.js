@@ -116,11 +116,14 @@ function EditTrainingMembership(props) {
              label="Тренировки"
              value={training_membership.training}
              onChange={handleChangeTraining}>
-             {trainings.map(training => (
+             {trainings.map(training => {
+              let facility = training.complexFacility && training.complexFacility.facilityType ? training.complexFacility.facilityType : "не установлено";
+              return (
                <MenuItem key={training.idTraining}
                 value={training.idTraining}>{"Тренировка №" + training.idTraining
-                + ". Место проведения: " + training.complexFacility.facilityType}</MenuItem>
-             ))}
+                + ". Место проведения: " + facility}</MenuItem>
+              );
+            })}
             </Select>
             </FormControl>
             <FormControl fullWidth>

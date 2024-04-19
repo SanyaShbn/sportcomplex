@@ -3,7 +3,6 @@ import './Scheduler.css';
 import './Toolbar.css';
 import './MessageArea.css';
 import Toolbar from "./Toolbar.js"
-import MessageArea from "./MessageArea.js"
 import ScheduleCalendar from "./ScheduleCalendar.js"
 // import { SERVER_URL } from '../../constants.js';
 
@@ -29,17 +28,6 @@ const Scheduler = ({ setSelectedLink, link }) => {
 	// }
     
 	const [currentTimeFormatState, setTimeFormat] = useState(true);
-	const [messages, setMessages] = useState([]);
-
-	function addMessage(message) {
-		setMessages((arr) => [...arr, message]);
-	}
-
-	function logDataUpdate(action, ev, id) {
-		const text = ev && ev.text ? ` (${ev.text})` : "";
-		const message = `event ${action}: ${id} ${text}`;
-		addMessage(message);
-	}
 
 	return (
 		<div>
@@ -52,11 +40,7 @@ const Scheduler = ({ setSelectedLink, link }) => {
 			<div className="scheduler-container">
 				<ScheduleCalendar
 					timeFormatState={currentTimeFormatState}
-					onDataUpdated={logDataUpdate}
 				/>
-			</div>
-			<div className="message-area">
-			<MessageArea messages={messages} />
 			</div>
 		</div>
 	);
