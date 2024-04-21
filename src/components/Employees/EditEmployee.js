@@ -65,7 +65,8 @@ function EditEmployee(props) {
       email: props.data.row.email,
       phoneNumber: props.data.row.phoneNumber,
       birthDate: props.data.row.birthDate,
-      post: props.data.row.post
+      post: props.data.row.post,
+      status: props.data.row.status
      })      
     setOpen(true);
   }

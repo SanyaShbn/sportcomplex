@@ -4,7 +4,7 @@ import { SERVER_URL, StyledDataGrid } from '../../constants.js';
 import {ruRU, gridClasses} from '@mui/x-data-grid';
 import {GridToolbarContainer} from '@mui/x-data-grid';
 import {GridToolbarExport} from '@mui/x-data-grid';
-import {Snackbar, Box, Typography} from '@mui/material';
+import {Snackbar, Box, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button} from '@mui/material';
 import '../CSS/employeeCSS.css';
 import '../CSS/table.css';
 import AddSportComplexMembership from './AddSportComplexMembership.js';
@@ -30,6 +30,7 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
 
     const [memberships, setMemberships] = useState([]);
     const [open, setOpen] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(false);
   
     useEffect(() => {
       fetchMemberships();
@@ -44,8 +45,12 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
       .then(data => setMemberships(data._embedded.sportComplexMemberships))
       .catch(err => console.error(err));    
     }
-    const onDelClick = (url) => {
-      if (window.confirm("ВЫ уверены, что хотите удалить запись об абонементе?")) {
+
+    const onDelClick = () => {
+      setDialogOpen(true);
+    }
+
+    const handleConfirmDelete = (url) => {
 
         // const token = sessionStorage.getItem("jwt");
 
@@ -61,10 +66,11 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
           else {
             alert('Что-то пошло не так!');
           }
+          setDialogOpen(false)
         })
         .catch(err => console.error(err))
-      }
-    }
+}
+
     const addMembership = (membership) => {
 
       // const token = sessionStorage.getItem("jwt");
@@ -134,10 +140,32 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
         sortable: false,
         filterable: false,
         renderCell: row => 
-        <IconButton onClick={() => onDelClick
-          (row.id)}>
+        <div>
+        <IconButton onClick={() => onDelClick()}>
           <DeleteIcon color="error" />
         </IconButton>
+        <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"ВЫ уверены, что хотите удалить запись об абонементе?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Запись об абонементе будет безвозвратно удалена
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)} color="primary">
+            Отменить
+          </Button>
+          <Button onClick={() => handleConfirmDelete(row.id)} color="primary" autoFocus>
+            Удалить
+          </Button>
+        </DialogActions>
+      </Dialog>
+      </div>
       }
     ];
     

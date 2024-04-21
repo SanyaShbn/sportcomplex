@@ -5,7 +5,7 @@ import {ruRU} from '@mui/x-data-grid';
 import {GridToolbarContainer} from '@mui/x-data-grid';
 import {GridToolbarExport} from '@mui/x-data-grid';
 import {gridClasses } from '@mui/x-data-grid';
-import {Snackbar, Box, Typography} from '@mui/material';
+import {Snackbar, Box, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button} from '@mui/material';
 import '../CSS/employeeCSS.css';
 import '../CSS/table.css';
 import EditClient from './EditClient';
@@ -29,6 +29,7 @@ const ClientTable = ({ setSelectedLink, link }) => {
 
     const [clients, setClients] = useState([]);
     const [open, setOpen] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(false);
     
 
     useEffect(() => {
@@ -44,27 +45,30 @@ const ClientTable = ({ setSelectedLink, link }) => {
       .then(data => setClients(data._embedded.clients))
       .catch(err => console.error(err));    
     }
-    const onDelClick = (url) => {
-      if (window.confirm("ВЫ уверены, что хотите удалить запись о клиенте?")) {
-
-        // const token = sessionStorage.getItem("jwt");
-
-        fetch(url, {
-          method: 'DELETE',
-          // headers: { 'Authorization' : token }
-          })
-        .then(response => {
-          if (response.ok) {
-            fetchClients();
-            setOpen(true);
-          }
-          else {
-            alert('Что-то пошло не так!');
-          }
-        })
-        .catch(err => console.error(err))
-      }
+    const onDelClick = () => {
+      setDialogOpen(true);
     }
+    
+    const handleConfirmDelete = (url) => {
+      // const token = sessionStorage.getItem("jwt");
+    
+      fetch(url, {
+        method: 'DELETE',
+        // headers: { 'Authorization' : token }
+      })
+      .then(response => {
+        if (response.ok) {
+          fetchClients();
+          setOpen(true);
+        }
+        else {
+          alert('Что-то пошло не так!');
+        }
+        setDialogOpen(false)
+      })
+      .catch(err => console.error(err))
+      setDialogOpen(false);
+    };
 
     const updateClient = (client, link) => {
 
@@ -113,10 +117,32 @@ const ClientTable = ({ setSelectedLink, link }) => {
         sortable: false,
         filterable: false,
         renderCell: row => 
-        <IconButton onClick={() => onDelClick
-          (row.id)}>
+        <div>
+        <IconButton onClick={() => onDelClick()}>
           <DeleteIcon color="error" />
         </IconButton>
+        <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"ВЫ уверены, что хотите удалить запись о клиенте?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Запись о клиенте будет безвозвратно удалена
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)} color="primary">
+            Отменить
+          </Button>
+          <Button onClick={() => handleConfirmDelete(row.id)} color="primary" autoFocus>
+            Удалить
+          </Button>
+        </DialogActions>
+      </Dialog>
+      </div>
       },
     ];
     

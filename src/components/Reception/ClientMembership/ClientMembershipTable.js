@@ -6,7 +6,7 @@ import {ruRU} from '@mui/x-data-grid';
 import {GridToolbarContainer} from '@mui/x-data-grid';
 import {GridToolbarExport} from '@mui/x-data-grid';
 import {gridClasses } from '@mui/x-data-grid';
-import {Snackbar, Box, Typography} from '@mui/material';
+import {Snackbar, Box, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button} from '@mui/material';
 import '../../CSS/employeeCSS.css';
 import '../../CSS/table.css';
 import AddClientMembership from './AddClientMembership.js';
@@ -33,6 +33,7 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
     const [client_memberships, setClientMemberships] = useState([]);
     const [open, setOpen] = useState(false);
     const [rows, setRows] = useState([]);
+    const [dialogOpen, setDialogOpen] = useState(false);
   
     useEffect(() => {
       fetchClientMemberships();
@@ -47,8 +48,12 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
       .then(data => setClientMemberships(data._embedded.clientMemberships))
       .catch(err => console.error(err));    
     }
-    const onDelClick = (id) => {
-      if (window.confirm("ВЫ уверены, что хотите удалить запись о продаже абонемента?")) {
+
+    const onDelClick = () => {
+      setDialogOpen(true);
+    }
+
+    const handleConfirmDelete = (id) => {
 
         // const token = sessionStorage.getItem("jwt");
 
@@ -64,11 +69,11 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
           else {
             alert('Что-то пошло не так!');
           }
+          setDialogOpen(false)
         })
         .catch(err => console.error(err))
+   }
 
-      }
-    }
     const addClientMembership = (membershipId, clientId) => {
 
       // const token = sessionStorage.getItem("jwt");
@@ -126,7 +131,6 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
           let id = response.data._links.self.href
           return "Абонемент №" + id.slice(id.lastIndexOf("/") + 1) + ": " + response.data.name;
         } catch (error) {
-          console.error('Error fetching memberships:', error);
           return 'N/A';
         }
     };
@@ -144,7 +148,6 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
           return "Клиент №" + id.slice(id.lastIndexOf("/") + 1) + ": " + response.data.surName + " " + response.data.firstName + " " + response.data.patrSurName + 
           " (" + response.data.phoneNumber + ")";
         } catch (error) {
-          console.error('Error fetching clients:', error);
           return 'N/A';
         }
       };
@@ -170,10 +173,32 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
         sortable: false,
         filterable: false,
         renderCell: row => 
-        <IconButton onClick={() => onDelClick
-          (row.id)}>
+        <div>
+        <IconButton onClick={() => onDelClick()}>
           <DeleteIcon color="error" />
         </IconButton>
+        <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"ВЫ уверены, что хотите удалить запись о продаже абонемента?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Запись о продаже абонемента будет безвозвратно удалена
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)} color="primary">
+            Отменить
+          </Button>
+          <Button onClick={() => handleConfirmDelete(row.id)} color="primary" autoFocus>
+            Удалить
+          </Button>
+        </DialogActions>
+      </Dialog>
+      </div>
       }
     ];
     

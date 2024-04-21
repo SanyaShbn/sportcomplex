@@ -6,7 +6,7 @@ import {ruRU} from '@mui/x-data-grid';
 import {GridToolbarContainer} from '@mui/x-data-grid';
 import {GridToolbarExport} from '@mui/x-data-grid';
 import {gridClasses } from '@mui/x-data-grid';
-import {Snackbar, Box, Typography} from '@mui/material';
+import {Snackbar, Box, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button} from '@mui/material';
 import '../../CSS/employeeCSS.css';
 import '../../CSS/table.css';
 import AddClientTraining from './AddClientTraining.js';
@@ -37,6 +37,7 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
     const [client_trainings, setClientTrainings] = useState([]);
     const [open, setOpen] = useState(false);
     const [rows, setRows] = useState([]);
+    const [dialogOpen, setDialogOpen] = useState(false);
   
     useEffect(() => {
       fetchClientTrainings();
@@ -51,8 +52,12 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
       .then(data => setClientTrainings(data._embedded.clientTrainings))
       .catch(err => console.error(err));    
     }
-    const onDelClick = (id) => {
-      if (window.confirm("ВЫ уверены, что хотите удалить запись о согласованном занятии?")) {
+
+    const onDelClick = () => {
+      setDialogOpen(true);
+    }
+
+    const handleConfirmDelete = (id) => {
 
         // const token = sessionStorage.getItem("jwt");
 
@@ -68,11 +73,12 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
           else {
             alert('Что-то пошло не так!');
           }
+          setDialogOpen(false)
         })
         .catch(err => console.error(err))
 
-      }
-    }
+}
+
     const addClientTraining = (trainingId, clientId) => {
 
       // const token = sessionStorage.getItem("jwt");
@@ -180,7 +186,6 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
         return "Тренировка №" + id.slice(id.lastIndexOf("/") + 1) + ". " + response.data.name + ". Место проведения: "
          + facility;
       } catch (error) {
-        console.error(error);
         return 'N/A';
       }
     };
@@ -196,7 +201,6 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
         const response = await axios.get(url, config);
         return response.data.facilityType;
       } catch (error) {
-        console.error(error);
         return 'N/A';
       }
     }
@@ -214,7 +218,6 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
           return "Клиент №" + id.slice(id.lastIndexOf("/") + 1) + ": " + response.data.surName + " " + response.data.firstName + " " + response.data.patrSurName + 
           " (" + response.data.phoneNumber + ")";
         } catch (error) {
-          console.error('Error fetching clients:', error);
           return 'N/A';
         }
       };
@@ -241,10 +244,32 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
         sortable: false,
         filterable: false,
         renderCell: row => 
-        <IconButton onClick={() => onDelClick
-          (row.id)}>
+        <div>
+        <IconButton onClick={() => onDelClick()}>
           <DeleteIcon color="error" />
         </IconButton>
+        <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"ВЫ уверены, что хотите удалить запись о согласованном занятии?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Запись о согласованном занятии будет безвозвратно удалена
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)} color="primary">
+            Отменить
+          </Button>
+          <Button onClick={() => handleConfirmDelete(row.id)} color="primary" autoFocus>
+            Удалить
+          </Button>
+        </DialogActions>
+      </Dialog>
+      </div>
       }
     ];
     

@@ -4,7 +4,7 @@ import { SERVER_URL, StyledDataGrid } from '../../constants.js';
 import {ruRU, gridClasses} from '@mui/x-data-grid';
 import {GridToolbarContainer} from '@mui/x-data-grid';
 import {GridToolbarExport} from '@mui/x-data-grid';
-import {Snackbar, Box, Typography} from '@mui/material';
+import {Snackbar, Box, Typography,  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button} from '@mui/material';
 import '../CSS/employeeCSS.css';
 import '../CSS/table.css';
 import AddEmployee from './AddEmployee';
@@ -35,6 +35,7 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
 
     const [users, setUsers] = useState([]);
     const [open, setOpen] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(false);
   
     useEffect(() => {
       fetchUsers();
@@ -49,9 +50,34 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
       .then(data => setUsers(data._embedded.users))
       .catch(err => console.error(err));    
     }
-    const onDelCoach = (id) => {
-      if (window.confirm("ВЫ уверены, что хотите удалить запись о сотруднике?")) {
 
+    const onDelClick = () => {
+      setDialogOpen(true);
+    }
+
+    const handleConfirmDelete  = (url) => {
+
+        // const token = sessionStorage.getItem("jwt");
+
+        fetch(url, {
+          method: 'DELETE',
+          // headers: { 'Authorization' : token }
+          })
+        .then(response => {
+          if (response.ok) {
+            fetchUsers();
+            setOpen(true);
+            setDialogOpen(false)
+          }
+          else {
+            alert('Что-то пошло не так!');
+          }
+        })
+        .catch(err => console.error(err))
+}
+
+
+    const handleConfirmDeleteCoach = (id) => {
         // const token = sessionStorage.getItem("jwt");
 
         fetch(SERVER_URL + '/api/delete_coach?coach_id=' + id.slice(id.lastIndexOf('/') + 1), {
@@ -76,29 +102,8 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
           }
         })
         .catch(err => console.error(err))
-      }
-    }
-    const onDelClick = (url) => {
-      if (window.confirm("ВЫ уверены, что хотите удалить запись о сотруднике?")) {
+  }
 
-        // const token = sessionStorage.getItem("jwt");
-
-        fetch(url, {
-          method: 'DELETE',
-          // headers: { 'Authorization' : token }
-          })
-        .then(response => {
-          if (response.ok) {
-            fetchUsers();
-            setOpen(true);
-          }
-          else {
-            alert('Что-то пошло не так!');
-          }
-        })
-        .catch(err => console.error(err))
-      }
-    }
     const addEmployee = (user) => {
 
       // const token = sessionStorage.getItem("jwt");
@@ -172,13 +177,58 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
         filterable: false,
         renderCell: row => 
         row.row.role !== "COACH" ? 
-         <IconButton onClick={() => onDelClick
-          (row.id)}>
-          <DeleteIcon color="error" />
-        </IconButton> :  
-        <IconButton onClick={() => onDelCoach(row.id)}>
+        <div>
+        <IconButton onClick={() => onDelClick()}>
           <DeleteIcon color="error" />
         </IconButton>
+        <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"ВЫ уверены, что хотите удалить запись о сотруднике?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Запись о сотруднике будет безвозвратно удалена
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)} color="primary">
+            Отменить
+          </Button>
+          <Button onClick={() => handleConfirmDelete(row.id)} color="primary" autoFocus>
+            Удалить
+          </Button>
+        </DialogActions>
+      </Dialog>
+      </div> :  
+        <div>
+        <IconButton onClick={() => onDelClick()}>
+          <DeleteIcon color="error" />
+        </IconButton>
+        <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"ВЫ уверены, что хотите удалить запись о сотруднике?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Запись о сотруднике будет безвозвратно удалена
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)} color="primary">
+            Отменить
+          </Button>
+          <Button onClick={() => handleConfirmDeleteCoach(row.id)} color="primary" autoFocus>
+            Удалить
+          </Button>
+        </DialogActions>
+      </Dialog>
+      </div>
       },
       {
         field: 'account', 

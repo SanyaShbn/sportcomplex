@@ -5,7 +5,7 @@ import {ruRU} from '@mui/x-data-grid';
 import {GridToolbarContainer} from '@mui/x-data-grid';
 import {GridToolbarExport} from '@mui/x-data-grid';
 import {gridClasses } from '@mui/x-data-grid';
-import {Snackbar, Box, Typography} from '@mui/material';
+import {Snackbar, Box, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button} from '@mui/material';
 import '../CSS/employeeCSS.css';
 import '../CSS/table.css';
 import AddFacility from './AddFacility.js';
@@ -35,6 +35,7 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
 
     const [facilities, setFacilities] = useState([]);
     const [open, setOpen] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(false);
   
     useEffect(() => {
       fetchFacilities();
@@ -49,37 +50,41 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
       .then(data => setFacilities(data._embedded.complexFacilities))
       .catch(err => console.error(err));    
     }
-    const onDelClick = (url, trainingsAmount) => {
-      if (window.confirm("ВЫ уверены, что хотите удалить запись о сооружении комплекса?")) {
-
-        // const token = sessionStorage.getItem("jwt");
-
-        fetch(url, {
-          method: 'DELETE',
-          // headers: { 'Authorization' : token }
-          })
-        .then(response => {
-          if (response.ok) {
-            fetchFacilities();
-            setOpen(true);
-            if(trainingsAmount !== 0){
-            dispatch({
-              type: 'UPDATE_ALERT',
-              payload: {
-                open: true,
-                severity: 'info',
-                message: 'Необходимо назначить новые места проведения для занятий, которые планировалось провести в сооружении,' +
-                 'запись о котором была вами удалена',
-              },});
-            }
-          }
-          else {
-            alert('Что-то пошло не так!');
-          }
-        })
-        .catch(err => console.error(err))
-      }
+    const onDelClick = () => {
+      setDialogOpen(true);
     }
+    
+    const handleConfirmDelete = (url, trainingsAmount) => {
+      // const token = sessionStorage.getItem("jwt");
+    
+      fetch(url, {
+        method: 'DELETE',
+        // headers: { 'Authorization' : token }
+      })
+      .then(response => {
+        if (response.ok) {
+          if(trainingsAmount !== 0){
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'info',
+              message: 'Необходимо назначить новые места проведения для занятий, которые планировалось провести в сооружении,' +
+               'запись о котором была вами удалена',
+            },});
+          }
+          fetchFacilities();
+          setOpen(true);
+        }
+        else {
+          alert('Что-то пошло не так!');
+        }
+        setDialogOpen(false)
+      })
+      .catch(err => console.error(err))
+      setDialogOpen(false);
+    };
+     
     const addFacility = (facility) => {
 
       // const token = sessionStorage.getItem("jwt");
@@ -148,10 +153,32 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
         sortable: false,
         filterable: false,
         renderCell: row => 
-        <IconButton onClick={() => onDelClick
-          (row.id, row.trainingsAmount)}>
+        <div>
+        <IconButton onClick={() => onDelClick()}>
           <DeleteIcon color="error" />
         </IconButton>
+        <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"ВЫ уверены, что хотите удалить запись о сооружении комплекса?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Запись о сооружении будет безвозвратно удалена
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)} color="primary">
+            Отменить
+          </Button>
+          <Button onClick={() => handleConfirmDelete(row.id, row.row.trainingsAmount)} color="primary" autoFocus>
+            Удалить
+          </Button>
+        </DialogActions>
+      </Dialog>
+      </div>
       }
     ];
     

@@ -61,6 +61,7 @@ const Login = () => {
   }
   
   const login = () => {
+    console.log(user)
     dispatch({ type: 'START_LOADING' });
     fetch(SERVER_URL + '/login', {
       method: 'POST',
