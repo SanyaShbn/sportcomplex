@@ -20,7 +20,7 @@ function EditTraining(props) {
   const [coaches, setCoaches] = useState([]);
   const [open, setOpen] = useState(false);
   const [training, setTraining] = useState({
-    name: '', type: '', capacity: '',  cost: '', complexFacility: '', clients_amount: '', coach: ''
+    name: '', type: '', capacity: '',  cost: '', clients_amount: '', complexFacility: '', coach: ''
   });
   const [isGroup, setIsGroup] = useState(true);
     
@@ -81,7 +81,7 @@ function EditTraining(props) {
       [event.target.name]: event.target.value});
   }
  
-  const handleChangeCoach= (event) => {
+  const handleChangeCoach = (event) => {
     setCoachId(event.target.value)
     setTraining({...training, 
       [event.target.name]: event.target.value});

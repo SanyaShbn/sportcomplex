@@ -5,6 +5,9 @@ import { FaTruckLoading, FaCalendarAlt } from "react-icons/fa"
 import { CiDiscount1 } from "react-icons/ci"
 import { GrDomain } from "react-icons/gr";
 import Scheduler from "../Scheduler/Scheduler"
+import { useTheme } from '@mui/material/styles';
+import { SERVER_URL } from '../../constants.js';
+// import Badge from '@mui/material/Badge';
 import {
     Avatar,
     Box,
@@ -24,7 +27,7 @@ ChevronLeft,
 Logout,
 } from '@mui/icons-material';
 import MuiDrawer from '@mui/material/Drawer';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import Home from './Home';
 import EmployeeTable from '../Employees/EmployeeTable'
@@ -35,9 +38,41 @@ import SportComplexMembershipTable from "../SportComplexMembership/SportComplexM
 import ReceptionButtonsList from "./ReceptionButtonsList"
 import SetTheme from "../Scheduler/SetTheme"
 import Registration from "../User/Registration"
-// import { jwtDecode } from 'jwt-decode';
+import UpdateProfile from "../User/UpdateProfile.js"
+import { blue } from '@mui/material/colors';
+import { jwtDecode } from 'jwt-decode';
   
   const drawerWidth = 250;
+
+
+  // const StyledBadge = styled(Badge)(({ theme }) => ({
+  //   '& .MuiBadge-badge': {
+  //     backgroundColor: '#44b700',
+  //     color: '#44b700',
+  //     boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+  //     '&::after': {
+  //       position: 'absolute',
+  //       top: 0,
+  //       left: 0,
+  //       width: '100%',
+  //       height: '100%',
+  //       borderRadius: '50%',
+  //       animation: 'ripple 1.2s infinite ease-in-out',
+  //       border: '1px solid currentColor',
+  //       content: '""',
+  //     },
+  //   },
+  //   '@keyframes ripple': {
+  //     '0%': {
+  //       transform: 'scale(.8)',
+  //       opacity: 1,
+  //     },
+  //     '100%': {
+  //       transform: 'scale(2.4)',
+  //       opacity: 0,
+  //     },
+  //   },
+  // }));
   
   const openedMixin = (theme) => ({
     width: drawerWidth,
@@ -94,11 +129,23 @@ import Registration from "../User/Registration"
     }
   
     const [selectedLink, setSelectedLink] = useState('');
-    // const token = sessionStorage.getItem("jwt");
-      
-    // const decodedToken = jwtDecode(token);
+    const token = sessionStorage.getItem("jwt");
+    const decodedToken = jwtDecode(token);
+    const [user, setUser] = useState([]);
+    const [profileIcon, setProfileIcon] = useState([]);
 
-    // const roles = decodedToken.roles
+    useEffect(() => {
+      fetchUser();
+    }, []);
+  
+    const fetchUser = () => {
+      fetch(SERVER_URL + '/api/user_profile?userLogin=' + decodedToken.sub, {
+        headers: { 'Authorization' : token }
+      })
+      .then(response => response.json())
+      .then(data => {setUser(data); setProfileIcon(data.firstName[0] + data.surName[0])})
+      .catch(err => console.error(err));    
+    }
 
     const list = useMemo(
       () => {
@@ -196,6 +243,8 @@ import Registration from "../User/Registration"
 // }, [roles]); - для авторизации
 
     const navigate = useNavigate();
+    const theme = useTheme();
+    let color = theme.palette.mode;
     return (
       <>
         <Drawer variant="permanent" open={open}>
@@ -237,10 +286,25 @@ import Registration from "../User/Registration"
           <Divider />
           <Box sx={{ mx: 'auto', mt: 3, mb: 1 }}>
             <Tooltip title={''}>
+              {/* <StyledBadge
+                overlap="circular"
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                variant="dot"
+              > */}
               <Avatar
-                {...(open && { sx: { width: 100, height: 100 } })}
-              />
+                sx={{ bgcolor: color!=='dark' ? blue[500] : "null" }}
+                {...(open && { sx: { width: 60, height: 60, bgcolor: color!=='dark' ? blue[500] : "null" }})}
+              >{profileIcon}</Avatar>
+              {/* </StyledBadge> */}
             </Tooltip>
+          </Box>
+          <Box sx={{ textAlign: 'center' }}>
+            {open && <Typography>{}</Typography>}
+            <Typography variant="body2">{}</Typography>
+            {open && (
+              <Typography variant="body2">{}</Typography>
+            )}
+              <UpdateProfile data={user}/>
           </Box>
           <Box sx={{ textAlign: 'center' }}>
             {open && <Typography>{}</Typography>}
