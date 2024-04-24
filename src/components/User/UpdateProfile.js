@@ -11,15 +11,19 @@ import {
   Stack,
   Tooltip,
   RadioGroup, 
-  FormControl, FormControlLabel, Radio, InputLabel, MenuItem, FormLabel
+  FormControl, FormControlLabel, Radio
 } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useValue } from '../../context/ContextProvider';
 import PasswordField from './PasswordField';
 import { SERVER_URL } from '../../constants';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { IoIosSettings } from "react-icons/io"
+import {
+  usePhoneInput
+} from 'react-international-phone';
+import { PhoneNumberUtil } from 'google-libphonenumber';
 
 function UpdateProfile(props){
 
@@ -28,13 +32,36 @@ function UpdateProfile(props){
   } = useValue();
   const passwordRef = useRef();
   const confirmPasswordRef = useRef();
+  let navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState({
-    firstName: '', surName: '', patrSurName: '',
+    firstName: '', surName: '', patrSurName: '', phoneNumber: '', email: '',
     post: '', rights: '', userLogin: '', isUpdate: '',
+    userPassword: '',
   });
 
+  const {
+    inputValue,
+    phone,
+    handlePhoneValueChange,
+  } = usePhoneInput({
+    defaultCountry: 'by',
+    forceDialCode: true,
+    value: props.data.phoneNumber,
+  });
+
+  const phoneUtil = PhoneNumberUtil.getInstance();
+
+  const isPhoneValid = (phone) => {
+    try {
+      return phoneUtil.isValidNumber(phoneUtil.parseAndKeepRawInput(phone));
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const isValid = isPhoneValid(phone);
   const [isUpdate, setIsUpdate] = useState(false);
 
   const handleClickOpen = () => {
@@ -52,7 +79,9 @@ function UpdateProfile(props){
       surName: props.data.surName,
       patrSurName: props.data.patrSurName,
       post: props.data.post,
+      phoneNumber: props.data.phoneNumber,
       userLogin: props.data.email,
+      email: props.data.email,
       rights: userRights,
       isUpdate: "Просмотр",
      })      
@@ -62,6 +91,7 @@ function UpdateProfile(props){
 
   const handleClose = () => {
     setOpen(false)
+    setIsUpdate(false)
   };
 
   const location = useLocation();
@@ -96,10 +126,12 @@ function UpdateProfile(props){
     }
   };
 
-  const register = () => {
+  const updateAdmin = () => {
+    if(isValid){
+    const token = sessionStorage.getItem("jwt");
     const password = passwordRef.current.value;
     const confirmPassword = confirmPasswordRef.current.value;
-    if (password !== confirmPassword)
+    if (password !== '' && password !== confirmPassword)
       return dispatch({
         type: 'UPDATE_ALERT',
         payload: {
@@ -109,10 +141,12 @@ function UpdateProfile(props){
         },
       });
     else{
+    user.phoneNumber = phone
     dispatch({ type: 'START_LOADING' });
-    fetch(SERVER_URL + '/register', {
+    fetch(SERVER_URL + '/update_admin_profile', {
       method: 'POST',
-      headers: { 'Content-Type':'application/json' },
+      headers: { 'Content-Type':'application/json',
+                 'Authorization' : token },
       body: JSON.stringify(user)
     })
     .then(response => {
@@ -123,28 +157,46 @@ function UpdateProfile(props){
         payload: {
           open: true,
           severity: 'error',
-          message: 'Логин или пароль уже испольуются в системе',
+          message: 'Ошибка редактирования учетной записи! Проверьте корректность ввода данных',
         },});
       }
       else {
-        dispatch({
-          type: 'UPDATE_ALERT',
-          payload: {
-            open: true,
-            severity: 'success',
-            message: 'Новая учётная запись успешно создана',
-          },});
-          clearValues()
-          handleClose()
-          props.data.row.status = "active"
+        clearValues()
+        handleClose()
+        props.fetchUser()
+        if(password !== '' || user.userLogin !== props.data.userLogin){
+        dispatch({ type: 'START_LOADING' });
+        sessionStorage.setItem("jwt", "");
+        navigate("/", { replace: true })
+        dispatch({ type: 'END_LOADING' });
+        }
       }
     })
     .catch(err => console.error(err))
   }
+  } else{
+    dispatch({
+      type: 'UPDATE_ALERT',
+      payload: {
+        open: true,
+        severity: 'error',
+        message: 'Ошибка редактирования учетной записи! Проверьте корректность ввода данных',
+      },});
   }
+}
 
   const handleChangeIsUpdate = (event) => {
     if(props.data.role === 'ADMIN'){
+      if(!isUpdate){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'warning',
+          message: 'При изменении логина или установлении нового пароля текущая сессия работы в системе будет завершена.'
+           + ' Вы будете перенаправлены на главную страницу для входа в аккаунт, используя измененные данные',
+        },});
+      }
     setUser({...user, isUpdate:event.target.value})
     setIsUpdate(event.target.value === 'Редактирование');
     }else{
@@ -159,8 +211,8 @@ function UpdateProfile(props){
     }
   };
 
-  const handleRegisterClick = () => {
-    register();
+  const handleUpdateClick = () => {
+    updateAdmin();
   };
 
     return(
@@ -188,24 +240,24 @@ function UpdateProfile(props){
       <form>
         <DialogContent dividers>
         <Stack spacing={2} mt={1}>
-        {!isUpdate && (
         <TextField margin="normal" variant="standard" label="Имя"
             InputLabelProps={{
               shrink: true,
-            }} name="firstName" type="text" fullWidth required value={user.firstName}  disabled
-        />)}
-        {!isUpdate && (
+            }} name="firstName" type="text" fullWidth required value={user.firstName}  disabled = {!isUpdate} 
+            onChange={handleChange}
+        />
         <TextField margin="normal" variant="standard" label="Фамилия"
             InputLabelProps={{
               shrink: true,
-            }} name="surName" type="text" fullWidth required value={user.surName}  disabled
-        /> )}
-        {!isUpdate && (
+            }} name="surName" type="text" fullWidth required value={user.surName}  disabled = {!isUpdate} 
+            onChange={handleChange}
+        />
         <TextField margin="normal" variant="standard" label="Отчество"
             InputLabelProps={{
               shrink: true,
-            }} name="patrSurName" type="text" fullWidth required value={user.patrSurName}  disabled
-        />)}
+            }} name="patrSurName" type="text" fullWidth required value={user.patrSurName}  disabled = {!isUpdate} 
+            onChange={handleChange}
+        />
         {!isUpdate && (
         <TextField margin="normal" variant="standard" label="Должность"
             InputLabelProps={{
@@ -218,7 +270,14 @@ function UpdateProfile(props){
               shrink: true,
             }} name="post" type="text" fullWidth required value={user.rights}  disabled multiline
         />)}
-        {!isUpdate && (
+        {isUpdate && (
+         <TextField
+           error={!isValid}
+           value={inputValue}
+           onChange={handlePhoneValueChange}
+           label="Номер телефона"
+           variant="outlined"
+          />)}
           <TextField
             margin="normal"
             variant="standard"
@@ -231,8 +290,9 @@ function UpdateProfile(props){
             fullWidth
             required
             value={user.userLogin}
-            disabled
-          />)}
+            disabled = {!isUpdate} 
+            onChange={handleChange}
+          />
 
             <FormControl fullWidth>
             <RadioGroup
@@ -252,12 +312,11 @@ function UpdateProfile(props){
           margin="normal"
           variant="standard"
           name="userPassword"
-          label="Пароль"
+          label="Новый пароль"
           type={showPassword ? 'text' : 'password'}
           fullWidth
           inputRef={passwordRef}
           inputProps={{ minLength: 5 }}
-          required
           onChange={handleChange}
           InputProps={{
           endAdornment: (
@@ -278,14 +337,16 @@ function UpdateProfile(props){
     )}
         </Stack>
         </DialogContent>
+        {isUpdate && (
            <DialogActions sx={{ px: '19px' }}>
            <Button variant="contained"
             endIcon={<Send />}
             color="primary" 
-            onClick={handleRegisterClick}>
+            onClick={handleUpdateClick}>
             Обновить
           </Button>
         </DialogActions>
+        )}
       </form>
       <DialogActions sx={{ justifyContent: 'left', p: '5px 24px' }}>
         <Button onClick={handleClose}>

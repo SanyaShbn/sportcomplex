@@ -304,7 +304,7 @@ import { jwtDecode } from 'jwt-decode';
             {open && (
               <Typography variant="body2">{}</Typography>
             )}
-              <UpdateProfile data={user}/>
+              <UpdateProfile data={user} fetchUser={fetchUser}/>
           </Box>
           <Box sx={{ textAlign: 'center' }}>
             {open && <Typography>{}</Typography>}
