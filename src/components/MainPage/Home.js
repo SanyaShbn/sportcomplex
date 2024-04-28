@@ -1,21 +1,74 @@
-import React,  { useEffect } from 'react';
+import React,  { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom'
+import {
+  Box,
+  Paper,
+  Typography,
+} from '@mui/material';
 import 
-{ BsFillArchiveFill, BsFillGrid3X3GapFill, BsPeopleFill, BsFillBellFill}
+{ BsPeopleFill, BsFillPersonVcardFill}
  from 'react-icons/bs'
- import 
- { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } 
- from 'recharts'
+ import {MdCardMembership} from "react-icons/md"
+ import { SERVER_URL } from '../../constants.js';
+import SoldMembershipsAreaChart from './SoldMembershipsAreaChart.js';
+import { useValue } from '../../context/ContextProvider';
+import PieMembershipsCost from './PieMembershipsCost.js'
 
 const Home = ({ setSelectedLink, link }) => {
 
   useEffect(() => {
     setSelectedLink(link);
+    fetchClients();
+    fetchUsers();
+    fetchMemberships();
   }, []);
 
   
   const location = useLocation();
+  const [users, setUsers] = useState([]);
+  const [memberships, setMemberships] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
+  const fetchUsers = () => {
+    // const token = sessionStorage.getItem("jwt");
+    fetch(SERVER_URL + '/api/users', {
+      // headers: { 'Authorization' : token }
+    })
+    .then(response => response.json())
+    .then(data => {
+      setUsers(data._embedded.users)
+      setIsLoading(false)
+    })
+    .catch(err => console.error(err));    
+  }
+  const fetchMemberships = () => {
+    // const token = sessionStorage.getItem("jwt");
+    fetch(SERVER_URL + '/api/sportComplexMemberships', {
+      // headers: { 'Authorization' : token }
+    })
+    .then(response => response.json())
+    .then(data => {
+      setMemberships(data._embedded.sportComplexMemberships)
+      setIsLoading(false)
+    })
+    .catch(err => console.error(err));    
+  }
+  const fetchClients = () => {
+    // const token = sessionStorage.getItem("jwt");
+    fetch(SERVER_URL + '/api/clients', {
+      // headers: { 'Authorization' : token }
+    })
+    .then(response => response.json())
+    .then(data => {
+      setClients(data._embedded.clients)
+      setIsLoading(false)
+    })
+    .catch(err => console.error(err));    
+  }
+  const {
+    dispatch,
+  } = useValue();
   useEffect(() => {
     window.history.pushState(null, document.title, window.location.href);
     window.addEventListener('popstate', function(event) {
@@ -71,86 +124,59 @@ const Home = ({ setSelectedLink, link }) => {
 
   return (
     <main className='main-container'>
-        <div className='main-title'>
-            <h3>ИНФОРМАЦИОННАЯ ПАНЕЛЬ</h3>
-        </div>
-
+    {/* {isLoading ? (
+      <p></p>
+    ):( */}
+        <>
         <div className='main-cards'>
-            <div className='card'>
-                <div className='card-inner'>
-                    <h3>УСЛУГИ</h3>
-                    <BsFillArchiveFill className='card_icon'/>
-                </div>
-                <h1>300</h1>
-            </div>
-            <div className='card'>
-                <div className='card-inner'>
-                    <h3>КАТЕГОРИИ</h3>
-                    <BsFillGrid3X3GapFill className='card_icon'/>
-                </div>
-                <h1>12</h1>
-            </div>
-            <div className='card'>
-                <div className='card-inner'>
-                    <h3>КЛИЕНТЫ</h3>
-                    <BsPeopleFill className='card_icon'/>
-                </div>
-                <h1>33</h1>
-            </div>
-            <div className='card'>
-                <div className='card-inner'>
-                    <h3>УВЕДОМЛЕНИЯ</h3>
-                    <BsFillBellFill className='card_icon'/>
-                </div>
-                <h1>42</h1>
-            </div>
+        <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h6">АБОНЕМЕНТЫ</Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <MdCardMembership size={70} sx={{ height: 100, width: 100, opacity: 0.3, mr: 1 }} />
+          <Typography variant="h4">{memberships.length}</Typography>
+        </Box>
+        </Paper>
+        <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h6">КЛИЕНТЫ</Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <BsFillPersonVcardFill size={70} sx={{ height: 100, width: 100, opacity: 0.3, mr: 1 }} />
+          <Typography variant="h4">{clients.length}</Typography>
+        </Box>
+        </Paper>
+        <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h6">ПОЛЬЗОВАТЕЛИ</Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <BsPeopleFill  size={70} sx={{ height: 100, width: 100, opacity: 0.3, mr: 1 }} />
+          <Typography variant="h4">{users.length}</Typography>
+        </Box>
+        </Paper>
+        <Paper elevation={3} sx={{ p: 2, gridColumn: '1/3' }}>
+        <PieMembershipsCost />
+        </Paper>
+        <Paper elevation={3} sx={{ p: 3, gridColumn: '1/3' }}>
+        <SoldMembershipsAreaChart/>
+        </Paper>
         </div>
-
-        <div className='charts'>
-            <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-            width={500}
-            height={300}
-            data={data}
-            margin={{
-                top: 5,
-                right: 30,
-                left: 20,
-                bottom: 5,
-            }}
-            >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="pv" fill="#8884d8" />
-                <Bar dataKey="uv" fill="#82ca9d" />
-                </BarChart>
-            </ResponsiveContainer>
-
-            <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                width={500}
-                height={300}
-                data={data}
-                margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5,
-                }}
-                >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
-                <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
-                </LineChart>
-            </ResponsiveContainer>
-        </div>
+        </>
+{/* )} */}
     </main>
   )
 }

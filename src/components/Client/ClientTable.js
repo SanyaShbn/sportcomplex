@@ -186,7 +186,7 @@ const ClientTable = ({ setSelectedLink, link }) => {
           open={open}
           autoHideDuration={2000}
           onClose={() => setOpen(false)}
-          message="Запись о сотруднике удалена"
+          message="Запись о клиенте удалена"
         />
       </div>
     </React.Fragment>

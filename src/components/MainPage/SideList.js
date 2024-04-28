@@ -129,23 +129,23 @@ import { jwtDecode } from 'jwt-decode';
     }
   
     const [selectedLink, setSelectedLink] = useState('');
-    const token = sessionStorage.getItem("jwt");
-    const decodedToken = jwtDecode(token);
-    const [user, setUser] = useState([]);
-    const [profileIcon, setProfileIcon] = useState([]);
+    // const token = sessionStorage.getItem("jwt");
+    // const decodedToken = jwtDecode(token);
+    // const [user, setUser] = useState([]);
+    // const [profileIcon, setProfileIcon] = useState([]);
 
-    useEffect(() => {
-      fetchUser();
-    }, []);
+    // useEffect(() => {
+    //   fetchUser();
+    // }, []);
   
-    const fetchUser = () => {
-      fetch(SERVER_URL + '/api/user_profile?userLogin=' + decodedToken.sub, {
-        headers: { 'Authorization' : token }
-      })
-      .then(response => response.json())
-      .then(data => {setUser(data); setProfileIcon(data.firstName[0] + data.surName[0])})
-      .catch(err => console.error(err));    
-    }
+    // const fetchUser = () => {
+    //   fetch(SERVER_URL + '/api/user_profile?userLogin=' + decodedToken.sub, {
+    //     headers: { 'Authorization' : token }
+    //   })
+    //   .then(response => response.json())
+    //   .then(data => {setUser(data); setProfileIcon(data.firstName[0] + data.surName[0])})
+    //   .catch(err => console.error(err));    
+    // }
 
     const list = useMemo(
       () => {
@@ -291,10 +291,14 @@ import { jwtDecode } from 'jwt-decode';
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 variant="dot"
               > */}
-              <Avatar
+              
+              {/* профиль пользователя */}
+              {/* <Avatar
                 sx={{ bgcolor: color!=='dark' ? blue[500] : "null" }}
                 {...(open && { sx: { width: 60, height: 60, bgcolor: color!=='dark' ? blue[500] : "null" }})}
-              >{profileIcon}</Avatar>
+              >{profileIcon}</Avatar> */}
+              {/* профиль пользователя */}
+              
               {/* </StyledBadge> */}
             </Tooltip>
           </Box>
@@ -304,7 +308,7 @@ import { jwtDecode } from 'jwt-decode';
             {open && (
               <Typography variant="body2">{}</Typography>
             )}
-              <UpdateProfile data={user} fetchUser={fetchUser}/>
+              {/* <UpdateProfile data={user} fetchUser={fetchUser}/> */}
           </Box>
           <Box sx={{ textAlign: 'center' }}>
             {open && <Typography>{}</Typography>}

@@ -235,8 +235,6 @@ body {
     grid-area: main;
     overflow-y: auto;
     padding: auto;
-    color: rgba(255, 255, 255, 0.95);
-    background-image: url("../MainNavs/nav_images/new_main_back_darked.jpg");
     background-size: cover;
   }
   
@@ -265,7 +263,7 @@ body {
   }
   
   .card:nth-child(2) {
-    background-color: #ff6d00;
+    background-color: transparent;
   }
   
   .card:nth-child(3) {

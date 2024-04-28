@@ -209,7 +209,7 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
           open={open}
           autoHideDuration={2000}
           onClose={() => setOpen(false)}
-          message="Запись о сотруднике удалена"
+          message="Запись об абонементе удалена"
         />
       </div>
     </React.Fragment>
