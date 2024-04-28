@@ -11,8 +11,9 @@ import
  import {MdCardMembership} from "react-icons/md"
  import { SERVER_URL } from '../../constants.js';
 import SoldMembershipsAreaChart from './SoldMembershipsAreaChart.js';
-import { useValue } from '../../context/ContextProvider';
-import PieMembershipsCost from './PieMembershipsCost.js'
+import PieMembershipsCost from './PieMembershipsCost.js';
+import MonthsDropdown from './MonthsDropdown.js';
+import { Backdrop, CircularProgress } from '@mui/material';
 
 const Home = ({ setSelectedLink, link }) => {
 
@@ -23,12 +24,12 @@ const Home = ({ setSelectedLink, link }) => {
     fetchMemberships();
   }, []);
 
-  
   const location = useLocation();
   const [users, setUsers] = useState([]);
   const [memberships, setMemberships] = useState([]);
   const [clients, setClients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedMonths, setSelectedMonths] = useState(3);
 
   const fetchUsers = () => {
     // const token = sessionStorage.getItem("jwt");
@@ -66,9 +67,6 @@ const Home = ({ setSelectedLink, link }) => {
     })
     .catch(err => console.error(err));    
   }
-  const {
-    dispatch,
-  } = useValue();
   useEffect(() => {
     window.history.pushState(null, document.title, window.location.href);
     window.addEventListener('popstate', function(event) {
@@ -76,57 +74,13 @@ const Home = ({ setSelectedLink, link }) => {
     });
   }, [location]);
 
-    const data = [
-        {
-          name: 'Page A',
-          uv: 4000,
-          pv: 2400,
-          amt: 2400,
-        },
-        {
-          name: 'Page B',
-          uv: 3000,
-          pv: 1398,
-          amt: 2210,
-        },
-        {
-          name: 'Page C',
-          uv: 2000,
-          pv: 9800,
-          amt: 2290,
-        },
-        {
-          name: 'Page D',
-          uv: 2780,
-          pv: 3908,
-          amt: 2000,
-        },
-        {
-          name: 'Page E',
-          uv: 1890,
-          pv: 4800,
-          amt: 2181,
-        },
-        {
-          name: 'Page F',
-          uv: 2390,
-          pv: 3800,
-          amt: 2500,
-        },
-        {
-          name: 'Page G',
-          uv: 3490,
-          pv: 4300,
-          amt: 2100,
-        },
-      ];
-     
-
   return (
     <main className='main-container'>
-    {/* {isLoading ? (
-      <p></p>
-    ):( */}
+    {isLoading ? (
+      <Backdrop open={true} sx={{ zIndex: (theme) => theme.zIndex.modal + 1 }}>
+        <CircularProgress sx={{ color: 'white' }} />
+      </Backdrop>
+    ):(
         <>
         <div className='main-cards'>
         <Paper elevation={3} sx={{ p: 3 }}>
@@ -168,15 +122,24 @@ const Home = ({ setSelectedLink, link }) => {
           <Typography variant="h4">{users.length}</Typography>
         </Box>
         </Paper>
-        <Paper elevation={3} sx={{ p: 2, gridColumn: '1/3' }}>
-        <PieMembershipsCost />
-        </Paper>
         <Paper elevation={3} sx={{ p: 3, gridColumn: '1/3' }}>
-        <SoldMembershipsAreaChart/>
+        <MonthsDropdown onChange={(e) => setSelectedMonths(Number(e.target.value))} />
+        <SoldMembershipsAreaChart  months={selectedMonths} />
         </Paper>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+        <Paper elevation={3} sx={{ p: 2, gridColumn: '1/3' }}>
+        <PieMembershipsCost/>
+        </Paper>
+        </Box>
         </div>
         </>
-{/* )} */}
+  )}
     </main>
   )
 }
