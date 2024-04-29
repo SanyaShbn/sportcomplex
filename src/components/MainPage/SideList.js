@@ -41,6 +41,7 @@ import Registration from "../User/Registration"
 import UpdateProfile from "../User/UpdateProfile.js"
 import { blue } from '@mui/material/colors';
 import { jwtDecode } from 'jwt-decode';
+import FinanciesMain from "../Financies/FinanciesMain.js"
   
   const drawerWidth = 250;
 
@@ -213,9 +214,10 @@ import { jwtDecode } from 'jwt-decode';
             component: <SportComplexMembershipTable {...{ setSelectedLink, link: 'memberships' }}/>,
           },
           {
-            title: 'Финансы',
+            title: 'Выручка',
             icon: <MdAttachMoney />,
-            link: '',
+            link: 'financies',
+            component: <FinanciesMain {...{ setSelectedLink, link: 'financies' }}/>,
           },
           {
             title: 'Рецепция',
@@ -290,13 +292,13 @@ import { jwtDecode } from 'jwt-decode';
                 overlap="circular"
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 variant="dot"
-              > */}
+              >  */}
               
               {/* профиль пользователя */}
               {/* <Avatar
                 sx={{ bgcolor: color!=='dark' ? blue[500] : "null" }}
                 {...(open && { sx: { width: 60, height: 60, bgcolor: color!=='dark' ? blue[500] : "null" }})}
-              >{profileIcon}</Avatar> */}
+              ></Avatar>  */}
               {/* профиль пользователя */}
               
               {/* </StyledBadge> */}
