@@ -10,6 +10,9 @@ import { SERVER_URL } from '../../../constants.js';
 import {FormControl, InputLabel, MenuItem, TextField} from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
+import { useValue } from '../../../context/ContextProvider.js';
+import { NumberInput } from '../../../constants.js';
+
 
 function EditTrainingMembership(props) {
 
@@ -22,6 +25,10 @@ function EditTrainingMembership(props) {
   const [training_membership, setTrainingMembership] = useState({
     visitsAmount: '', sportComplexMembership: '', training: ''
   });
+  const [visitsAmountInputValue, setValue] = React.useState(null);
+  const {
+    dispatch,
+  } = useValue();
     
   useEffect(() => {
     fetchTrainings();
@@ -61,6 +68,7 @@ function EditTrainingMembership(props) {
         training: parseInt(id_training),
       })          
       setOpen(true);
+      setValue(props.data.row.visitsAmount)
       }
       
   const handleChangeMembership = (event) => {
@@ -75,25 +83,31 @@ function EditTrainingMembership(props) {
       [event.target.name]: event.target.value});
   }
 
-  const handleChangeAmount= (event) => {
-    setVisitsAmount(event.target.value)
-    setTrainingMembership({...training_membership, 
-      [event.target.name]: event.target.value});
-  }
-
   const handleClose = () => {
     setOpen(false);
   };
  
   const handleSave = () => {
+    if(visitsAmountInputValue < 1 | visitsAmountInputValue > 30){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Проверьте корректность ввода данных! Количество входящих в абонемент услуг не может принимать значение менее 1, ' 
+          + "либо более 30",
+        },});
+    }
+    else{
     if (updatedVisitsAmount !== " " && updatedVisitsAmount.length !== 0){
       props.updateTrainingMembership(props.data.id, trainingId, membershipId, updatedVisitsAmount)
       setVisitsAmount(" ")
     } 
     else{
-      props.updateTrainingMembership(props.data.id, trainingId, membershipId, props.data.row.visitsAmount);
+      props.updateTrainingMembership(props.data.id, trainingId, membershipId, visitsAmountInputValue);
     }
     handleClose();
+  }
   }
 
   return(
@@ -105,9 +119,11 @@ function EditTrainingMembership(props) {
           <DialogTitle className='dialog'>Обновление информации о пакете тренировок</DialogTitle>
           <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
-            <TextField label="Количество занятий в пакете" name="visitsAmount" autoFocus
-            variant="standard" value={training_membership.visitsAmount} 
-            onChange={handleChangeAmount}/>
+        <NumberInput
+            label="Количество занятий в пакете"
+            placeholder="Количество занятий в пакете"
+            variant="standard" value={visitsAmountInputValue} 
+            onChange={(event, val) => setValue(val)}/>
             <FormControl fullWidth>
             <InputLabel>Тренировки</InputLabel>
              <Select

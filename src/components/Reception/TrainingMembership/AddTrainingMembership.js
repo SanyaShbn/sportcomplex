@@ -10,7 +10,8 @@ import Stack from '@mui/material/Stack';
 import { SERVER_URL } from '../../../constants.js';
 import '../../CSS/employeeCSS.css';
 import '../../CSS/table.css';
-
+import { useValue } from '../../../context/ContextProvider.js';
+import { NumberInput } from '../../../constants.js';
 
 function AddTrainingMembership(props){
 
@@ -22,6 +23,10 @@ function AddTrainingMembership(props){
   const [membership, setMembership] = useState({
     visitsAmount: ''
   });
+  const [visitsAmountInputValue, setValue] = React.useState(null);
+  const {
+    dispatch,
+  } = useValue();
 
   useEffect(() => {
     fetchTrainings();
@@ -60,13 +65,21 @@ function AddTrainingMembership(props){
   };
 
   const handleSave = () => {
+    if(visitsAmountInputValue < 1 | visitsAmountInputValue > 30){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Проверьте корректность ввода данных! Количество входящих в абонемент услуг не может принимать значение менее 1, ' 
+          + "либо более 30",
+        },});
+    }
+    else{
+    membership.visitsAmount = visitsAmountInputValue
     props.addTrainingMembership(membership, trainingId, membershipId);
     handleClose();
-  }
-
-  const handleChange = (event) => {
-    setMembership({...membership, 
-      [event.target.name]: event.target.value});
+    }
   }
 
   return (
@@ -78,9 +91,11 @@ function AddTrainingMembership(props){
       <DialogTitle className='dialog'>Новый пакет тренировок</DialogTitle>
       <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
-            <TextField label="Количество занятий в пакете" name="visitsAmount" autoFocus
-            variant="standard" value={membership.visitsAmount} 
-            onChange={handleChange}/>
+           <NumberInput
+            label="Количество занятий в пакете"
+            placeholder="Количество занятий в пакете"
+            variant="standard" value={visitsAmountInputValue} 
+            onChange={(event, val) => setValue(val)}/>
             <FormControl fullWidth>
             <InputLabel>Тренировки</InputLabel>
              <Select

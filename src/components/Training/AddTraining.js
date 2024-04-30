@@ -9,8 +9,11 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import { SERVER_URL } from '../../constants.js';
+import { useValue } from '../../context/ContextProvider';
+import { NumberInput } from '../../constants';
 import '../CSS/employeeCSS.css';
 import '../CSS/table.css';
+import CurrencyTextField from '@lupus-ai/mui-currency-textfield'
 
 
 function AddTraining(props){
@@ -24,6 +27,11 @@ function AddTraining(props){
     name: '', type: 'групповое', capacity: '',  cost: '', clients_amount: 0
   });
   const [isGroup, setIsGroup] = useState(true);
+  const [capacityInputValue, setCapacityValue] = React.useState(null);
+  const [costInputValue, setCostValue] = React.useState(null);
+  const {
+    dispatch,
+  } = useValue();
 
   useEffect(() => {
     fetchFacilities()
@@ -59,14 +67,44 @@ function AddTraining(props){
     setTraining({
       name: '', type: '', capacity: '',  cost: ''
     })
+    setCapacityValue(null)
+    setCostValue(null)
   };
 
   const handleSave = () => {
+    if(costInputValue < 1){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Проверьте корректность ввода данных! Значение стоимости услуги (тренировочного занятия) не может быть столь низкой,'
+          +' а также отрицательной',
+        },});
+    }
+    else{
     if(training.type === 'персональное'){
       training.capacity = 1
     }
+    else {
+      if(capacityInputValue < 2 | capacityInputValue > 50){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Проверьте корректность ввода данных! Емкость занятия/услуги (количество человек, которое могут посетить данное ' + 
+          'занятие/приобрести услугу одновременно) не может принимать значения менее 2, либо более 50',
+        },});
+    }
+    else{
+    training.capacity = capacityInputValue
+    }
+    }
+    training.cost = costInputValue
     props.addTraining(training, complexFacilityId, coachId);
     handleClose();
+  }
   }
 
   const handleChange = (event) => {
@@ -102,13 +140,20 @@ function AddTraining(props){
             <FormControlLabel value="персональное" control={<Radio color="primary" />} label="Персональное" />
             </RadioGroup>
             </FormControl>
-            {isGroup && (<TextField label="Емкость (количество человек)" name="capacity"
-            variant="standard" value={training.capacity} 
-            onChange={handleChange}/>
+            {isGroup && ( <NumberInput
+            label="Емкость (чел.)"
+            placeholder="Емкость (чел.)"
+            variant="standard" value={capacityInputValue} 
+            onChange={(event, val) => setCapacityValue(val)}/>
             )}
-            <TextField label="Стоимость (бел.руб.)" name="cost"
-            variant="standard" value={training.cost} 
-            onChange={handleChange}/>
+             <CurrencyTextField
+		          label="Стоимость (бел.руб.)"
+		          variant="standard"
+	          	value={costInputValue}
+	          	currencySymbol="BYN"
+		          outputFormat="string"
+		          onChange={(event, value)=> setCostValue(value)}
+            />
             <FormControl fullWidth>
             <InputLabel>Место проведения</InputLabel>
              <Select
@@ -118,7 +163,7 @@ function AddTraining(props){
              onChange={(event) => { setComplexFacilityId(event.target.value) }}>
              {facilities.map(facility => (
                <MenuItem key={facility.idComplexFacility}
-                value={facility.idComplexFacility}>{facility.facilityType + " №" + facility.idComplexFacility}</MenuItem>
+                value={facility.idComplexFacility}>{"Сооружение №" + facility.idComplexFacility + ": " + facility.name}</MenuItem>
              ))}
             </Select>
             </FormControl>

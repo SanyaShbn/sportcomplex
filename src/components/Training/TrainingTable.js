@@ -149,7 +149,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
         };
         const response = await axios.get(url, config);
         let id = response.data._links.self.href;
-        return response.data.facilityType + " №" + id.slice(id.lastIndexOf("/") + 1);
+        return "Сооружение №" + id.slice(id.lastIndexOf("/") + 1) + ": " + response.data.name ;
       } catch (error) {
         return 'не установлено';
       }

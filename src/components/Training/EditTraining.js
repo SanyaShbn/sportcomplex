@@ -11,6 +11,9 @@ import { SERVER_URL } from '../../constants.js';
 import { FormControl, RadioGroup, FormControlLabel, Radio, InputLabel, MenuItem, FormLabel } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
+import CurrencyTextField from '@lupus-ai/mui-currency-textfield'
+import { useValue } from '../../context/ContextProvider';
+import { NumberInput } from '../../constants';
 
 function EditTraining(props) {
 
@@ -23,7 +26,13 @@ function EditTraining(props) {
     name: '', type: '', capacity: '',  cost: '', clients_amount: '', complexFacility: '', coach: ''
   });
   const [isGroup, setIsGroup] = useState(true);
-    
+  const [capacityInputValue, setCapacityValue] = React.useState(null);
+  const [costInputValue, setCostValue] = React.useState(null);
+  
+  const {
+    dispatch,
+  } = useValue();
+
   useEffect(() => {
     fetchFacilities()
     fetchCoaches()
@@ -63,6 +72,8 @@ function EditTraining(props) {
       complexFacility: parseInt(facilityId),
       coach: parseInt(idCoach),
      })      
+    setCapacityValue(props.data.row.capacity)
+    setCostValue(props.data.row.cost)
     setOpen(true);
   }
 
@@ -87,11 +98,36 @@ function EditTraining(props) {
       [event.target.name]: event.target.value});
   }
   const handleSave = () => {
-    if(training.type === 'персональное'){
-      training.capacity = 1
+    if(costInputValue < 1){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Проверьте корректность ввода данных! Значение стоимости услуги (тренировочного занятия) не может быть столь низкой,'
+          +' а также отрицательной',
+        },});
     }
-    props.updateTraining(training, props.data.id, complexFacilityId, coachId);
-    handleClose();
+    else{
+      if(training.type !== 'персональное' && (capacityInputValue < 2 | capacityInputValue > 50)){
+        dispatch({
+          type: 'UPDATE_ALERT',
+          payload: {
+            open: true,
+            severity: 'error',
+            message: 'Проверьте корректность ввода данных! Емкость занятия/услуги (количество человек, которое могут посетить данное ' + 
+            'занятие/приобрести услугу одновременно) не может принимать значения менее 2, либо более 50',
+          },});
+      }
+    else {
+      if(training.type === 'персональное'){
+        training.capacity = 1
+      } else {training.capacity = capacityInputValue}
+      training.cost = costInputValue
+      props.updateTraining(training, props.data.id, complexFacilityId, coachId);
+      handleClose();
+    }
+    }
   }
 
   const handleChangeType = (event) => {
@@ -123,13 +159,20 @@ function EditTraining(props) {
             <FormControlLabel value="персональное" control={<Radio />} label="Персональное" />
             </RadioGroup>
             </FormControl>
-            {isGroup && (<TextField label="Емкость (количество человек)" name="capacity"
-            variant="standard" value={training.capacity} 
-            onChange={handleChange}/>
+            {isGroup && (<NumberInput
+            label="Емкость (чел.)"
+            placeholder="Емкость (чел.)"
+            variant="standard" value={capacityInputValue} 
+            onChange={(event, val) => setCapacityValue(val)}/>
             )}
-            <TextField label="Стоимость (бел.руб.)" name="cost"
-            variant="standard" value={training.cost} 
-            onChange={handleChange}/>
+             <CurrencyTextField
+		          label="Стоимость (бел.руб.)"
+		          variant="standard"
+	          	value={training.cost}
+	          	currencySymbol="BYN"
+		          outputFormat="string"
+		          onChange={(event, value)=> setCostValue(value)}
+            />
             <FormControl fullWidth>
             <InputLabel>Место проведения</InputLabel>
              <Select
@@ -140,7 +183,7 @@ function EditTraining(props) {
              onChange={handleChangeComplexFacility}>
              {facilities.map(facility => (
                <MenuItem key={facility.idComplexFacility}
-                value={facility.idComplexFacility}>{facility.facilityType + " №" + facility.idComplexFacility}</MenuItem>
+                value={facility.idComplexFacility}>{"Сооружение №" + facility.idComplexFacility + ": " + facility.name}</MenuItem>
              ))}
             </Select>
             </FormControl>

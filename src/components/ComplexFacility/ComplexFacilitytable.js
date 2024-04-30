@@ -133,9 +133,9 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
     }
     
     const columns = [
-      {field: 'facilityType', headerName: 'Вид сооружения', width: 300},
+      {field: 'name', headerName: 'Наименование', width: 300},
       {field: 'trainingsAmount', headerName: 'Количество тренировок', width: 300},
-      {field: 'cleaningServiceTime', headerName: 'Время уборки и обслуживания', width: 400},
+      {field: 'capacity', headerName: 'Вместимость (чел.)', width: 400},
       {
         field: '_links.facility.href', 
         headerName: '', 
