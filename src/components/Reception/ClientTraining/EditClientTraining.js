@@ -10,6 +10,7 @@ import { SERVER_URL } from '../../../constants.js';
 import {FormControl, InputLabel, MenuItem} from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
+import { useValue } from '../../../context/ContextProvider.js';
 
 function EditClientTraining(props) {
 
@@ -21,7 +22,10 @@ function EditClientTraining(props) {
     const [client_training, setClientTraining] = useState({
       status: '', client: '', training: ''
     });
-    
+    const {
+      dispatch,
+    } = useValue();
+
   useEffect(() => {
     fetchTrainings();
     fetchClients();
@@ -78,8 +82,19 @@ function EditClientTraining(props) {
   }
  
   const handleSave = () => {
+    if(clientId.length === 0 | trainingId.length === 0){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Заполните обязательные поля!',
+        },});
+    }
+    else{
     props.updateClientTraining(props.data.id, trainingId, clientId);
     handleClose();
+    }
   }
 
   return(
@@ -92,7 +107,7 @@ function EditClientTraining(props) {
           <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
         <FormControl fullWidth>
-            <InputLabel>Тренировки</InputLabel>
+            <InputLabel required>Тренировки</InputLabel>
              <Select
              name='training'
              autoFocus variant="standard"
@@ -115,7 +130,7 @@ function EditClientTraining(props) {
             </Select>
             </FormControl>
             <FormControl fullWidth>
-            <InputLabel>Клиенты</InputLabel>
+            <InputLabel required>Клиенты</InputLabel>
              <Select
              name='client'
              autoFocus variant="standard"

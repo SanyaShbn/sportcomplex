@@ -33,6 +33,42 @@ function UpdateProfile(props){
   const passwordRef = useRef();
   const confirmPasswordRef = useRef();
   let navigate = useNavigate();
+  const [isValidPassword, setIsValidPassword] = useState(false);
+  const [isEmailError, setIsEmailError] = useState(false);
+  const [isNameError, setIsNameError] = useState(false);
+  const [isSurNameError, setIsSurNameError] = useState(false);
+  const [isPatrSurNameError, setIsPatrSurNameError] = useState(false);
+  const handleEmailErrorChange = (event) => {
+    const { value } = event.target;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    setIsEmailError(!emailRegex.test(value));
+    setUser({...user, [event.target.name] : event.target.value});
+  };
+  const handleNameErrorChange = (event) => {
+    const { value } = event.target;
+    const isInvalid = value.length < 2 || value[0] !== value[0].toUpperCase() || !/^[\u0400-\u04FF]+$/.test(value);
+    setIsNameError(isInvalid);
+    setUser({...user, [event.target.name] : event.target.value});
+  };
+  const handleSurNameErrorChange = (event) => {
+    const { value } = event.target;
+    const isInvalid = value.length < 2 || value[0] !== value[0].toUpperCase() || !/^[\u0400-\u04FF]+$/.test(value);
+    setIsSurNameError(isInvalid);
+    setUser({...user, [event.target.name] : event.target.value});
+  };
+  const handlePatrSurNameErrorChange = (event) => {
+    const { value } = event.target;
+    const isInvalid = value.length < 2 || value[0] !== value[0].toUpperCase() || !/^[\u0400-\u04FF]+$/.test(value);
+    setIsPatrSurNameError(isInvalid);
+    setUser({...user, [event.target.name] : event.target.value});
+  };
+
+  const handleIsValidPasswordChange = (event) => {
+    const { value } = event.target;
+    const isInvalid = value.length < 8;
+    setIsValidPassword(isInvalid);
+    setUser({...user, [event.target.name] : event.target.value});
+  };
 
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState({
@@ -92,6 +128,11 @@ function UpdateProfile(props){
   const handleClose = () => {
     setOpen(false)
     setIsUpdate(false)
+    setIsValidPassword(false)
+    setIsEmailError(false)
+    setIsNameError(false)
+    setIsSurNameError(false)
+    setIsPatrSurNameError(false)
   };
 
   const location = useLocation();
@@ -113,10 +154,6 @@ function UpdateProfile(props){
     e.preventDefault();
   };
 
-  const handleChange = (event) => {
-    setUser({...user, [event.target.name] : event.target.value});
-  }
-
   const clearValues = () => {
     if (passwordRef.current) {
       passwordRef.current.value = '';
@@ -127,7 +164,27 @@ function UpdateProfile(props){
   };
 
   const updateAdmin = () => {
-    if(isValid){
+    if(user.firstName.length === 0 | user.surName.length === 0 | user.patrSurName.length === 0
+      | user.email.length === 0){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Заполните обязательные поля',
+        },});
+    }
+    else{
+    if(!isValid | isEmailError | isNameError | isSurNameError | isPatrSurNameError){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Проверьте корректность ввода данных',
+        },});
+    }
+    else{
     const token = sessionStorage.getItem("jwt");
     const password = passwordRef.current.value;
     const confirmPassword = confirmPasswordRef.current.value;
@@ -157,7 +214,8 @@ function UpdateProfile(props){
         payload: {
           open: true,
           severity: 'error',
-          message: 'Ошибка редактирования учетной записи! Проверьте корректность ввода данных',
+          message: 'Ошибка! Не удалось обновить данные учетной записи. Возможно, введенное вами значение обновленного адреса '
+          + 'электронной почты уже используется другими сотрудниками',
         },});
       }
       else {
@@ -173,15 +231,8 @@ function UpdateProfile(props){
       }
     })
     .catch(err => console.error(err))
-  }
-  } else{
-    dispatch({
-      type: 'UPDATE_ALERT',
-      payload: {
-        open: true,
-        severity: 'error',
-        message: 'Ошибка редактирования учетной записи! Проверьте корректность ввода данных',
-      },});
+    }  
+   }
   }
 }
 
@@ -244,19 +295,19 @@ function UpdateProfile(props){
             InputLabelProps={{
               shrink: true,
             }} name="firstName" type="text" fullWidth required value={user.firstName}  disabled = {!isUpdate} 
-            onChange={handleChange}
+            error={isNameError} onChange={handleNameErrorChange}
         />
         <TextField margin="normal" variant="standard" label="Фамилия"
             InputLabelProps={{
               shrink: true,
             }} name="surName" type="text" fullWidth required value={user.surName}  disabled = {!isUpdate} 
-            onChange={handleChange}
+            error={isSurNameError} onChange={handleSurNameErrorChange}
         />
         <TextField margin="normal" variant="standard" label="Отчество"
             InputLabelProps={{
               shrink: true,
             }} name="patrSurName" type="text" fullWidth required value={user.patrSurName}  disabled = {!isUpdate} 
-            onChange={handleChange}
+            error={isPatrSurNameError} onChange={handlePatrSurNameErrorChange}
         />
         {!isUpdate && (
         <TextField margin="normal" variant="standard" label="Должность"
@@ -279,6 +330,7 @@ function UpdateProfile(props){
            variant="outlined"
           />)}
           <TextField
+            error={isEmailError}
             margin="normal"
             variant="standard"
             label="Логин"
@@ -291,7 +343,7 @@ function UpdateProfile(props){
             required
             value={user.userLogin}
             disabled = {!isUpdate} 
-            onChange={handleChange}
+            onChange={handleEmailErrorChange}
           />
 
             <FormControl fullWidth>
@@ -308,6 +360,7 @@ function UpdateProfile(props){
             </FormControl>
        {isUpdate && (
           <TextField
+          error={isValidPassword}
           autoFocus
           margin="normal"
           variant="standard"
@@ -317,7 +370,7 @@ function UpdateProfile(props){
           fullWidth
           inputRef={passwordRef}
           inputProps={{ minLength: 5 }}
-          onChange={handleChange}
+          onChange={handleIsValidPasswordChange}
           InputProps={{
           endAdornment: (
           <InputAdornment position="end">

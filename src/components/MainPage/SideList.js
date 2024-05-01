@@ -298,7 +298,7 @@ import FinanciesMain from "../Financies/FinanciesMain.js"
               {/* <Avatar
                 sx={{ bgcolor: color!=='dark' ? blue[500] : "null" }}
                 {...(open && { sx: { width: 60, height: 60, bgcolor: color!=='dark' ? blue[500] : "null" }})}
-              ></Avatar>  */}
+              >{profileIcon}</Avatar>  */}
               {/* профиль пользователя */}
               
               {/* </StyledBadge> */}

@@ -65,6 +65,16 @@ function AddTrainingMembership(props){
   };
 
   const handleSave = () => {
+    if(trainingId.length === 0 | membershipId.length === 0){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Заполните обязательные поля!',
+        },});
+    }
+    else{
     if(visitsAmountInputValue < 1 | visitsAmountInputValue > 30){
       dispatch({
         type: 'UPDATE_ALERT',
@@ -80,6 +90,7 @@ function AddTrainingMembership(props){
     props.addTrainingMembership(membership, trainingId, membershipId);
     handleClose();
     }
+  }
   }
 
   return (
@@ -97,7 +108,7 @@ function AddTrainingMembership(props){
             variant="standard" value={visitsAmountInputValue} 
             onChange={(event, val) => setValue(val)}/>
             <FormControl fullWidth>
-            <InputLabel>Тренировки</InputLabel>
+            <InputLabel required>Тренировки</InputLabel>
              <Select
              name='training'
              autoFocus variant="standard"
@@ -114,7 +125,7 @@ function AddTrainingMembership(props){
             </Select>
             </FormControl>
             <FormControl fullWidth>
-            <InputLabel>Абонементы</InputLabel>
+            <InputLabel required>Абонементы</InputLabel>
              <Select
              name='client'
              autoFocus variant="standard"

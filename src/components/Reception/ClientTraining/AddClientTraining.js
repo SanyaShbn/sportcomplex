@@ -10,6 +10,7 @@ import Stack from '@mui/material/Stack';
 import { SERVER_URL } from '../../../constants.js';
 import '../../CSS/employeeCSS.css';
 import '../../CSS/table.css';
+import { useValue } from '../../../context/ContextProvider.js';
 
 
 function AddClientTraining(props){
@@ -19,6 +20,9 @@ function AddClientTraining(props){
   const [clients, setClients] = useState([]);
   const [trainings, setTrainings] = useState([]);
   const [open, setOpen] = useState(false);
+  const {
+    dispatch,
+  } = useValue();
 
   useEffect(() => {
     fetchTrainings();
@@ -56,8 +60,19 @@ function AddClientTraining(props){
   };
 
   const handleSave = () => {
+    if(clientId.length === 0 |trainingId.length === 0){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Заполните обязательные поля!',
+        },});
+    }
+    else{
     props.addClientTraining(trainingId, clientId);
     handleClose();
+    }
   }
 
   return (
@@ -70,7 +85,7 @@ function AddClientTraining(props){
       <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
             <FormControl fullWidth>
-            <InputLabel>Тренировки</InputLabel>
+            <InputLabel required>Тренировки</InputLabel>
              <Select
              name='training'
              autoFocus variant="standard"
@@ -90,7 +105,7 @@ function AddClientTraining(props){
             </Select>
             </FormControl>
             <FormControl fullWidth>
-            <InputLabel>Клиенты</InputLabel>
+            <InputLabel required>Клиенты</InputLabel>
              <Select
              name='client'
              autoFocus variant="standard"

@@ -76,11 +76,11 @@ const Home = ({ setSelectedLink, link }) => {
 
   return (
     <main className='main-container'>
-    {isLoading ? (
+    {/* {isLoading ? (
       <Backdrop open={true} sx={{ zIndex: (theme) => theme.zIndex.modal + 1 }}>
         <CircularProgress sx={{ color: 'white' }} />
       </Backdrop>
-    ):(
+    ):( */}
         <>
         <div className='main-cards'>
         <Paper elevation={3} sx={{ p: 3 }}>
@@ -139,7 +139,7 @@ const Home = ({ setSelectedLink, link }) => {
         </Box>
         </div>
         </>
-  )}
+  {/* )} */}
     </main>
   )
 }

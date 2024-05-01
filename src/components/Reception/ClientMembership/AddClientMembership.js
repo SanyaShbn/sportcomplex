@@ -10,6 +10,7 @@ import Stack from '@mui/material/Stack';
 import { SERVER_URL } from '../../../constants.js';
 import '../../CSS/employeeCSS.css';
 import '../../CSS/table.css';
+import { useValue } from '../../../context/ContextProvider.js';
 
 
 function AddClientMembership(props){
@@ -19,7 +20,10 @@ function AddClientMembership(props){
   const [memberships, setMemberships] = useState([]);
   const [clients, setClients] = useState([]);
   const [open, setOpen] = useState(false);
-
+  const {
+    dispatch,
+  } = useValue();
+  
   useEffect(() => {
     fetchClients();
     fetchMemberships();
@@ -54,8 +58,19 @@ function AddClientMembership(props){
   };
 
   const handleSave = () => {
+    if(clientId.length === 0 | membershipId.length === 0){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Заполните обязательные поля!',
+        },});
+    }
+    else{
     props.addClientMembership(membershipId, clientId);
     handleClose();
+    }
   }
 
   return (
@@ -68,7 +83,7 @@ function AddClientMembership(props){
       <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
         <FormControl fullWidth>
-            <InputLabel>Клиенты</InputLabel>
+            <InputLabel required>Клиенты</InputLabel>
              <Select
              name='client'
              autoFocus variant="standard"
@@ -82,7 +97,7 @@ function AddClientMembership(props){
             </Select>
             </FormControl>
             <FormControl fullWidth>
-            <InputLabel>Абонементы</InputLabel>
+            <InputLabel required>Абонементы</InputLabel>
              <Select
              name='client'
              autoFocus variant="standard"

@@ -120,7 +120,14 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
           fetchUsers();
         }
         else {
-          alert('Что-то пошло не так!');
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'error',
+              message: 'Ошибка! Новую запись о сотруднике не удалось создать. Возможно, введенные вами значения адреса электронной '
+              + 'почты или номера телефона уже используются другими сотрудниками',
+            },});
         }
       })
       .catch(err => console.error(err))
@@ -145,7 +152,14 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
           fetchUsers();
         }
         else {
-          alert('Что-то пошло не так!');
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'error',
+              message: 'Ошибка! Не удалось обновить данные о сотруднике. Возможно, введенные вами значения адреса электронной '
+              + 'почты или номера телефона уже используются другими сотрудниками',
+            },});
         }
       })
       .catch(err => console.error(err))

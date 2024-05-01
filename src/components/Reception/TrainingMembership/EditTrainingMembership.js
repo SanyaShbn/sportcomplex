@@ -88,6 +88,16 @@ function EditTrainingMembership(props) {
   };
  
   const handleSave = () => {
+    if(trainingId.length === 0 | membershipId.length === 0){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Заполните обязательные поля!',
+        },});
+    }
+    else{
     if(visitsAmountInputValue < 1 | visitsAmountInputValue > 30){
       dispatch({
         type: 'UPDATE_ALERT',
@@ -109,6 +119,7 @@ function EditTrainingMembership(props) {
     handleClose();
   }
   }
+  }
 
   return(
     <div>
@@ -125,7 +136,7 @@ function EditTrainingMembership(props) {
             variant="standard" value={visitsAmountInputValue} 
             onChange={(event, val) => setValue(val)}/>
             <FormControl fullWidth>
-            <InputLabel>Тренировки</InputLabel>
+            <InputLabel required>Тренировки</InputLabel>
              <Select
              name='training'
              autoFocus variant="standard"
@@ -143,7 +154,7 @@ function EditTrainingMembership(props) {
             </Select>
             </FormControl>
             <FormControl fullWidth>
-            <InputLabel>Абонементы</InputLabel>
+            <InputLabel required>Абонементы</InputLabel>
              <Select
              name='sportComplexMembership'
              autoFocus variant="standard"

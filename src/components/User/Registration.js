@@ -28,7 +28,14 @@ const Registration = (props) => {
   const emailRef = useRef();
   const passwordRef = useRef();
   const confirmPasswordRef = useRef();
+  const [isValidPassword, setIsValidPassword] = useState(false);
 
+  const handleIsValidPasswordChange = (event) => {
+    const { value } = event.target;
+    const isInvalid = value.length < 8;
+    setIsValidPassword(isInvalid);
+    setUser({...user, [event.target.name] : event.target.value});
+  };
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState({
     userLogin: '', 
@@ -131,6 +138,7 @@ const Registration = (props) => {
 
   const handleClose = () => {
     setOpen(false)
+    setIsValidPassword(false)
   };
 
   const handleCloseAndSwitchOff = () => {
@@ -274,6 +282,7 @@ const Registration = (props) => {
             onChange={handleChange}
           />
           <TextField
+          error={isValidPassword}
           autoFocus
           margin="normal"
           variant="standard"
@@ -284,7 +293,8 @@ const Registration = (props) => {
           inputRef={passwordRef}
           inputProps={{ minLength: 5 }}
           required
-          onChange={handleChange}
+          helperText="Пароль должен содержать не менее 8 символов"
+          onChange={handleIsValidPasswordChange}
           InputProps={{
           endAdornment: (
           <InputAdornment position="end">

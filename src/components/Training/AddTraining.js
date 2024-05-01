@@ -29,6 +29,7 @@ function AddTraining(props){
   const [isGroup, setIsGroup] = useState(true);
   const [capacityInputValue, setCapacityValue] = React.useState(null);
   const [costInputValue, setCostValue] = React.useState(null);
+  const [isNameError, setIsNameError] = useState(false);
   const {
     dispatch,
   } = useValue();
@@ -38,6 +39,12 @@ function AddTraining(props){
     fetchCoaches()
   }, []);
 
+  const handleNameErrorChange = (event) => {
+    const { value } = event.target;
+    const isInvalid = value.length < 2 || value[0] !== value[0].toUpperCase() || !/^[\u0400-\u04FF\s]+$/.test(value);
+    setIsNameError(isInvalid);
+    setTraining({...training, [event.target.name]: event.target.value});
+  };
   const fetchFacilities = () => {
       // const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/view_facilities', {
@@ -59,6 +66,10 @@ function AddTraining(props){
     }
 
   const handleClickOpen = () => {
+    setTraining({
+      ...training, type: 'групповое'
+    })
+    setIsGroup(true)
     setOpen(true);
   };
     
@@ -69,9 +80,30 @@ function AddTraining(props){
     })
     setCapacityValue(null)
     setCostValue(null)
+    setIsNameError(false)
   };
 
   const handleSave = () => {
+    if(training.name.length === 0 | coachId.length === 0 | complexFacilityId.length === 0){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Заполните обязательные поля!',
+        },});
+    }
+    else{
+      if(isNameError){
+        dispatch({
+          type: 'UPDATE_ALERT',
+          payload: {
+            open: true,
+            severity: 'error',
+            message: 'Проверьте корректность ввода данных!',
+          },});
+      }
+    else{
     if(costInputValue < 1){
       dispatch({
         type: 'UPDATE_ALERT',
@@ -106,9 +138,7 @@ function AddTraining(props){
     handleClose();
   }
   }
-
-  const handleChange = (event) => {
-    setTraining({...training, [event.target.name]: event.target.value});
+  }
   }
 
   const handleChangeType = (event) => {
@@ -125,9 +155,9 @@ function AddTraining(props){
       <DialogTitle className='dialog'>Новая тренировка</DialogTitle>
       <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
-          <TextField label="Наименование" name="name"
+          <TextField error={isNameError} label="Наименование" name="name" required
             variant="standard" value={training.name} 
-            onChange={handleChange}/>
+            onChange={handleNameErrorChange}/>
             <FormControl>
             <FormLabel id="demo-radio-buttons-group-label">Тип занятия</FormLabel>
             <RadioGroup
@@ -140,13 +170,14 @@ function AddTraining(props){
             <FormControlLabel value="персональное" control={<Radio color="primary" />} label="Персональное" />
             </RadioGroup>
             </FormControl>
-            {isGroup && ( <NumberInput
+            {isGroup && ( <NumberInput required
             label="Емкость (чел.)"
             placeholder="Емкость (чел.)"
             variant="standard" value={capacityInputValue} 
             onChange={(event, val) => setCapacityValue(val)}/>
             )}
              <CurrencyTextField
+              required
 		          label="Стоимость (бел.руб.)"
 		          variant="standard"
 	          	value={costInputValue}
@@ -155,7 +186,7 @@ function AddTraining(props){
 		          onChange={(event, value)=> setCostValue(value)}
             />
             <FormControl fullWidth>
-            <InputLabel>Место проведения</InputLabel>
+            <InputLabel required>Место проведения</InputLabel>
              <Select
              name='complexFacility'
              autoFocus variant="standard"
@@ -168,7 +199,7 @@ function AddTraining(props){
             </Select>
             </FormControl>
             <FormControl fullWidth>
-            <InputLabel>Тренер</InputLabel>
+            <InputLabel required>Тренер</InputLabel>
              <Select
              name='coach'
              autoFocus variant="standard"

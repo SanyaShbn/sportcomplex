@@ -10,6 +10,7 @@ import { SERVER_URL } from '../../../constants.js';
 import {FormControl, InputLabel, MenuItem} from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
+import { useValue } from '../../../context/ContextProvider.js';
 
 function EditClientMembership(props) {
 
@@ -21,7 +22,10 @@ function EditClientMembership(props) {
     const [client_membership, setClientMembership] = useState({
       sportComplexMembership: '', client: ''
     });
-  
+    const {
+      dispatch,
+    } = useValue();
+
     useEffect(() => {
       fetchClients();
       fetchMemberships();
@@ -76,8 +80,19 @@ function EditClientMembership(props) {
   };
  
   const handleSave = () => {
+    if(clientId.length === 0 | membershipId.length === 0){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Заполните обязательные поля!',
+        },});
+    }
+    else{
     props.updateClientMembership(props.data.id, membershipId, clientId);
     handleClose();
+    }
   }
 
   return(
@@ -90,7 +105,7 @@ function EditClientMembership(props) {
           <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
         <FormControl fullWidth>
-            <InputLabel>Клиенты</InputLabel>
+            <InputLabel required>Клиенты</InputLabel>
              <Select
              name='client'
              autoFocus variant="standard"
@@ -105,7 +120,7 @@ function EditClientMembership(props) {
             </Select>
             </FormControl>
             <FormControl fullWidth>
-            <InputLabel>Абонементы</InputLabel>
+            <InputLabel required>Абонементы</InputLabel>
              <Select
              name='sportComplexMembership'
              autoFocus variant="standard"

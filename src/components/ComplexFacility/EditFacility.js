@@ -14,13 +14,22 @@ import { useValue } from '../../context/ContextProvider';
 function EditFacility(props) {
   const [open, setOpen] = useState(false);
   const [capacityInputValue, setValue] = React.useState(null);
+  const [isNameError, setIsNameError] = useState(false);
   const [facility, setFacility] = useState({
     name: '', trainingsAmount: 0, capacity: ''
   });
   const {
     dispatch,
   } = useValue();
+
+  const handleNameErrorChange = (event) => {
+    const { value } = event.target;
+    const isInvalid = value.length < 2 || value[0] !== value[0].toUpperCase() || !/^[\u0400-\u04FF\s]+$/.test(value);
+    setIsNameError(isInvalid);
+    setFacility({...facility, [event.target.name]: event.target.value});
+  };
   const handleClickOpen = () => {
+    if(props.data.row.trainingsAmount !== 0){
     dispatch({
       type: 'UPDATE_ALERT',
       payload: {
@@ -28,6 +37,7 @@ function EditFacility(props) {
         severity: 'warning',
         message: 'Внимание! При изменении информации о данном сооружении все тренировочные занятия, которые планировалось проводить в данном сооружении, автоматически отменяются',
       },});
+    }
     setFacility({
       name: props.data.row.name,
       trainingsAmount: props.data.row.trainingsAmount,
@@ -39,14 +49,20 @@ function EditFacility(props) {
 
   const handleClose = () => {
     setOpen(false);
+    setIsNameError(false)
   };
-  
-  const handleChange = (event) => {
-    setFacility({...facility, 
-      [event.target.name]: event.target.value});
-  }
 
   const handleSave = () => {
+    if(facility.name.length === 0 | facility.capacity.length === 0){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Заполните обязательные поля!',
+        },});
+    }
+    else{
     if(capacityInputValue < 1 | capacityInputValue > 50){
       dispatch({
         type: 'UPDATE_ALERT',
@@ -58,9 +74,21 @@ function EditFacility(props) {
         },});
     }
     else{
-    facility.capacity = capacityInputValue
-    props.updateFacility(facility, props.data.id);
-    handleClose();
+      if(isNameError){
+        dispatch({
+          type: 'UPDATE_ALERT',
+          payload: {
+            open: true,
+            severity: 'error',
+            message: 'Проверьте корректность ввода данных!'
+          },});
+      }
+      else{
+        facility.capacity = capacityInputValue
+        props.updateFacility(facility, props.data.id);
+        handleClose();
+      }
+    }
     }
   }
 
@@ -73,10 +101,11 @@ function EditFacility(props) {
           <DialogTitle className='dialog'>Обновление информации о сооружении</DialogTitle>
           <DialogContent className='dialog'>
           <Stack spacing={2} mt={1}>
-          <TextField label="Наименование" name="name" autoFocus
-            variant="standard" value={facility.name} 
-            onChange={handleChange}/>
+          <TextField error={isNameError} label="Наименование" name="name" autoFocus
+            variant="standard" value={facility.name} required
+            onChange={handleNameErrorChange}/>
              <NumberInput
+              required
               label="Вместимость (чел.)"
               placeholder="Вместимость (чел.)"
               variant="standard" value={capacityInputValue} 

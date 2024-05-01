@@ -9,13 +9,40 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import InputAdornment from '@mui/material/InputAdornment';
+import CurrencyTextField from '@lupus-ai/mui-currency-textfield'
+import { useValue } from '../../context/ContextProvider';
 
 function AddSportComplexMembership(props){
   const [open, setOpen] = useState(false);
   const [membership, setMembership] = useState({
     name: '', durationDeadline: '', cost: '', completeVisitsAmount: ''
   });
+  const [costInputValue, setCostValue] = React.useState(null);
+  const [isNameError, setIsNameError] = useState(false);
+  const [isDateError, setIsDateError] = useState(false);
+  const {
+    dispatch,
+  } = useValue();
 
+  const handleNameErrorChange = (event) => {
+    const { value } = event.target;
+    const isInvalid = value.length < 2 || value[0] !== value[0].toUpperCase() || !/^[\u0400-\u04FF\s]+$/.test(value);
+    setIsNameError(isInvalid);
+    setMembership({...membership, [event.target.name]: event.target.value});
+  };
+  const handleDateErrorChange = (event) => {
+    const inputDate = new Date(event.target.value);
+    const today = new Date();
+    const weekFromToday = new Date();
+    weekFromToday.setDate(today.getDate() + 7);
+
+    if(inputDate < weekFromToday) {
+      setIsDateError(true);
+    } else {
+      setIsDateError(false);
+    }
+    setMembership({...membership, [event.target.name]: event.target.value});
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -26,16 +53,50 @@ function AddSportComplexMembership(props){
     setMembership({
         name: '', durationDeadline: '', cost: '', completeVisitsAmount: ''
     })
+    setIsNameError(false)
+    setIsDateError(false)
   };
 
   const handleSave = () => {
-    props.addMembership(membership);
-    handleClose();
+    if(membership.name.length === 0 | membership.durationDeadline.length === 0){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Заполните обязательные поля',
+        },});
+    }
+    else{
+    if(isNameError | isDateError){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Проверьте корректность ввода данных',
+        },});
+    }
+    else{
+      if(costInputValue < 1){
+        dispatch({
+          type: 'UPDATE_ALERT',
+          payload: {
+            open: true,
+            severity: 'error',
+            message: 'Проверьте корректность ввода данных! Значение стоимости абонемента не может быть столь низкой,'
+            +' а также отрицательной',
+          },});
+      }
+      else{
+        membership.cost = costInputValue
+        props.addMembership(membership);
+        handleClose();
+      }
+    }
+  }
   }
 
-  const handleChange = (event) => {
-    setMembership({...membership, [event.target.name]: event.target.value});
-  }
   return (
     <div>
     <Button className="shine-button" variant="contained" onClick={handleClickOpen}>
@@ -45,12 +106,13 @@ function AddSportComplexMembership(props){
       <DialogTitle className='dialog'>Новый абонемент</DialogTitle>
       <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
-          <TextField label="Наименование" name="name" autoFocus
+          <TextField error={isNameError} required label="Наименование" name="name" autoFocus
             variant="standard" value={membership.name} 
-            onChange={handleChange}/>
-           <TextField type='date' label="Дата окончания действия" name="durationDeadline"
-            variant="standard" value={membership.durationDeadline} 
-            onChange={handleChange}
+            onChange={handleNameErrorChange}/>
+           <TextField  error={isDateError} required type='date' label="Дата окончания действия" name="durationDeadline"
+            helperText="Срок действия абонемента должен быть не менее недели" variant="standard"
+             value={membership.durationDeadline} 
+            onChange={handleDateErrorChange}
             InputProps={{
                 inputProps: {
                   inputMode: 'numeric',
@@ -59,9 +121,15 @@ function AddSportComplexMembership(props){
                   <InputAdornment position="start"> </InputAdornment>
                 ),
               }}/>
-          <TextField label="Стоимость (бел.руб.)" name="cost" 
-            variant="standard" value={membership.cost} 
-            onChange={handleChange}/>
+           <CurrencyTextField
+              required
+		          label="Стоимость (бел.руб.)"
+		          variant="standard"
+	          	value={membership.cost}
+	          	currencySymbol="BYN"
+		          outputFormat="string"
+		          onChange={(event, value)=> setCostValue(value)}
+            />
         </Stack>
       </DialogContent>
       <DialogActions>

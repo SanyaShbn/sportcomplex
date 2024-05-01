@@ -19,11 +19,54 @@ import { useValue } from '../../context/ContextProvider.js';
 
 function AddEmployee(props){
   const [open, setOpen] = useState(false);
+  const [isEmailError, setIsEmailError] = useState(false);
+  const [isNameError, setIsNameError] = useState(false);
+  const [isSurNameError, setIsSurNameError] = useState(false);
+  const [isPatrSurNameError, setIsPatrSurNameError] = useState(false);
+  const [isBirthDateError, setIsBirthDateError] = useState(false);
   const [employee, setEmployee] = useState({
     firstName: '', surName: '', patrSurName: '', email: '', 
     phoneNumber: '', birthDate:'', post: '', role: ''
   });
+  const handleEmailErrorChange = (event) => {
+    const { value } = event.target;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    setIsEmailError(!emailRegex.test(value));
+    setEmployee({...employee, [event.target.name]: event.target.value});
+  };
+  const handleNameErrorChange = (event) => {
+    const { value } = event.target;
+    const isInvalid = value.length < 2 || value[0] !== value[0].toUpperCase() || !/^[\u0400-\u04FF]+$/.test(value);
+    setIsNameError(isInvalid);
+    setEmployee({...employee, [event.target.name]: event.target.value});
+  };
+  const handleSurNameErrorChange = (event) => {
+    const { value } = event.target;
+    const isInvalid = value.length < 2 || value[0] !== value[0].toUpperCase() || !/^[\u0400-\u04FF]+$/.test(value);
+    setIsSurNameError(isInvalid);
+    setEmployee({...employee, [event.target.name]: event.target.value});
+  };
+  const handlePatrSurNameErrorChange = (event) => {
+    const { value } = event.target;
+    const isInvalid = value.length < 2 || value[0] !== value[0].toUpperCase() || !/^[\u0400-\u04FF]+$/.test(value);
+    setIsPatrSurNameError(isInvalid);
+    setEmployee({...employee, [event.target.name]: event.target.value});
+  };
+  const handleBirthDateErrorChange = (event) => {
+    const { value } = event.target;
+    const birthDate = new Date(value);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
 
+    const isInvalid = age < 18;
+
+    setIsBirthDateError(isInvalid);
+    setEmployee({...employee, [event.target.name]: event.target.value});
+  };
   const {
     dispatch,
   } = useValue();
@@ -58,9 +101,35 @@ function AddEmployee(props){
       firstName: '', surName: '', patrSurName: '', email: '', 
       phoneNumber: '', birthDate:'', post: '', role:'', status: ''
     })
+    setIsEmailError(false)
+    setIsNameError(false)
+    setIsSurNameError(false)
+    setIsPatrSurNameError(false)
+    setIsBirthDateError(false)
   };
 
   const handleSave = () => {
+    if(employee.firstName.length === 0 | employee.surName.length === 0 | employee.patrSurName.length === 0
+      | employee.email.length === 0 | employee.post.length === 0 | employee.birthDate.length === 0){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Заполните обязательные поля',
+        },});
+    }
+    else{
+    if(!isValid | isEmailError | isNameError | isSurNameError | isPatrSurNameError | isBirthDateError){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Проверьте корректность ввода данных',
+        },});
+    }
+    else{
     switch (employee.post) {
       case 'Сотрудник тренерского персонала':
         employee.role = "COACH";
@@ -82,19 +151,10 @@ function AddEmployee(props){
     }
     employee.status = "disabled"
     employee.phoneNumber = phone
-    if(!isValid){
-      dispatch({
-        type: 'UPDATE_ALERT',
-        payload: {
-          open: true,
-          severity: 'error',
-          message: 'Проверьте корректность ввода данных',
-        },});
-    }
-    else{
     props.addEmployee(employee);
     handleClose();
     }
+  }
   }
 
   const handleChange = (event) => {
@@ -109,28 +169,29 @@ function AddEmployee(props){
       <DialogTitle className='dialog'>Новый сотрудник</DialogTitle>
       <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
-          <TextField label="Имя" name="firstName" autoFocus
+          <TextField error={isNameError} label="Имя" name="firstName" autoFocus
             variant="standard" value={employee.firstName} required
-            onChange={handleChange}/>
-           <TextField label="Фамилия" name="surName"
+            onChange={handleNameErrorChange}/>
+           <TextField error={isSurNameError} label="Фамилия" name="surName"
             variant="standard" value={employee.surName} required
-            onChange={handleChange}/>
-          <TextField label="Отчество" name="patrSurName" 
+            onChange={handleSurNameErrorChange}/>
+          <TextField error={isPatrSurNameError} label="Отчество" name="patrSurName" 
             variant="standard" value={employee.patrSurName} required
-            onChange={handleChange}/>
-          <TextField label="Email" name="email" type="email"
+            onChange={handlePatrSurNameErrorChange}/>
+          <TextField error = {isEmailError} label="Email" name="email" type="email"
             variant="standard" value={employee.email} required
-            onChange={handleChange}/>
+            onChange={handleEmailErrorChange}/>
           <TextField
            error={!isValid}
            value={inputValue}
+           required
            onChange={handlePhoneValueChange}
            label="Номер телефона"
            variant="outlined"
           />
-          <TextField type='date' label="Дата рождения" name="birthDate" 
-            variant="standard" value={employee.birthDate} required
-            onChange={handleChange} InputProps={{
+          <TextField error={isBirthDateError} type='date' label="Дата рождения" name="birthDate" 
+            variant="standard" value={employee.birthDate} required helperText="Потенциальный сотрудник должен быть совершеннолетним"
+            onChange={handleBirthDateErrorChange} InputProps={{
               inputProps: {
                 inputMode: 'numeric',
               },
@@ -139,18 +200,15 @@ function AddEmployee(props){
               ),
             }}/>
           <FormControl fullWidth>
-            <InputLabel>Должность</InputLabel>
+            <InputLabel required>Должность</InputLabel>
              <Select
               name="post"
               value={employee.post}
               autoFocus variant="standard"
               label="Должность"
-              required
               onChange={handleChange}>
               <MenuItem value={"Сотрудник тренерского персонала"}>Сотрудник тренерского персонала</MenuItem>
-              <MenuItem value={"Бухгалтер"}>Бухгалтер</MenuItem>
               <MenuItem value={"Менеджер по клиентам"}>Менеджер по клиентам</MenuItem>
-              <MenuItem value={"Сотрудник отдела маркетинга"}>Сотрудник отдела маркетинга</MenuItem>
               <MenuItem value={"Сотрудник обслуживающего персонала"}>Сотрудник обслуживающего персонала</MenuItem>
             </Select>
             </FormControl>
