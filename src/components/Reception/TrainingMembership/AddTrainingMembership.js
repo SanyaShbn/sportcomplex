@@ -99,7 +99,7 @@ function AddTrainingMembership(props){
       Добавить информацию
     </Button>
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle className='dialog'>Новый пакет тренировок</DialogTitle>
+      <DialogTitle className='dialog'>Новый пакет услуг</DialogTitle>
       <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
            <NumberInput

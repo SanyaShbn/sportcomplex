@@ -25,7 +25,7 @@ import ClientMembershipTable from "../Reception/ClientMembership/ClientMembershi
     const list = useMemo(
       () => [
         {
-          title: 'Пакеты тренировок',
+          title: 'Пакеты услуг',
           icon: <LuPackage2 />,
           link: 'training_memberships',
           component: <TrainingMembershipTable {...{ setSelectedButtonLink, link: 'training_memberships' }} />,

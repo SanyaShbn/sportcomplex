@@ -183,7 +183,7 @@ function EditEmployee(props) {
         <EditIcon color="primary" />
     </IconButton>
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle className='dialog'>Новый сотрудник</DialogTitle>
+      <DialogTitle className='dialog'>Обновление информации о сотруднике</DialogTitle>
       <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
           <TextField error={isNameError} label="Имя" name="firstName" autoFocus
@@ -234,7 +234,7 @@ function EditEmployee(props) {
       </DialogContent>
       <DialogActions>
          <Button onClick={handleClose}>Отмена</Button>
-         <Button onClick={handleSave}>Добавить</Button>
+         <Button onClick={handleSave}>Сохранить</Button>
       </DialogActions>
     </Dialog>            
   </div>

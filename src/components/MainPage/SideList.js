@@ -196,17 +196,17 @@ import FinanciesMain from "../Financies/FinanciesMain.js"
           </div>
           </div>
         },
-        {
-            title: 'Поставщики',
-            icon: <FaTruckLoading />,
-            link: '',
-          },
-          {
-            title: 'Акции',
-            icon: <CiDiscount1 />,
-            link: '',
+        // {
+        //     title: 'Поставщики',
+        //     icon: <FaTruckLoading />,
+        //     link: '',
+        //   },
+        //   {
+        //     title: 'Акции',
+        //     icon: <CiDiscount1 />,
+        //     link: '',
             
-          },
+        //   },
           {
             title: 'Абонементы',
             icon: <MdCardMembership />,

@@ -25,6 +25,7 @@ const Home = ({ setSelectedLink, link }) => {
   }, []);
 
   const location = useLocation();
+  const [employees, setEmployees] = useState([]);
   const [users, setUsers] = useState([]);
   const [memberships, setMemberships] = useState([]);
   const [clients, setClients] = useState([]);
@@ -38,7 +39,10 @@ const Home = ({ setSelectedLink, link }) => {
     })
     .then(response => response.json())
     .then(data => {
-      setUsers(data._embedded.users)
+      const employeesData = data._embedded.users;
+      setEmployees(employeesData);
+      const usersData = employeesData.filter(employee => employee.status !== 'disabled');
+      setUsers(usersData);
       setIsLoading(false)
     })
     .catch(err => console.error(err));    
@@ -120,6 +124,19 @@ const Home = ({ setSelectedLink, link }) => {
         >
           <BsPeopleFill  size={70} sx={{ height: 100, width: 100, opacity: 0.3, mr: 1 }} />
           <Typography variant="h4">{users.length}</Typography>
+        </Box>
+        </Paper>
+        <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h6">СОТРУДНИКИ</Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <BsPeopleFill  size={70} sx={{ height: 100, width: 100, opacity: 0.3, mr: 1 }} />
+          <Typography variant="h4">{employees.length}</Typography>
         </Box>
         </Paper>
         <Paper elevation={3} sx={{ p: 3, gridColumn: '1/3' }}>

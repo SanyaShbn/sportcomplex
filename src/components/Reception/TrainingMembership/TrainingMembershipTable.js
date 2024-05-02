@@ -249,7 +249,7 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
       component="h5"
       sx={{ textAlign: 'center', mt: 3, mb: 3 }}
     >
-    Пакеты тренировок  
+    Пакеты услуг  
     </Typography>
       <main className='info_pages_body'>
     <React.Fragment>

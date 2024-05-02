@@ -127,7 +127,7 @@ function EditTrainingMembership(props) {
         <EditIcon color="primary" />
       </IconButton>
       <Dialog open={open} onClose={handleClose}>
-          <DialogTitle className='dialog'>Обновление информации о пакете тренировок</DialogTitle>
+          <DialogTitle className='dialog'>Обновление информации о пакете услуг</DialogTitle>
           <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
         <NumberInput
