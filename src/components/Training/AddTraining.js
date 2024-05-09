@@ -115,11 +115,7 @@ function AddTraining(props){
         },});
     }
     else{
-    if(training.type === 'персональное'){
-      training.capacity = 1
-    }
-    else {
-      if(capacityInputValue < 2 | capacityInputValue > 50){
+    if(training.type !== 'персональное' && capacityInputValue < 2 | capacityInputValue > 50){
       dispatch({
         type: 'UPDATE_ALERT',
         payload: {
@@ -129,13 +125,17 @@ function AddTraining(props){
           'занятие/приобрести услугу одновременно) не может принимать значения менее 2, либо более 50',
         },});
     }
-    else{
-    training.capacity = capacityInputValue
+    else {
+    if(training.type === 'групповое'){
+      training.capacity = capacityInputValue
     }
-    }
+    else{training.capacity = 1}
     training.cost = costInputValue
     props.addTraining(training, complexFacilityId, coachId);
-    handleClose();
+    handleClose()
+    setCoachId('')
+    setComplexFacilityId('')
+    }
   }
   }
   }

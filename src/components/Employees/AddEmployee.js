@@ -134,14 +134,8 @@ function AddEmployee(props){
       case 'Сотрудник тренерского персонала':
         employee.role = "COACH";
         break;
-      case 'Бухгалтер':
-        employee.role = "ACCOUNTANT";
-        break;
       case 'Менеджер по клиентам':
         employee.role = "MANAGER";
-        break;
-      case 'Сотрудник отдела маркетинга':
-        employee.role= "MARKETER";
         break;
       case 'Сотрудник обслуживающего персонала':
         employee.role= "CLEANER";

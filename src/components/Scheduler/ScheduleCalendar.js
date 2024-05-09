@@ -94,6 +94,8 @@ export default class ScheduleCalendar extends Component {
         });
 
         scheduler.attachEvent("onLightbox", function(id) {
+            var lightbox = scheduler.getLightbox(); 
+            lightbox.style.top = "80px";
             setTimeout(function() {
             var node = scheduler.formSection("Тип события").node;
             var radios = node.getElementsByTagName("input");
@@ -125,8 +127,8 @@ export default class ScheduleCalendar extends Component {
                         }
                         else{
                             options = data.map(item => ({
-                                key: item.facilityType + " №" + item.idComplexFacility,
-                                label: item.facilityType + " №" +item.idComplexFacility,
+                                key: item.name + " №" + item.idComplexFacility,
+                                label: item.name + " №" +item.idComplexFacility,
                              }));
                         }
                         scheduler.formSection("Событие").control.options.length = 0;

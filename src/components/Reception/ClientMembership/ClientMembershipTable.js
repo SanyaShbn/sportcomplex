@@ -31,7 +31,9 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
 
 
     const [client_memberships, setClientMemberships] = useState([]);
-    const [open, setOpen] = useState(false);
+    const [delOpen, setDelOpen] = useState(false);
+    const [addOpen, setAddOpen] = useState(false);
+    const [editOpen, setEditOpen] = useState(false);
     const [rows, setRows] = useState([]);
     const [dialogOpen, setDialogOpen] = useState(false);
   
@@ -64,7 +66,7 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
         .then(response => {
           if (response.ok) {
             fetchClientMemberships();
-            setOpen(true);
+            setDelOpen(true);
           }
           else {
             alert('Что-то пошло не так!');
@@ -87,6 +89,7 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
       .then(response => {
         if (response.ok) {
           fetchClientMemberships();
+          setAddOpen(true)
         }
         else {
           alert('Что-то пошло не так!');
@@ -111,6 +114,7 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
       .then(response => {
         if (response.ok) {
           fetchClientMemberships();
+          setEditOpen(true)
         }
         else {
           alert('Что-то пошло не так!');
@@ -182,6 +186,11 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
         onClose={() => setDialogOpen(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        sx={{
+          '& .MuiBackdrop-root': {
+            backgroundColor: 'rgba(0, 0, 0, 0.2)', 
+          },
+        }}
       >
         <DialogTitle id="alert-dialog-title">{"ВЫ уверены, что хотите удалить запись о продаже абонемента?"}</DialogTitle>
         <DialogContent>
@@ -254,10 +263,22 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
           }}
         />
         <Snackbar
-          open={open}
+          open={delOpen}
           autoHideDuration={2000}
-          onClose={() => setOpen(false)}
+          onClose={() => setDelOpen(false)}
           message="Запись о продаже абонемента удалена"
+        />
+        <Snackbar
+          open={addOpen}
+          autoHideDuration={2000}
+          onClose={() => setAddOpen(false)}
+          message="Запись о новой продаже абонемента успешно добавлена"
+        />
+        <Snackbar
+          open={editOpen}
+          autoHideDuration={2000}
+          onClose={() => setEditOpen(false)}
+          message="Информация о продаже абонемента успешно обновлена"
         />
       </div>
     </React.Fragment>

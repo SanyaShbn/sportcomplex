@@ -101,7 +101,7 @@ const ClientTable = ({ setSelectedLink, link }) => {
       {field: 'phoneNumber', headerName: 'Номер телефона', width: 200},
       {field: 'email', headerName: 'Email', width: 250},
       {
-        field: '_links.employee.href', 
+        field: '_links.client.href', 
         headerName: '', 
         sortable: false,
         filterable: false,
@@ -126,6 +126,11 @@ const ClientTable = ({ setSelectedLink, link }) => {
         onClose={() => setDialogOpen(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        sx={{
+          '& .MuiBackdrop-root': {
+            backgroundColor: 'rgba(0, 0, 0, 0.2)', 
+          },
+        }}
       >
         <DialogTitle id="alert-dialog-title">{"ВЫ уверены, что хотите удалить запись о клиенте?"}</DialogTitle>
         <DialogContent>

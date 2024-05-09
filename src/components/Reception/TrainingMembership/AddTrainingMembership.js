@@ -62,6 +62,7 @@ function AddTrainingMembership(props){
     setMembership({
         visitsAmount: ''
       })
+    setValue(null)
   };
 
   const handleSave = () => {

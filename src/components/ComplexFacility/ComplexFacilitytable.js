@@ -34,7 +34,9 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
   } = useValue();
 
     const [facilities, setFacilities] = useState([]);
-    const [open, setOpen] = useState(false);
+    const [delOpen, setDelOpen] = useState(false);
+    const [addOpen, setAddOpen] = useState(false);
+    const [editOpen, setEditOpen] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
   
     useEffect(() => {
@@ -74,7 +76,7 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
             },});
           }
           fetchFacilities();
-          setOpen(true);
+          setDelOpen(true);
         }
         else {
           alert('Что-то пошло не так!');
@@ -99,6 +101,7 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
       .then(response => {
         if (response.ok) {
           fetchFacilities();
+          setAddOpen(true)
         }
         else {
           alert('Что-то пошло не так!');
@@ -124,6 +127,7 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
       .then(response => {
         if (response.ok) {
           fetchFacilities();
+          setEditOpen(true)
         }
         else {
           alert('Что-то пошло не так!');
@@ -162,6 +166,11 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
         onClose={() => setDialogOpen(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        sx={{
+          '& .MuiBackdrop-root': {
+            backgroundColor: 'rgba(0, 0, 0, 0.2)', 
+          },
+        }}
       >
         <DialogTitle id="alert-dialog-title">{"ВЫ уверены, что хотите удалить запись о сооружении комплекса?"}</DialogTitle>
         <DialogContent>
@@ -220,10 +229,22 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
           }}
         />
         <Snackbar
-          open={open}
+          open={delOpen}
           autoHideDuration={2000}
-          onClose={() => setOpen(false)}
+          onClose={() => setDelOpen(false)}
           message="Запись о сооружении удалена"
+        />
+        <Snackbar
+          open={addOpen}
+          autoHideDuration={2000}
+          onClose={() => setAddOpen(false)}
+          message="Запись о новом сооружении успешно добавлена"
+        />
+        <Snackbar
+          open={editOpen}
+          autoHideDuration={2000}
+          onClose={() => setEditOpen(false)}
+          message="Информация о сооружении успешно обновлена"
         />
       </div>
     </React.Fragment>

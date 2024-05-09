@@ -42,6 +42,7 @@ import UpdateProfile from "../User/UpdateProfile.js"
 import { blue } from '@mui/material/colors';
 import { jwtDecode } from 'jwt-decode';
 import FinanciesMain from "../Financies/FinanciesMain.js"
+import { useValue } from '../../context/ContextProvider';
   
   const drawerWidth = 250;
 
@@ -123,10 +124,17 @@ import FinanciesMain from "../Financies/FinanciesMain.js"
   }));
   
   const SideList = ({ open, setOpen }) => {
-
+    const {
+      dispatch,
+    } = useValue();
     const handleLogout = () => {
-      sessionStorage.setItem("jwt", "");
-      navigate("/", { replace: true })
+    sessionStorage.setItem("jwt", "");
+    dispatch({ type: 'START_LOADING' });
+
+    setTimeout(() => {
+      dispatch({ type: 'END_LOADING' });
+      navigate("/", { replace: true });
+    }, 1000);
     }
   
     const [selectedLink, setSelectedLink] = useState('');
@@ -168,7 +176,7 @@ import FinanciesMain from "../Financies/FinanciesMain.js"
           title: 'Клиенты',
           icon: <BsFillPersonVcardFill/>,
           link: 'clients',
-          component: [<ClientTable {...{ setSelectedLink, link: 'clients' }}/>, <Registration/>],
+          component: <ClientTable {...{ setSelectedLink, link: 'clients' }}/>,
         },
         {
           title: 'Сооружения комплекса',
@@ -287,7 +295,7 @@ import FinanciesMain from "../Financies/FinanciesMain.js"
           </List>
           <Divider />
           <Box sx={{ mx: 'auto', mt: 3, mb: 1 }}>
-            <Tooltip title={''}>
+            {/* <Tooltip title={''}>   title либо подписать, либо Tooltip убрать вообще!!!! */} 
               {/* <StyledBadge
                 overlap="circular"
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
@@ -302,7 +310,7 @@ import FinanciesMain from "../Financies/FinanciesMain.js"
               {/* профиль пользователя */}
               
               {/* </StyledBadge> */}
-            </Tooltip>
+            {/* </Tooltip> */}
           </Box>
           <Box sx={{ textAlign: 'center' }}>
             {open && <Typography>{}</Typography>}
@@ -319,8 +327,8 @@ import FinanciesMain from "../Financies/FinanciesMain.js"
               <Typography variant="body2">{}</Typography>
             )}
             <Tooltip title="Выйти" sx={{ mt: 1 }}>
-              <IconButton>
-                <Logout onClick={handleLogout}/>
+              <IconButton onClick={handleLogout}>
+                <Logout/>
               </IconButton>
             </Tooltip>
           </Box>

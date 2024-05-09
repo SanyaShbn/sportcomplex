@@ -9,6 +9,7 @@ import
 { BsPeopleFill, BsFillPersonVcardFill}
  from 'react-icons/bs'
  import {MdCardMembership} from "react-icons/md"
+ import { FaUserCircle } from "react-icons/fa";
  import { SERVER_URL } from '../../constants.js';
 import SoldMembershipsAreaChart from './SoldMembershipsAreaChart.js';
 import PieMembershipsCost from './PieMembershipsCost.js';
@@ -122,7 +123,7 @@ const Home = ({ setSelectedLink, link }) => {
             justifyContent: 'center',
           }}
         >
-          <BsPeopleFill  size={70} sx={{ height: 100, width: 100, opacity: 0.3, mr: 1 }} />
+          <FaUserCircle  size={70} sx={{ height: 100, width: 100, opacity: 0.3, mr: 1 }} />
           <Typography variant="h4">{users.length}</Typography>
         </Box>
         </Paper>

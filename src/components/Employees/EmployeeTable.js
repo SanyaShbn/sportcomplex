@@ -34,9 +34,11 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
   } = useValue();
 
     const [users, setUsers] = useState([]);
-    const [open, setOpen] = useState(false);
+    const [delOpen, setDelOpen] = useState(false);
+    const [addOpen, setAddOpen] = useState(false);
+    const [editOpen, setEditOpen] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
-  
+
     useEffect(() => {
       fetchUsers();
     }, []);
@@ -47,7 +49,11 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
         // headers: { 'Authorization' : token }
       })
       .then(response => response.json())
-      .then(data => setUsers(data._embedded.users))
+      .then(data => {
+        const nonAdminUsers = data._embedded.users.filter(user => user.role !== "ADMIN");
+        setUsers(nonAdminUsers);
+      }
+      )
       .catch(err => console.error(err));    
     }
 
@@ -66,7 +72,7 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
         .then(response => {
           if (response.ok) {
             fetchUsers();
-            setOpen(true);
+            setDelOpen(true);
             setDialogOpen(false)
           }
           else {
@@ -87,7 +93,7 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
         .then(response => {
           if (response.ok) {
             fetchUsers();
-            setOpen(true);
+            setDelOpen(true);
             dispatch({
               type: 'UPDATE_ALERT',
               payload: {
@@ -119,6 +125,7 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
       .then(response => {
         if (response.ok) {
           fetchUsers();
+          setAddOpen(true)
         }
         else {
           dispatch({
@@ -151,6 +158,7 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
       .then(response => {
         if (response.ok) {
           fetchUsers();
+          setEditOpen(true)
         }
         else {
           dispatch({
@@ -191,7 +199,6 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
         sortable: false,
         filterable: false,
         renderCell: row => 
-        row.row.role !== "COACH" ? 
         <div>
         <IconButton onClick={() => onDelClick()}>
           <DeleteIcon color="error" />
@@ -201,6 +208,11 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
         onClose={() => setDialogOpen(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        sx={{
+          '& .MuiBackdrop-root': {
+            backgroundColor: 'rgba(0, 0, 0, 0.2)', 
+          },
+        }}
       >
         <DialogTitle id="alert-dialog-title">{"ВЫ уверены, что хотите удалить запись о сотруднике?"}</DialogTitle>
         <DialogContent>
@@ -212,33 +224,8 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
           <Button onClick={() => setDialogOpen(false)} color="primary">
             Отменить
           </Button>
-          <Button onClick={() => handleConfirmDelete(row.id)} color="primary" autoFocus>
-            Удалить
-          </Button>
-        </DialogActions>
-      </Dialog>
-      </div> :  
-        <div>
-        <IconButton onClick={() => onDelClick()}>
-          <DeleteIcon color="error" />
-        </IconButton>
-        <Dialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"ВЫ уверены, что хотите удалить запись о сотруднике?"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Запись о сотруднике будет безвозвратно удалена
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)} color="primary">
-            Отменить
-          </Button>
-          <Button onClick={() => handleConfirmDeleteCoach(row.id)} color="primary" autoFocus>
+          <Button onClick={() => { row.row.role !== "COACH" ? handleConfirmDelete(row.id):
+            handleConfirmDeleteCoach(row.id)}} color="primary" autoFocus>
             Удалить
           </Button>
         </DialogActions>
@@ -293,10 +280,22 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
             },
           }}/>
         <Snackbar
-          open={open}
+          open={delOpen}
           autoHideDuration={2000}
-          onClose={() => setOpen(false)}
+          onClose={() => setDelOpen(false)}
           message="Запись о сотруднике удалена"
+        />
+        <Snackbar
+          open={addOpen}
+          autoHideDuration={2000}
+          onClose={() => setAddOpen(false)}
+          message="Запись о новом сотруднике успешно добавлена"
+        />
+        <Snackbar
+          open={editOpen}
+          autoHideDuration={2000}
+          onClose={() => setEditOpen(false)}
+          message="Информация о сотруднике успешно обновлена"
         />
       </div>
     </React.Fragment>

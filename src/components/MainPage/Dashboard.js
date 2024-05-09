@@ -41,7 +41,7 @@ export default function Dashboard() {
     () =>
       createTheme({
         palette: {
-          mode: dark ? 'dark' : 'light',
+          mode: dark ? 'light' : 'dark',
         },
       }),
     [dark]
@@ -79,7 +79,7 @@ export default function Dashboard() {
             <span className='company_title'>BestSports</span>
             </Typography>
             <IconButton onClick={() => setDark(!dark)}>
-              {dark ? <Brightness7 /> : <Brightness4 />}
+              {dark ? <Brightness4 /> : <Brightness7 />}
             </IconButton>
           </Toolbar>
         </AppBar>

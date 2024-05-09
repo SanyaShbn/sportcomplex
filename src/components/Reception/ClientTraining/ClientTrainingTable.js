@@ -35,7 +35,9 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
   } = useValue();
 
     const [client_trainings, setClientTrainings] = useState([]);
-    const [open, setOpen] = useState(false);
+    const [delOpen, setDelOpen] = useState(false);
+    const [addOpen, setAddOpen] = useState(false);
+    const [editOpen, setEditOpen] = useState(false);
     const [rows, setRows] = useState([]);
     const [dialogOpen, setDialogOpen] = useState(false);
   
@@ -68,7 +70,7 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
         .then(response => {
           if (response.ok) {
             fetchClientTrainings();
-            setOpen(true);
+            setDelOpen(true);
           }
           else {
             alert('Что-то пошло не так!');
@@ -104,6 +106,7 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
               });
             }
             fetchClientTrainings();
+            setAddOpen(true)
           });
         } else {
           if(response.status === 400){
@@ -152,6 +155,7 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
               });
             }
             fetchClientTrainings();
+            setEditOpen(true)
           });
         } else {
           if(response.status === 400){
@@ -253,6 +257,11 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
         onClose={() => setDialogOpen(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        sx={{
+          '& .MuiBackdrop-root': {
+            backgroundColor: 'rgba(0, 0, 0, 0.2)', 
+          },
+        }}
       >
         <DialogTitle id="alert-dialog-title">{"ВЫ уверены, что хотите удалить запись о согласованном занятии?"}</DialogTitle>
         <DialogContent>
@@ -326,10 +335,22 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
           }}
         />
         <Snackbar
-          open={open}
+          open={delOpen}
           autoHideDuration={2000}
-          onClose={() => setOpen(false)}
+          onClose={() => setDelOpen(false)}
           message="Запись о согласовании занятий удалена"
+        />
+        <Snackbar
+          open={addOpen}
+          autoHideDuration={2000}
+          onClose={() => setAddOpen(false)}
+          message="Запись о новом согласовании занятий успешно добавлена"
+        />
+        <Snackbar
+          open={editOpen}
+          autoHideDuration={2000}
+          onClose={() => setEditOpen(false)}
+          message="Информация о согласовании занятий успешно обновлена"
         />
       </div>
     </React.Fragment>

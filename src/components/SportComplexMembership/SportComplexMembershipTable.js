@@ -29,7 +29,9 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
   }, []);
 
     const [memberships, setMemberships] = useState([]);
-    const [open, setOpen] = useState(false);
+    const [delOpen, setDelOpen] = useState(false);
+    const [addOpen, setAddOpen] = useState(false);
+    const [editOpen, setEditOpen] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
   
     useEffect(() => {
@@ -61,7 +63,7 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
         .then(response => {
           if (response.ok) {
             fetchMemberships();
-            setOpen(true);
+            setDelOpen(true);
           }
           else {
             alert('Что-то пошло не так!');
@@ -85,6 +87,7 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
       .then(response => {
         if (response.ok) {
           fetchMemberships();
+          setAddOpen(true)
         }
         else {
           alert('Что-то пошло не так!');
@@ -110,6 +113,7 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
       .then(response => {
         if (response.ok) {
           fetchMemberships();
+          setEditOpen(true)
         }
         else {
           alert('Что-то пошло не так!');
@@ -149,6 +153,11 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
         onClose={() => setDialogOpen(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        sx={{
+          '& .MuiBackdrop-root': {
+            backgroundColor: 'rgba(0, 0, 0, 0.2)', 
+          },
+        }}
       >
         <DialogTitle id="alert-dialog-title">{"ВЫ уверены, что хотите удалить запись об абонементе?"}</DialogTitle>
         <DialogContent>
@@ -206,10 +215,22 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
             },
           }}/>
         <Snackbar
-          open={open}
+          open={delOpen}
           autoHideDuration={2000}
-          onClose={() => setOpen(false)}
+          onClose={() => setDelOpen(false)}
           message="Запись об абонементе удалена"
+        />
+        <Snackbar
+          open={addOpen}
+          autoHideDuration={2000}
+          onClose={() => setAddOpen(false)}
+          message="Запись о новом абонементе успешно добавлена"
+        />
+        <Snackbar
+          open={editOpen}
+          autoHideDuration={2000}
+          onClose={() => setEditOpen(false)}
+          message="Информация об абонементе занятий успешно обновлена"
         />
       </div>
     </React.Fragment>

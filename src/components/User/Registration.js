@@ -42,16 +42,17 @@ const Registration = (props) => {
     userPassword: '',
     status: ''
   });
-  let initial_check
-  if(props.data && props.data.row && props.data.row.status === "active"){
-    initial_check = true;
-  }
-  else{
-    initial_check = false;
-  }
   const [state, setState] = useState({
-    checked: initial_check,
+    checked: props.data && props.data.row && props.data.row.status === "active" ? true : false,
   });
+
+  useEffect(() => {
+    let initial_check = false;
+    if(props.data && props.data.row && props.data.row.status === "active"){
+      initial_check = true;
+    }
+    setState(prevState => ({...prevState, checked: initial_check}));
+  }, [props.data && props.data.row && props.data.row.status]);
 
   const handleSwitchClick = () => {
     let updated_user = props.data.row
