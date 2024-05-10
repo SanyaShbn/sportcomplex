@@ -9,17 +9,20 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import InputAdornment from '@mui/material/InputAdornment';
-import CurrencyTextField from '@lupus-ai/mui-currency-textfield'
 import { useValue } from '../../context/ContextProvider';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
 
 function AddSportComplexMembership(props){
   const [open, setOpen] = useState(false);
   const [membership, setMembership] = useState({
     name: '', durationDeadline: '', cost: '', completeVisitsAmount: ''
   });
-  const [costInputValue, setCostValue] = React.useState(null);
+  const [costInputValue, setCostValue] = useState('');
   const [isNameError, setIsNameError] = useState(false);
   const [isDateError, setIsDateError] = useState(false);
+  const [isCostError, setIsCostError] = useState(false);
   const {
     dispatch,
   } = useValue();
@@ -29,6 +32,15 @@ function AddSportComplexMembership(props){
     const isInvalid = value.length < 2 || value[0] !== value[0].toUpperCase() || !/^[\u0400-\u04FF\s]+$/.test(value);
     setIsNameError(isInvalid);
     setMembership({...membership, [event.target.name]: event.target.value});
+  };
+  const handleCostErrorChange = (event) => {
+    const { value } = event.target;
+    const isInvalid = value < 15 || value > 300
+    setIsCostError(isInvalid);
+    const re = /^[0-9]*\.?[0-9]{0,2}$/;
+    if (event.target.value === '' || re.test(event.target.value)) {
+        setCostValue(event.target.value);
+    }
   };
   const handleDateErrorChange = (event) => {
     const inputDate = new Date(event.target.value);
@@ -55,6 +67,8 @@ function AddSportComplexMembership(props){
     })
     setIsNameError(false)
     setIsDateError(false)
+    setIsCostError(false)
+    setCostValue('')
   };
 
   const handleSave = () => {
@@ -78,14 +92,14 @@ function AddSportComplexMembership(props){
         },});
     }
     else{
-      if(costInputValue < 1){
+      if(costInputValue < 15 | costInputValue > 300){
         dispatch({
           type: 'UPDATE_ALERT',
           payload: {
             open: true,
             severity: 'error',
-            message: 'Проверьте корректность ввода данных! Значение стоимости абонемента не может быть столь низкой,'
-            +' а также отрицательной',
+            message: 'Проверьте корректность ввода данных! Значение стоимости абонемента не соответствует рыночным стандартам' 
+            + ' (рекомендуемые значения: от 15 до 300 бел.руб.)',
           },});
       }
       else{
@@ -121,7 +135,18 @@ function AddSportComplexMembership(props){
                   <InputAdornment position="start"> </InputAdornment>
                 ),
               }}/>
-           <CurrencyTextField
+          <FormControl fullWidth sx={{ m: 1 }}>
+          <InputLabel error={isCostError} htmlFor="outlined-adornment-amount">Стоимость (бел.руб.)</InputLabel>
+          <OutlinedInput
+            error={isCostError}
+            id="outlined-adornment-amount"
+            value={costInputValue}
+            onChange={handleCostErrorChange}
+            startAdornment={<InputAdornment position="start">BYN</InputAdornment>}
+            label="Стоимость (бел.руб.)"
+          />
+        </FormControl>
+           {/* <CurrencyTextField
               required
 		          label="Стоимость (бел.руб.)"
 		          variant="standard"
@@ -129,7 +154,7 @@ function AddSportComplexMembership(props){
 	          	currencySymbol="BYN"
 		          outputFormat="string"
 		          onChange={(event, value)=> setCostValue(value)}
-            />
+            /> */}
         </Stack>
       </DialogContent>
       <DialogActions>

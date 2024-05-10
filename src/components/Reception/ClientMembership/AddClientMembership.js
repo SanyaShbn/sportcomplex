@@ -15,8 +15,8 @@ import { useValue } from '../../../context/ContextProvider.js';
 
 function AddClientMembership(props){
 
-  const [membershipId, setMembershipId] = useState([]);
-  const [clientId, setClientId] = useState([]);
+  const [membershipId, setMembershipId] = useState('');
+  const [clientId, setClientId] = useState('');
   const [memberships, setMemberships] = useState([]);
   const [clients, setClients] = useState([]);
   const [open, setOpen] = useState(false);
@@ -58,7 +58,7 @@ function AddClientMembership(props){
   };
 
   const handleSave = () => {
-    if(clientId.length === 0 | membershipId.length === 0){
+    if(clientId === '' | membershipId === ''){
       dispatch({
         type: 'UPDATE_ALERT',
         payload: {
@@ -88,6 +88,7 @@ function AddClientMembership(props){
              name='client'
              autoFocus variant="standard"
              label="Клиенты"
+             value={clientId} 
              onChange={(event) => { setClientId(event.target.value) }}>
              {clients.map(client => (
                <MenuItem key={client.idClient}
@@ -102,6 +103,7 @@ function AddClientMembership(props){
              name='client'
              autoFocus variant="standard"
              label="Абонементы"
+             value={membershipId}
              onChange={(event) => { setMembershipId(event.target.value) }}>
              {memberships.map(membership => (
                <MenuItem key={membership.idSportComplexMembership}

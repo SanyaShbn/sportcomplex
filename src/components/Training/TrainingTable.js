@@ -35,6 +35,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
       dispatch,
     } = useValue();
     const [trainings, setTrainings] = useState([]);
+    const [rowIdToDelete, setRowIdToDelete] = useState([]);
     const [delOpen, setDelOpen] = useState(false);
     const [addOpen, setAddOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
@@ -71,8 +72,9 @@ const TrainingTable = ({ setSelectedLink, link }) => {
       .catch(err => console.error(err)); 
   }
 
-  const onDelClick = () => {
+  const onDelClick = (id) => {
     setDialogOpen(true);
+    setRowIdToDelete(id);
   }
 
     const handleConfirmDelete = (url) => {
@@ -201,7 +203,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
         filterable: false,
         renderCell: row => 
         <div>
-        <IconButton onClick={() => onDelClick()}>
+        <IconButton onClick={() => onDelClick(row.id)}>
           <DeleteIcon color="error" />
         </IconButton>
         <Dialog
@@ -225,7 +227,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
           <Button onClick={() => setDialogOpen(false)} color="primary">
             Отменить
           </Button>
-          <Button onClick={() => handleConfirmDelete(row.id)} color="primary" autoFocus>
+          <Button onClick={() => handleConfirmDelete(rowIdToDelete)} color="primary" autoFocus>
             Удалить
           </Button>
         </DialogActions>

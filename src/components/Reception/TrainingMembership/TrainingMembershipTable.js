@@ -36,6 +36,7 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
     const [editOpen, setEditOpen] = useState(false);
     const [rows, setRows] = useState([]);
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [rowIdToDelete, setRowIdToDelete] = useState([]);
   
     useEffect(() => {
       fetchTrainingMemberships();
@@ -51,8 +52,9 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
       .catch(err => console.error(err));    
     }
 
-    const onDelClick = () => {
+    const onDelClick = (id) => {
       setDialogOpen(true);
+      setRowIdToDelete(id)
     }
 
     const handleConfirmDelete = (id) => {
@@ -198,7 +200,7 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
         filterable: false,
         renderCell: row => 
         <div>
-        <IconButton onClick={() => onDelClick()}>
+        <IconButton onClick={() => onDelClick(row.id)}>
           <DeleteIcon color="error" />
         </IconButton>
         <Dialog
@@ -222,7 +224,7 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
           <Button onClick={() => setDialogOpen(false)} color="primary">
             Отменить
           </Button>
-          <Button onClick={() => handleConfirmDelete(row.id)} color="primary" autoFocus>
+          <Button onClick={() => handleConfirmDelete(rowIdToDelete)} color="primary" autoFocus>
             Удалить
           </Button>
         </DialogActions>

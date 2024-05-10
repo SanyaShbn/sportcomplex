@@ -21,7 +21,6 @@ function EditTrainingMembership(props) {
   const [memberships, setMemberships] = useState([]);
   const [trainings, setTrainings] = useState([]);
   const [open, setOpen] = useState(false);
-  const [updatedVisitsAmount, setVisitsAmount] = useState([]);
   const [training_membership, setTrainingMembership] = useState({
     visitsAmount: '', sportComplexMembership: '', training: ''
   });
@@ -109,13 +108,8 @@ function EditTrainingMembership(props) {
         },});
     }
     else{
-    if (updatedVisitsAmount !== " " && updatedVisitsAmount.length !== 0){
-      props.updateTrainingMembership(props.data.id, trainingId, membershipId, updatedVisitsAmount)
-      setVisitsAmount(" ")
-    } 
-    else{
-      props.updateTrainingMembership(props.data.id, trainingId, membershipId, visitsAmountInputValue);
-    }
+    props.updateTrainingMembership(props.data.id, trainingId, membershipId, visitsAmountInputValue);
+  
     handleClose();
   }
   }

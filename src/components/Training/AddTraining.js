@@ -13,13 +13,14 @@ import { useValue } from '../../context/ContextProvider';
 import { NumberInput } from '../../constants';
 import '../CSS/employeeCSS.css';
 import '../CSS/table.css';
-import CurrencyTextField from '@lupus-ai/mui-currency-textfield'
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputAdornment from '@mui/material/InputAdornment';
 
 
 function AddTraining(props){
 
-  const [complexFacilityId, setComplexFacilityId] = useState([]);
-  const [coachId, setCoachId] = useState([]);
+  const [complexFacilityId, setComplexFacilityId] = useState('');
+  const [coachId, setCoachId] = useState('');
   const [facilities, setFacilities] = useState([]);
   const [coaches, setCoaches] = useState([]);
   const [open, setOpen] = useState(false);
@@ -28,8 +29,9 @@ function AddTraining(props){
   });
   const [isGroup, setIsGroup] = useState(true);
   const [capacityInputValue, setCapacityValue] = React.useState(null);
-  const [costInputValue, setCostValue] = React.useState(null);
+  const [costInputValue, setCostValue] = useState('');
   const [isNameError, setIsNameError] = useState(false);
+  const [isCostError, setIsCostError] = useState(false);
   const {
     dispatch,
   } = useValue();
@@ -39,6 +41,15 @@ function AddTraining(props){
     fetchCoaches()
   }, []);
 
+  const handleCostErrorChange = (event) => {
+    const { value } = event.target;
+    const isInvalid = value < 5 || value > 100
+    setIsCostError(isInvalid);
+    const re = /^[0-9]*\.?[0-9]{0,2}$/;
+    if (event.target.value === '' || re.test(event.target.value)) {
+        setCostValue(event.target.value);
+    }
+  };
   const handleNameErrorChange = (event) => {
     const { value } = event.target;
     const isInvalid = value.length < 2 || value[0] !== value[0].toUpperCase() || !/^[\u0400-\u04FF\s]+$/.test(value);
@@ -79,12 +90,14 @@ function AddTraining(props){
       name: '', type: '', capacity: '',  cost: ''
     })
     setCapacityValue(null)
-    setCostValue(null)
+    setCostValue('')
     setIsNameError(false)
+    setCoachId('')
+    setComplexFacilityId('')
   };
 
   const handleSave = () => {
-    if(training.name.length === 0 | coachId.length === 0 | complexFacilityId.length === 0){
+    if(training.name.length === 0 | coachId === '' | complexFacilityId === ''){
       dispatch({
         type: 'UPDATE_ALERT',
         payload: {
@@ -104,15 +117,15 @@ function AddTraining(props){
           },});
       }
     else{
-    if(costInputValue < 1){
-      dispatch({
-        type: 'UPDATE_ALERT',
-        payload: {
-          open: true,
-          severity: 'error',
-          message: 'Проверьте корректность ввода данных! Значение стоимости услуги (тренировочного занятия) не может быть столь низкой,'
-          +' а также отрицательной',
-        },});
+      if(costInputValue < 5 | costInputValue > 100){
+        dispatch({
+          type: 'UPDATE_ALERT',
+          payload: {
+            open: true,
+            severity: 'error',
+            message: 'Проверьте корректность ввода данных! Значение стоимости занятия не соответствует рыночным стандартам' 
+            + ' (рекомендуемые значения: от 5 до 100 бел.руб.)',
+          },});
     }
     else{
     if(training.type !== 'персональное' && capacityInputValue < 2 | capacityInputValue > 50){
@@ -176,21 +189,24 @@ function AddTraining(props){
             variant="standard" value={capacityInputValue} 
             onChange={(event, val) => setCapacityValue(val)}/>
             )}
-             <CurrencyTextField
-              required
-		          label="Стоимость (бел.руб.)"
-		          variant="standard"
-	          	value={costInputValue}
-	          	currencySymbol="BYN"
-		          outputFormat="string"
-		          onChange={(event, value)=> setCostValue(value)}
-            />
+          <FormControl fullWidth sx={{ m: 1 }}>
+          <InputLabel error={isCostError} htmlFor="outlined-adornment-amount">Стоимость (бел.руб.)</InputLabel>
+          <OutlinedInput
+            error={isCostError}
+            id="outlined-adornment-amount"
+            value={costInputValue}
+            onChange={handleCostErrorChange}
+            startAdornment={<InputAdornment position="start">BYN</InputAdornment>}
+            label="Стоимость (бел.руб.)"
+          />
+        </FormControl>
             <FormControl fullWidth>
             <InputLabel required>Место проведения</InputLabel>
              <Select
              name='complexFacility'
              autoFocus variant="standard"
              label="Место проведения"
+             value={complexFacilityId}
              onChange={(event) => { setComplexFacilityId(event.target.value) }}>
              {facilities.map(facility => (
                <MenuItem key={facility.idComplexFacility}
@@ -204,6 +220,7 @@ function AddTraining(props){
              name='coach'
              autoFocus variant="standard"
              label="Тренер"
+             value={coachId}
              onChange={(event) => { setCoachId(event.target.value) }}>
              {coaches.map(coach => (
                <MenuItem key={coach.userId}

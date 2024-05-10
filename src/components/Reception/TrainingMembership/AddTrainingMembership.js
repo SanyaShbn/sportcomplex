@@ -15,8 +15,8 @@ import { NumberInput } from '../../../constants.js';
 
 function AddTrainingMembership(props){
 
-  const [membershipId, setMembershipId] = useState([]);
-  const [trainingId, setTrainingId] = useState([]);
+  const [membershipId, setMembershipId] = useState('');
+  const [trainingId, setTrainingId] = useState('');
   const [memberships, setMemberships] = useState([]);
   const [trainings, setTrainings] = useState([]);
   const [open, setOpen] = useState(false);
@@ -66,7 +66,7 @@ function AddTrainingMembership(props){
   };
 
   const handleSave = () => {
-    if(trainingId.length === 0 | membershipId.length === 0){
+    if(trainingId === '' | membershipId.length === ''){
       dispatch({
         type: 'UPDATE_ALERT',
         payload: {
@@ -114,6 +114,7 @@ function AddTrainingMembership(props){
              name='training'
              autoFocus variant="standard"
              label="Тренировки"
+             value={trainingId} 
              onChange={(event) => { setTrainingId(event.target.value) }}>
               {trainings.map(training => {
               let facility = training.complexFacility && training.complexFacility.facilityType ? training.complexFacility.facilityType : "не установлено";
@@ -131,6 +132,7 @@ function AddTrainingMembership(props){
              name='client'
              autoFocus variant="standard"
              label="Абонементы"
+             value={membershipId} 
              onChange={(event) => { setMembershipId(event.target.value) }}>
              {memberships.map(membership => (
                <MenuItem key={membership.idSportComplexMembership}

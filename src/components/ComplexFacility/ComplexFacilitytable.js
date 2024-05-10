@@ -38,6 +38,8 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
     const [addOpen, setAddOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [rowIdToDelete, setRowIdToDelete] = useState([]);
+    const [rowTrainingsAmount, setRowTrainingsAmount] = useState([]);
   
     useEffect(() => {
       fetchFacilities();
@@ -52,8 +54,10 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
       .then(data => setFacilities(data._embedded.complexFacilities))
       .catch(err => console.error(err));    
     }
-    const onDelClick = () => {
-      setDialogOpen(true);
+    const onDelClick = (id, amount) => {
+      setDialogOpen(true)
+      setRowIdToDelete(id)
+      setRowTrainingsAmount(amount)
     }
     
     const handleConfirmDelete = (url, trainingsAmount) => {
@@ -158,7 +162,7 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
         filterable: false,
         renderCell: row => 
         <div>
-        <IconButton onClick={() => onDelClick()}>
+        <IconButton onClick={() => onDelClick(row.id, row.row.trainingsAmount)}>
           <DeleteIcon color="error" />
         </IconButton>
         <Dialog
@@ -182,7 +186,7 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
           <Button onClick={() => setDialogOpen(false)} color="primary">
             Отменить
           </Button>
-          <Button onClick={() => handleConfirmDelete(row.id, row.row.trainingsAmount)} color="primary" autoFocus>
+          <Button onClick={() => handleConfirmDelete(rowIdToDelete, rowTrainingsAmount)} color="primary" autoFocus>
             Удалить
           </Button>
         </DialogActions>

@@ -15,8 +15,8 @@ import { useValue } from '../../../context/ContextProvider.js';
 
 function AddClientTraining(props){
 
-  const [clientId, setClientId] = useState([]);
-  const [trainingId, setTrainingId] = useState([]);
+  const [clientId, setClientId] = useState('');
+  const [trainingId, setTrainingId] = useState('');
   const [clients, setClients] = useState([]);
   const [trainings, setTrainings] = useState([]);
   const [open, setOpen] = useState(false);
@@ -56,11 +56,13 @@ function AddClientTraining(props){
   };
     
   const handleClose = () => {
-    setOpen(false);
+    setOpen(false)
+    setClientId('')
+    setTrainingId('')
   };
 
   const handleSave = () => {
-    if(clientId.length === 0 |trainingId.length === 0){
+    if(clientId === '' | trainingId === ''){
       dispatch({
         type: 'UPDATE_ALERT',
         payload: {
@@ -90,6 +92,7 @@ function AddClientTraining(props){
              name='training'
              autoFocus variant="standard"
              label="Тренировки"
+             value={trainingId} 
              onChange={(event) => { setTrainingId(event.target.value) }}>
             {trainings.map(training => {
               if (training.capacity > training.clients_amount) {
@@ -110,6 +113,7 @@ function AddClientTraining(props){
              name='client'
              autoFocus variant="standard"
              label="Клиенты"
+             value={clientId} 
              onChange={(event) => { setClientId(event.target.value) }}>
              {clients.map(client => (
                <MenuItem key={client.idClient}

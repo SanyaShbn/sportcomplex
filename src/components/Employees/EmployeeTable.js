@@ -38,6 +38,7 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
     const [addOpen, setAddOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [rowIdToDelete, setRowIdToDelete] = useState([]);
 
     useEffect(() => {
       fetchUsers();
@@ -57,8 +58,9 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
       .catch(err => console.error(err));    
     }
 
-    const onDelClick = () => {
+    const onDelClick = (id) => {
       setDialogOpen(true);
+      setRowIdToDelete(id)
     }
 
     const handleConfirmDelete  = (url) => {
@@ -200,7 +202,7 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
         filterable: false,
         renderCell: row => 
         <div>
-        <IconButton onClick={() => onDelClick()}>
+        <IconButton onClick={() => onDelClick(row.id)}>
           <DeleteIcon color="error" />
         </IconButton>
         <Dialog
@@ -224,8 +226,8 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
           <Button onClick={() => setDialogOpen(false)} color="primary">
             Отменить
           </Button>
-          <Button onClick={() => { row.row.role !== "COACH" ? handleConfirmDelete(row.id):
-            handleConfirmDeleteCoach(row.id)}} color="primary" autoFocus>
+          <Button onClick={() => { row.row.role !== "COACH" ? handleConfirmDelete(rowIdToDelete):
+            handleConfirmDeleteCoach(rowIdToDelete)}} color="primary" autoFocus>
             Удалить
           </Button>
         </DialogActions>

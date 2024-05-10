@@ -30,6 +30,7 @@ const ClientTable = ({ setSelectedLink, link }) => {
     const [clients, setClients] = useState([]);
     const [open, setOpen] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [rowIdToDelete, setRowIdToDelete] = useState([]);
     
 
     useEffect(() => {
@@ -45,8 +46,9 @@ const ClientTable = ({ setSelectedLink, link }) => {
       .then(data => setClients(data._embedded.clients))
       .catch(err => console.error(err));    
     }
-    const onDelClick = () => {
+    const onDelClick = (id) => {
       setDialogOpen(true);
+      setRowIdToDelete(id)
     }
     
     const handleConfirmDelete = (url) => {
@@ -118,7 +120,7 @@ const ClientTable = ({ setSelectedLink, link }) => {
         filterable: false,
         renderCell: row => 
         <div>
-        <IconButton onClick={() => onDelClick()}>
+        <IconButton onClick={() => onDelClick(row.id)}>
           <DeleteIcon color="error" />
         </IconButton>
         <Dialog
@@ -142,7 +144,7 @@ const ClientTable = ({ setSelectedLink, link }) => {
           <Button onClick={() => setDialogOpen(false)} color="primary">
             Отменить
           </Button>
-          <Button onClick={() => handleConfirmDelete(row.id)} color="primary" autoFocus>
+          <Button onClick={() => handleConfirmDelete(rowIdToDelete)} color="primary" autoFocus>
             Удалить
           </Button>
         </DialogActions>

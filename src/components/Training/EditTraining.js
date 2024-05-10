@@ -11,9 +11,10 @@ import { SERVER_URL } from '../../constants.js';
 import { FormControl, RadioGroup, FormControlLabel, Radio, InputLabel, MenuItem, FormLabel } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
-import CurrencyTextField from '@lupus-ai/mui-currency-textfield'
 import { useValue } from '../../context/ContextProvider';
 import { NumberInput } from '../../constants';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputAdornment from '@mui/material/InputAdornment';
 
 function EditTraining(props) {
 
@@ -25,10 +26,11 @@ function EditTraining(props) {
   const [training, setTraining] = useState({
     name: '', type: '', capacity: '',  cost: '', clients_amount: '', complexFacility: '', coach: ''
   });
-  const [isGroup, setIsGroup] = useState(true);
+  const [isGroup, setIsGroup] = useState(props.data.row.type === "групповое");
   const [capacityInputValue, setCapacityValue] = React.useState(null);
-  const [costInputValue, setCostValue] = React.useState(null);
+  const [costInputValue, setCostValue] = useState('');
   const [isNameError, setIsNameError] = useState(false);
+  const [isCostError, setIsCostError] = useState(false);
   
   const {
     dispatch,
@@ -39,6 +41,15 @@ function EditTraining(props) {
     fetchCoaches()
   }, []);
 
+  const handleCostErrorChange = (event) => {
+    const { value } = event.target;
+    const isInvalid = value < 5 || value > 100
+    setIsCostError(isInvalid);
+    const re = /^[0-9]*\.?[0-9]{0,2}$/;
+    if (event.target.value === '' || re.test(event.target.value)) {
+        setCostValue(event.target.value);
+    }
+  };
   const handleNameErrorChange = (event) => {
     const { value } = event.target;
     const isInvalid = value.length < 2 || value[0] !== value[0].toUpperCase() || !/^[\u0400-\u04FF\s]+$/.test(value);
@@ -121,15 +132,15 @@ function EditTraining(props) {
           },});
       }
     else{
-    if(costInputValue < 1){
-      dispatch({
-        type: 'UPDATE_ALERT',
-        payload: {
-          open: true,
-          severity: 'error',
-          message: 'Проверьте корректность ввода данных! Значение стоимости услуги (тренировочного занятия) не может быть столь низкой,'
-          +' а также отрицательной',
-        },});
+      if(costInputValue < 5 | costInputValue > 100){
+        dispatch({
+          type: 'UPDATE_ALERT',
+          payload: {
+            open: true,
+            severity: 'error',
+            message: 'Проверьте корректность ввода данных! Значение стоимости занятия не соответствует рыночным стандартам' 
+            + ' (рекомендуемые значения: от 5 до 100 бел.руб.)',
+          },});
     }
     else{
       if(training.type !== 'персональное' && (capacityInputValue < 2 | capacityInputValue > 50)){
@@ -190,15 +201,17 @@ function EditTraining(props) {
             variant="standard" value={capacityInputValue} 
             onChange={(event, val) => setCapacityValue(val)}/>
             )}
-             <CurrencyTextField
-              required
-		          label="Стоимость (бел.руб.)"
-		          variant="standard"
-	          	value={training.cost}
-	          	currencySymbol="BYN"
-		          outputFormat="string"
-		          onChange={(event, value)=> setCostValue(value)}
-            />
+         <FormControl fullWidth sx={{ m: 1 }}>
+         <InputLabel error={isCostError} htmlFor="outlined-adornment-amount">Стоимость (бел.руб.)</InputLabel>
+          <OutlinedInput
+            error={isCostError}
+            id="outlined-adornment-amount"
+            value={costInputValue}
+            onChange={handleCostErrorChange}
+            startAdornment={<InputAdornment position="start">BYN</InputAdornment>}
+            label="Стоимость (бел.руб.)"
+          />
+          </FormControl>
             <FormControl fullWidth>
             <InputLabel required>Место проведения</InputLabel>
              <Select
