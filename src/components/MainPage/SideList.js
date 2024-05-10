@@ -128,11 +128,11 @@ import { useValue } from '../../context/ContextProvider';
       dispatch,
     } = useValue();
     const handleLogout = () => {
-    sessionStorage.setItem("jwt", "");
     dispatch({ type: 'START_LOADING' });
 
     setTimeout(() => {
       dispatch({ type: 'END_LOADING' });
+      sessionStorage.setItem("jwt", "");
       navigate("/", { replace: true });
     }, 1000);
     }

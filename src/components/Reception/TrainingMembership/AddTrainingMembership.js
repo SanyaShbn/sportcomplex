@@ -4,7 +4,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Select from '@mui/material/Select';
-import { FormControl, InputLabel, MenuItem, TextField } from '@mui/material';
+import { FormControl, InputLabel, MenuItem } from '@mui/material';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import { SERVER_URL } from '../../../constants.js';
@@ -117,11 +117,10 @@ function AddTrainingMembership(props){
              value={trainingId} 
              onChange={(event) => { setTrainingId(event.target.value) }}>
               {trainings.map(training => {
-              let facility = training.complexFacility && training.complexFacility.facilityType ? training.complexFacility.facilityType : "не установлено";
               return (
                <MenuItem key={training.idTraining}
                 value={training.idTraining}>{"Тренировка №" + training.idTraining
-                + ". Место проведения: " + facility}</MenuItem>
+                + ". " + training.name}</MenuItem>
               );
             })}
             </Select>

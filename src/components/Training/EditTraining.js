@@ -77,7 +77,11 @@ function EditTraining(props) {
     }
 
   const handleClickOpen = () => {
-    let facilityId = props.data.row.complexFacility.slice(props.data.row.complexFacility.lastIndexOf("№") + 1)
+    if(props.data.row.type !== "групповое"){
+      setIsGroup(false)
+    }
+    let facilityId = props.data.row.complexFacility.slice(props.data.row.complexFacility.indexOf("№") + 1,
+     props.data.row.complexFacility.indexOf(":"))
     let idCoach = props.data.row.coach.slice(props.data.row.coach.indexOf("№") + 1, props.data.row.coach.indexOf(":"))
     setComplexFacilityId(parseInt(facilityId))
     setCoachId(parseInt(idCoach))
@@ -143,14 +147,18 @@ function EditTraining(props) {
           },});
     }
     else{
-      if(training.type !== 'персональное' && (capacityInputValue < 2 | capacityInputValue > 50)){
+      const facility = facilities.find(facility => facility.idComplexFacility === complexFacilityId)
+      const capacity = facility.capacity
+      if(training.type !== 'персональное' && (capacityInputValue < 2 | capacityInputValue > 50 | capacityInputValue > capacity)){
         dispatch({
           type: 'UPDATE_ALERT',
           payload: {
             open: true,
             severity: 'error',
-            message: 'Проверьте корректность ввода данных! Емкость занятия/услуги (количество человек, которое могут посетить данное ' + 
-            'занятие/приобрести услугу одновременно) не может принимать значения менее 2, либо более 50',
+            message: capacityInputValue < 2 | capacityInputValue > 50 ? 'Проверьте корректность ввода данных! Емкость занятия/услуги (количество человек, которое могут посетить данное ' + 
+            'занятие/приобрести услугу одновременно) не может принимать значения менее 2, либо более 50' :
+            'Проверьте корректность ввода данных! Емкость занятия/услуги (количество человек, которое могут посетить данное ' + 
+            'занятие/приобрести услугу одновременно) не может принимать большее значение, чем вместимость сооружения, в котором планируется проводить занятие',
           },});
       }
     else {

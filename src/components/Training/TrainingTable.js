@@ -124,7 +124,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
   
 
     const updateTraining = (training, link, complexFacilityId, userId) => {
-
+      const trainingProperties = [training.cost, training.name, training.capacity, training.type];
       fetch(link + '?complexFacilityId='+ complexFacilityId + "&userId=" + userId,
         { 
           method: 'PUT', 
@@ -132,7 +132,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
           'Content-Type':  'application/json',
           // 'Authorization' : token
         },
-        body: JSON.stringify(training)
+        body: JSON.stringify(trainingProperties)
       })
       .then(response => {
         if (response.ok) {
@@ -175,8 +175,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
         return 'не назначен';
       }
     };
-
-
+ 
     const columns = [
       {field: 'name', headerName: 'Наименование', width: 180},
       {field: 'type', headerName: 'Тип занятия', width: 150},

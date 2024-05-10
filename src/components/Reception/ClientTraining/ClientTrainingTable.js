@@ -187,29 +187,12 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
           }
         };
         const response = await axios.get(url, config);
-        let facility = await fetchTrainingFacilities(response.data._links.complexFacility.href)
         let id = response.data._links.self.href;
-        return "Тренировка №" + id.slice(id.lastIndexOf("/") + 1) + ". " + response.data.name + ". Место проведения: "
-         + facility;
+        return "Тренировка №" + id.slice(id.lastIndexOf("/") + 1) + ". " + response.data.name
       } catch (error) {
         return 'N/A';
       }
     };
-
-    const fetchTrainingFacilities = async (url) => {
-      // const token = sessionStorage.getItem("jwt");
-      try {
-        const config = {
-          headers: {
-            // 'Authorization' : token
-          }
-        };
-        const response = await axios.get(url, config);
-        return response.data.facilityType;
-      } catch (error) {
-        return 'N/A';
-      }
-    }
 
     const fetchClients = async (url) => {
       // const token = sessionStorage.getItem("jwt");

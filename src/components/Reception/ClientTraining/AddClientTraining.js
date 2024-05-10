@@ -96,10 +96,9 @@ function AddClientTraining(props){
              onChange={(event) => { setTrainingId(event.target.value) }}>
             {trainings.map(training => {
               if (training.capacity > training.clients_amount) {
-                let facilityType = training.complexFacility && training.complexFacility.facilityType ? training.complexFacility.facilityType : "не установлено"
                 return (
                   <MenuItem key={training.idTraining} value={training.idTraining}>
-                    {"Тренировка №" + training.idTraining + ". " + training.name + ". Место проведения: " + facilityType}
+                    {"Тренировка №" + training.idTraining + ". " + training.name}
                   </MenuItem>
                 );
               }

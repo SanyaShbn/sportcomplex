@@ -146,15 +146,6 @@ function AddSportComplexMembership(props){
             label="Стоимость (бел.руб.)"
           />
         </FormControl>
-           {/* <CurrencyTextField
-              required
-		          label="Стоимость (бел.руб.)"
-		          variant="standard"
-	          	value={membership.cost}
-	          	currencySymbol="BYN"
-		          outputFormat="string"
-		          onChange={(event, value)=> setCostValue(value)}
-            /> */}
         </Stack>
       </DialogContent>
       <DialogActions>

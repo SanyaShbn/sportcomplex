@@ -118,11 +118,10 @@ function EditClientTraining(props) {
              onChange={handleChangeTraining}>
              {trainings.map(training => {
               if (training.capacity > training.clients_amount) {
-                  let facility = training.complexFacility && training.complexFacility.facilityType ? training.complexFacility.facilityType : "не установлено";
                   return (
                    <MenuItem key={training.idTraining}
                     value={training.idTraining}>{"Тренировка №" + training.idTraining
-                    + ". Место проведения: " + facility}</MenuItem>
+                    + ". " + training.name}</MenuItem>
                   );
               }
               return null;

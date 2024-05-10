@@ -138,11 +138,10 @@ function EditTrainingMembership(props) {
              value={training_membership.training}
              onChange={handleChangeTraining}>
              {trainings.map(training => {
-              let facility = training.complexFacility && training.complexFacility.facilityType ? training.complexFacility.facilityType : "не установлено";
               return (
                <MenuItem key={training.idTraining}
                 value={training.idTraining}>{"Тренировка №" + training.idTraining
-                + ". Место проведения: " + facility}</MenuItem>
+                + ". " + training.name}</MenuItem>
               );
             })}
             </Select>
