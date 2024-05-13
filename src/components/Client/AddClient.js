@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import '../CSS/employeeCSS.css';
+import '../CSS/table.css';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -7,17 +9,15 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
-import IconButton from '@mui/material/IconButton';
-import EditIcon from '@mui/icons-material/Edit';
 import { MenuItem, FormControl, InputLabel } from '@mui/material';
 import Select from '@mui/material/Select';
-import { useValue } from '../../context/ContextProvider';
 import {
   usePhoneInput
 } from 'react-international-phone';
 import { PhoneNumberUtil } from 'google-libphonenumber';
+import { useValue } from '../../context/ContextProvider.js';
 
-function EditClient(props) {
+function AddClient(props){
   const [open, setOpen] = useState(false);
   const [isEmailError, setIsEmailError] = useState(false);
   const [isNameError, setIsNameError] = useState(false);
@@ -27,9 +27,6 @@ function EditClient(props) {
   const [client, setClient] = useState({
     firstName: '', surName: '', patrSurName: '', birthDate:'', phoneNumber: '', email: ''
   });
-  const {
-    dispatch,
-  } = useValue();
   const handleEmailErrorChange = (event) => {
     const { value } = event.target;
     const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z]+\.[A-Za-z]{2,}$/;
@@ -72,13 +69,16 @@ function EditClient(props) {
     setClient({...client, [event.target.name]: event.target.value});
   };
   const {
+    dispatch,
+  } = useValue();
+
+  const {
     inputValue,
     phone,
     handlePhoneValueChange,
   } = usePhoneInput({
     defaultCountry: 'by',
     forceDialCode: true,
-    value: props.data.row.phoneNumber,
   });
 
   const phoneUtil = PhoneNumberUtil.getInstance();
@@ -91,21 +91,16 @@ function EditClient(props) {
     }
   };
   const isValid = isPhoneValid(phone);
-    
+
   const handleClickOpen = () => {
-    setClient({
-      firstName: props.data.row.firstName,
-      surName: props.data.row.surName,
-      patrSurName: props.data.row.patrSurName,
-      email: props.data.row.email,
-      phoneNumber: props.data.row.phoneNumber,
-      birthDate: props.data.row.birthDate
-     })      
     setOpen(true);
-  }
+  };
 
   const handleClose = () => {
     setOpen(false);
+    setClient({
+       firstName: '', surName: '', patrSurName: '', birthDate:'', phoneNumber: '', email: ''
+    })
     setIsEmailError(false)
     setIsNameError(false)
     setIsSurNameError(false)
@@ -136,19 +131,19 @@ function EditClient(props) {
     }
     else{
     client.phoneNumber = phone
-    props.updateClient(client, props.data.id);
+    props.addClient(client);
     handleClose();
     }
   }
   }
 
-  return(
+  return (
     <div>
-    <IconButton onClick={handleClickOpen}>
-        <EditIcon color="primary" />
-    </IconButton>
+    <Button className="shine-button" variant="contained" onClick={handleClickOpen}>
+      Добавить информацию
+    </Button>
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle className='dialog'>Обновление информации о клиенте</DialogTitle>
+      <DialogTitle className='dialog'>Новый клиент</DialogTitle>
       <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
           <TextField error={isNameError} label="Имя" name="firstName" autoFocus
@@ -185,11 +180,11 @@ function EditClient(props) {
       </DialogContent>
       <DialogActions>
          <Button onClick={handleClose}>Отмена</Button>
-         <Button onClick={handleSave}>Сохранить</Button>
+         <Button onClick={handleSave}>Добавить</Button>
       </DialogActions>
     </Dialog>            
   </div>
-  );  
+  );
 }
 
-export default EditClient;
+export default AddClient;

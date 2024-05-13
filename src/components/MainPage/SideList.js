@@ -1,8 +1,8 @@
 import {BsFillPersonVcardFill, BsPeopleFill, BsReception4} from "react-icons/bs"
 import {IoIosFitness} from "react-icons/io"
 import {MdOutlineSportsGymnastics, MdCardMembership, MdAttachMoney} from "react-icons/md"
-import { FaTruckLoading, FaCalendarAlt } from "react-icons/fa"
-import { CiDiscount1 } from "react-icons/ci"
+import { FaCalendarAlt } from "react-icons/fa"
+import { BiSolidReport } from "react-icons/bi"
 import { GrDomain } from "react-icons/gr";
 import Scheduler from "../Scheduler/Scheduler"
 import { useTheme } from '@mui/material/styles';
@@ -42,7 +42,9 @@ import UpdateProfile from "../User/UpdateProfile.js"
 import { blue } from '@mui/material/colors';
 import { jwtDecode } from 'jwt-decode';
 import FinanciesMain from "../Financies/FinanciesMain.js"
-import { useValue } from '../../context/ContextProvider';
+import { useValue } from '../../context/ContextProvider'
+import ReportViewer from '../Reports/ReportViewer.js'
+import ReportDesigner from '../Reports/ReportDesigner.js'
   
   const drawerWidth = 250;
 
@@ -204,17 +206,6 @@ import { useValue } from '../../context/ContextProvider';
           </div>
           </div>
         },
-        // {
-        //     title: 'Поставщики',
-        //     icon: <FaTruckLoading />,
-        //     link: '',
-        //   },
-        //   {
-        //     title: 'Акции',
-        //     icon: <CiDiscount1 />,
-        //     link: '',
-            
-        //   },
           {
             title: 'Абонементы',
             icon: <MdCardMembership />,
@@ -232,6 +223,12 @@ import { useValue } from '../../context/ContextProvider';
             icon: <BsReception4 />,
             link: 'reception/*',
             component: <ReceptionButtonsList {...{ setSelectedLink, link: 'reception/*' }}/>,
+          },
+          {
+            title: 'Отчеты',
+            icon: <BiSolidReport />,
+            link: 'reports',
+            component: <ReportViewer {...{ setSelectedLink, link: 'reports' }}/>,
           },
       ];
 

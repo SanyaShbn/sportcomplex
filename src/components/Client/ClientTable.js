@@ -9,9 +9,11 @@ import {Snackbar, Box, Typography, Dialog, DialogActions, DialogContent, DialogC
 import '../CSS/employeeCSS.css';
 import '../CSS/table.css';
 import EditClient from './EditClient';
+import AddClient from './AddClient.js';
 import { grey } from '@mui/material/colors';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useValue } from '../../context/ContextProvider';
 
 function CustomToolbar() {
   return (
@@ -27,10 +29,16 @@ const ClientTable = ({ setSelectedLink, link }) => {
     setSelectedLink(link);
   }, []);
 
+  const {
+    dispatch,
+  } = useValue();
+
     const [clients, setClients] = useState([]);
-    const [open, setOpen] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [rowIdToDelete, setRowIdToDelete] = useState([]);
+    const [delOpen, setDelOpen] = useState(false);
+    const [addOpen, setAddOpen] = useState(false);
+    const [editOpen, setEditOpen] = useState(false);
     
 
     useEffect(() => {
@@ -60,8 +68,8 @@ const ClientTable = ({ setSelectedLink, link }) => {
       })
       .then(response => {
         if (response.ok) {
-          fetchClients();
-          setOpen(true);
+          fetchClients()
+          setDelOpen(true)
         }
         else {
           alert('Что-то пошло не так!');
@@ -71,6 +79,36 @@ const ClientTable = ({ setSelectedLink, link }) => {
       .catch(err => console.error(err))
       setDialogOpen(false);
     };
+
+    const addClient = (client) => {
+
+      // const token = sessionStorage.getItem("jwt");
+
+      fetch(SERVER_URL + '/api/clients',
+        { method: 'POST', headers: {
+          'Content-Type':'application/json',
+          // 'Authorization' : token
+        },
+        body: JSON.stringify(client)
+      })
+      .then(response => {
+        if (response.ok) {
+          fetchClients()
+          setAddOpen(true)
+        }
+        else {
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'error',
+              message: 'Ошибка! Новую запись о клиенте не удалось создать. Возможно, введенные вами значения адреса электронной '
+              + 'почты или номера телефона уже используются другими клиентами (или сотрудниками)',
+            },});
+        }
+      })
+      .catch(err => console.error(err))
+    }
 
     const updateClient = (client, link) => {
 
@@ -87,27 +125,36 @@ const ClientTable = ({ setSelectedLink, link }) => {
       })
       .then(response => {
         if (response.ok) {
-          fetchClients();
+          fetchClients()
+          setEditOpen(true)
         }
         else {
-          alert('Что-то пошло не так!');
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'error',
+              message: 'Ошибка! Не удалось обновить данные о клиенте. Возможно, введенные вами значения адреса электронной '
+              + 'почты или номера телефона уже используются другими клиентами (или сотрудниками)',
+            },});
         }
       })
       .catch(err => console.error(err))
     }
      
     const columns = [
-      {field: 'firstName', headerName: 'Имя', width: 100},
-      {field: 'surName', headerName: 'Фамилия', width: 150},
-      {field: 'patrSurName', headerName: 'Отчество', width: 150},
-      {field: 'phoneNumber', headerName: 'Номер телефона', width: 200},
+      {field: 'firstName', headerName: 'Имя', width: 200},
+      {field: 'surName', headerName: 'Фамилия', width: 200},
+      {field: 'patrSurName', headerName: 'Отчество', width: 200},
+      {field: 'birthDate', headerName: 'Дата рождения', width: 200},
+      {field: 'phoneNumber', headerName: 'Номер телефона', width: 250},
       {field: 'email', headerName: 'Email', width: 250},
       {
         field: '_links.client.href', 
         headerName: '', 
         sortable: false,
         filterable: false,
-        width: 100,
+        width: 60,
         renderCell: row => <EditClient 
                               data={row} 
                               updateClient={updateClient} />
@@ -115,7 +162,7 @@ const ClientTable = ({ setSelectedLink, link }) => {
       {
         field: '_links.self.href', 
         headerName: '', 
-        width:120,
+        width: 60,
         sortable: false,
         filterable: false,
         renderCell: row => 
@@ -169,6 +216,7 @@ const ClientTable = ({ setSelectedLink, link }) => {
     </Typography>
     <main className='info_pages_body'>
     <React.Fragment>
+    <AddClient addClient={addClient} />
       <div className="container" style={{ height: 400, width: "100%"}}>
         <StyledDataGrid  localeText={ruRU.components.MuiDataGrid.defaultProps.localeText} className="grid_component" 
           columns={columns} 
@@ -190,10 +238,22 @@ const ClientTable = ({ setSelectedLink, link }) => {
           }}
         />
         <Snackbar
-          open={open}
+          open={delOpen}
           autoHideDuration={2000}
-          onClose={() => setOpen(false)}
+          onClose={() => setDelOpen(false)}
           message="Запись о клиенте удалена"
+        />
+        <Snackbar
+          open={addOpen}
+          autoHideDuration={2000}
+          onClose={() => setAddOpen(false)}
+          message="Запись о новом клиенте успешно добавлена"
+        />
+        <Snackbar
+          open={editOpen}
+          autoHideDuration={2000}
+          onClose={() => setEditOpen(false)}
+          message="Информация о клиенте успешно обновлена"
         />
       </div>
     </React.Fragment>

@@ -33,9 +33,11 @@ function EditEmployee(props) {
   } = useValue();
   const handleEmailErrorChange = (event) => {
     const { value } = event.target;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    setIsEmailError(!emailRegex.test(value));
-    setEmployee({...employee, [event.target.name]: event.target.value});
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z]+\.[A-Za-z]{2,}$/;
+    const cyrillicPattern = /[А-Яа-яЁё]/; 
+    const isCyrillic = cyrillicPattern.test(value);
+    setIsEmailError(!emailRegex.test(value) || isCyrillic);
+    setEmployee({...employee, [event.target.name]: value});
   };
   const handleNameErrorChange = (event) => {
     const { value } = event.target;
