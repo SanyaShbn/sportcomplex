@@ -11,11 +11,13 @@ import {FormControl, InputLabel, MenuItem} from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import { useValue } from '../../../context/ContextProvider.js';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 
 function EditClientMembership(props) {
 
-    const [membershipId, setMembershipId] = useState([]);
-    const [clientId, setClientId] = useState([]);
+    const [membershipId, setMembershipId] = useState('');
+    const [clientId, setClientId] = useState('');
     const [memberships, setMemberships] = useState([]);
     const [clients, setClients] = useState([]);
     const [open, setOpen] = useState(false);
@@ -26,6 +28,17 @@ function EditClientMembership(props) {
       dispatch,
     } = useValue();
 
+    const clientsFilterOptions = createFilterOptions({
+      matchFrom: 'any',
+      stringify: (option) => "Клиент №" + option.idClient + ": " + option.surName + " " + option.firstName + " " + option.patrSurName + 
+      " (" + option.phoneNumber + ")",
+    });
+    
+    const membershipsFilterOptions = createFilterOptions({
+      matchFrom: 'any',
+      stringify: (option) => "Абонемент №" + option.idSportComplexMembership + ": " + option.name,
+    });
+    
     useEffect(() => {
       fetchClients();
       fetchMemberships();
@@ -64,23 +77,12 @@ function EditClientMembership(props) {
       setOpen(true);
     }
 
-    const handleChangeMembership = (event) => {
-      setMembershipId(event.target.value) 
-      setClientMembership({...client_membership, 
-        [event.target.name]: event.target.value});
-    }
-    const handleChangeClient = (event) => {
-      setClientId(event.target.value)
-      setClientMembership({...client_membership, 
-        [event.target.name]: event.target.value});
-    }
-
   const handleClose = () => {
     setOpen(false);
   };
  
   const handleSave = () => {
-    if(clientId.length === 0 | membershipId.length === 0){
+    if(clientId === '' | membershipId === ''){
       dispatch({
         type: 'UPDATE_ALERT',
         payload: {
@@ -105,34 +107,40 @@ function EditClientMembership(props) {
           <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
         <FormControl fullWidth>
-            <InputLabel required>Клиенты</InputLabel>
-             <Select
-             name='client'
-             autoFocus variant="standard"
-             label="Клиенты"
-             value={client_membership.client}
-             onChange={handleChangeClient}>
-             {clients.map(client => (
-               <MenuItem key={client.idClient}
-                value={client.idClient}>{"Клиент №" + client.idClient + ": " + client.surName + " " + client.firstName + " " + client.patrSurName + 
-                " (" + client.phoneNumber + ")"}</MenuItem>
-             ))}
-            </Select>
-            </FormControl>
-            <FormControl fullWidth>
-            <InputLabel required>Абонементы</InputLabel>
-             <Select
-             name='sportComplexMembership'
-             autoFocus variant="standard"
-             label="Абонементы"
-             value={client_membership.sportComplexMembership}
-             onChange={handleChangeMembership}>
-             {memberships.map(membership => (
-               <MenuItem key={membership.idSportComplexMembership}
-                value={membership.idSportComplexMembership}>{"Абонемент №" + membership.idSportComplexMembership + ": " + membership.name}</MenuItem>
-             ))}
-            </Select>
-            </FormControl>
+            <Autocomplete
+            options={clients}
+            noOptionsText="Клиенты не найдены"
+            getOptionLabel={(option) => "Клиент №" + option.idClient + ": " + option.surName + " " + option.firstName + " " + option.patrSurName + 
+            " (" + option.phoneNumber + ")"}
+            value={clients.find(client => client.idClient  === clientId)}
+            onChange={(event, newValue) => {
+             setClientId(newValue?.idClient);
+            }}
+            filterOptions={clientsFilterOptions}
+            renderInput={(params) => <TextField {...params} label="Клиенты" variant="standard" 
+            InputProps={{
+              ...params.InputProps,
+              style: { width: 'auto', minWidth: '300px' },
+            }}/>}
+            />
+          </FormControl>
+          <FormControl fullWidth>
+            <Autocomplete
+            options={memberships}
+            noOptionsText="Абонементы не найдены"
+            getOptionLabel={(option) => "Абонемент №" + option.idSportComplexMembership + ": " + option.name}
+            value={memberships.find(membership => membership.idSportComplexMembership === membershipId)}
+            onChange={(event, newValue) => {
+             setMembershipId(newValue?.idSportComplexMembership);
+            }}
+            filterOptions={membershipsFilterOptions}
+            renderInput={(params) => <TextField {...params} label="Абонементы" variant="standard" 
+            InputProps={{
+              ...params.InputProps,
+              style: { width: 'auto', minWidth: '300px' },
+            }}/>}
+            />
+          </FormControl>
         </Stack>
       </DialogContent>
       <DialogActions>

@@ -15,11 +15,12 @@ import { useValue } from '../../context/ContextProvider';
 import { NumberInput } from '../../constants';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 
 function EditTraining(props) {
 
-  const [complexFacilityId, setComplexFacilityId] = useState([]);
-  const [coachId, setCoachId] = useState([]);
+  const [complexFacilityId, setComplexFacilityId] = useState('');
+  const [coachId, setCoachId] = useState('');
   const [facilities, setFacilities] = useState([]);
   const [coaches, setCoaches] = useState([]);
   const [open, setOpen] = useState(false);
@@ -40,6 +41,16 @@ function EditTraining(props) {
     fetchFacilities()
     fetchCoaches()
   }, []);
+
+  const facilitiesFilterOptions = createFilterOptions({
+    matchFrom: 'any',
+    stringify: (option) => "Сооружение №" + option.idComplexFacility + ": " + option.name,
+  });
+  
+  const coachesFilterOptions = createFilterOptions({
+    matchFrom: 'any',
+    stringify: (option) => "Тренер №" + option.userId + ": " + option.firstName + " " + option.surName,
+  });
 
   const handleCostErrorChange = (event) => {
     const { value } = event.target;
@@ -80,19 +91,21 @@ function EditTraining(props) {
     if(props.data.row.type !== "групповое"){
       setIsGroup(false)
     }
-    let facilityId = props.data.row.complexFacility.slice(props.data.row.complexFacility.indexOf("№") + 1,
-     props.data.row.complexFacility.indexOf(":"))
-    let idCoach = props.data.row.coach.slice(props.data.row.coach.indexOf("№") + 1, props.data.row.coach.indexOf(":"))
-    setComplexFacilityId(parseInt(facilityId))
-    setCoachId(parseInt(idCoach))
+
+    let facilityId = props.data.row.complexFacility !== 'не установлено' ? props.data.row.complexFacility.slice(props.data.row.complexFacility.indexOf("№") + 1,
+     props.data.row.complexFacility.indexOf(":")) : ''
+    let idCoach = props.data.row.coach !== 'не назначен' ? props.data.row.coach.slice(props.data.row.coach.indexOf("№") + 1,
+     props.data.row.coach.indexOf(":")) : ''
+    facilityId !== '' ? setComplexFacilityId(parseInt(facilityId)) : setComplexFacilityId(facilityId) 
+    idCoach !== '' ? setCoachId(parseInt(idCoach)) : setCoachId(idCoach) 
     setTraining({
       name: props.data.row.name,
       type: props.data.row.type,
       capacity: props.data.row.capacity,
       cost: props.data.row.cost,
       clients_amount: props.data.row.clients_amount,
-      complexFacility: parseInt(facilityId),
-      coach: parseInt(idCoach),
+      complexFacility: facilityId !== '' ? parseInt(facilityId) : '',
+      coach: idCoach !== '' ? parseInt(idCoach) : '',
      })      
     setCapacityValue(props.data.row.capacity)
     setCostValue(props.data.row.cost)
@@ -116,7 +129,7 @@ function EditTraining(props) {
       [event.target.name]: event.target.value});
   }
   const handleSave = () => {
-    if(training.name.length === 0 | coachId.length === 0 | complexFacilityId.length === 0){
+    if(training.name.length === 0 | coachId === '' | complexFacilityId === ''){
       dispatch({
         type: 'UPDATE_ALERT',
         payload: {
@@ -220,33 +233,39 @@ function EditTraining(props) {
             label="Стоимость (бел.руб.)"
           />
           </FormControl>
+          <FormControl fullWidth>
+            <Autocomplete
+            options={facilities}
+            noOptionsText="Сооружения не найдены"
+            getOptionLabel={(option) => "Сооружение №" + option.idComplexFacility + ": " + option.name}
+            value={facilities.find(facility => facility.idComplexFacility === complexFacilityId)}
+            onChange={(event, newValue) => {
+             setComplexFacilityId(newValue?.idComplexFacility);
+            }}
+            filterOptions={facilitiesFilterOptions}
+            renderInput={(params) => <TextField {...params} label="Место проведения" variant="standard" 
+            InputProps={{
+              ...params.InputProps,
+              style: { width: 'auto', minWidth: '300px' },
+            }}/>}
+            />
+          </FormControl>
             <FormControl fullWidth>
-            <InputLabel required>Место проведения</InputLabel>
-             <Select
-             name='complexFacility'
-             autoFocus variant="standard"
-             label="Место проведения"
-             value={training.complexFacility}
-             onChange={handleChangeComplexFacility}>
-             {facilities.map(facility => (
-               <MenuItem key={facility.idComplexFacility}
-                value={facility.idComplexFacility}>{"Сооружение №" + facility.idComplexFacility + ": " + facility.name}</MenuItem>
-             ))}
-            </Select>
-            </FormControl>
-            <FormControl>
-            <InputLabel required>Тренер</InputLabel>
-             <Select
-             name='coach'
-             autoFocus variant="standard"
-             label="Тренер"
-             value={training.coach}
-             onChange={handleChangeCoach}>
-             {coaches.map(coach => (
-               <MenuItem key={coach.userId}
-                value={coach.userId}>{"Тренер №" + coach.userId + ": " + coach.firstName + " " + coach.surName}</MenuItem>
-             ))}
-            </Select>
+            <Autocomplete
+            options={coaches}
+            noOptionsText="Тренеры не найдены"
+            getOptionLabel={(option) => "Тренер №" + option.userId + ": " + option.firstName + " " + option.surName}
+            value={coaches.find(coach => coach.userId === coachId)}
+            onChange={(event, newValue) => {
+             setCoachId(newValue?.userId);
+            }}
+            filterOptions={coachesFilterOptions}
+            renderInput={(params) => <TextField {...params} label="Тренер" variant="standard" 
+            InputProps={{
+              ...params.InputProps,
+              style: { width: 'auto', minWidth: '300px' },
+            }}/>}
+            />
             </FormControl>
         </Stack>
       </DialogContent>

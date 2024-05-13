@@ -12,6 +12,8 @@ import '../../CSS/employeeCSS.css';
 import '../../CSS/table.css';
 import { useValue } from '../../../context/ContextProvider.js';
 import { NumberInput } from '../../../constants.js';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 
 function AddTrainingMembership(props){
 
@@ -24,9 +26,20 @@ function AddTrainingMembership(props){
     visitsAmount: ''
   });
   const [visitsAmountInputValue, setValue] = React.useState(null);
+
   const {
     dispatch,
   } = useValue();
+
+const membershipsFilterOptions = createFilterOptions({
+  matchFrom: 'any',
+  stringify: (option) => "Абонемент №" + option.idSportComplexMembership + ": " + option.name,
+});
+
+const trainingsFilterOptions = createFilterOptions({
+  matchFrom: 'any',
+  stringify: (option) => "Тренировка №" + option.idTraining + ". " + option.name,
+});
 
   useEffect(() => {
     fetchTrainings();
@@ -63,6 +76,8 @@ function AddTrainingMembership(props){
         visitsAmount: ''
       })
     setValue(null)
+    setTrainingId('')
+    setMembershipId('')
   };
 
   const handleSave = () => {
@@ -109,40 +124,43 @@ function AddTrainingMembership(props){
             variant="standard" value={visitsAmountInputValue} 
             onChange={(event, val) => setValue(val)}/>
             <FormControl fullWidth>
-            <InputLabel required>Тренировки</InputLabel>
-             <Select
-             name='training'
-             autoFocus variant="standard"
-             label="Тренировки"
-             value={trainingId} 
-             onChange={(event) => { setTrainingId(event.target.value) }}>
-              {trainings.map(training => {
-              return (
-               <MenuItem key={training.idTraining}
-                value={training.idTraining}>{"Тренировка №" + training.idTraining
-                + ". " + training.name}</MenuItem>
-              );
-            })}
-            </Select>
+            <Autocomplete
+            options={trainings}
+            noOptionsText="Тренировки не найдены"
+            getOptionLabel={(option) => "Тренировка №" + option.idTraining + ". " + option.name}
+            value={trainings.find(training => training.idTraining  === trainingId)}
+            onChange={(event, newValue) => {
+             setTrainingId(newValue?.idTraining);
+            }}
+            filterOptions={trainingsFilterOptions}
+            renderInput={(params) => <TextField {...params} label="Тренировки" variant="standard" 
+            InputProps={{
+              ...params.InputProps,
+              style: { width: 'auto', minWidth: '300px' },
+            }}/>}
+            />
             </FormControl>
             <FormControl fullWidth>
-            <InputLabel required>Абонементы</InputLabel>
-             <Select
-             name='client'
-             autoFocus variant="standard"
-             label="Абонементы"
-             value={membershipId} 
-             onChange={(event) => { setMembershipId(event.target.value) }}>
-             {memberships.map(membership => (
-               <MenuItem key={membership.idSportComplexMembership}
-                value={membership.idSportComplexMembership}>{"Абонемент №" + membership.idSportComplexMembership + ": " + membership.name}</MenuItem>
-             ))}
-            </Select>
-            </FormControl>
+            <Autocomplete
+            options={memberships}
+            noOptionsText="Абонементы не найдены"
+            getOptionLabel={(option) => "Абонемент №" + option.idSportComplexMembership + ": " + option.name}
+            value={memberships.find(membership => membership.idSportComplexMembership === membershipId)}
+            onChange={(event, newValue) => {
+             setMembershipId(newValue?.idSportComplexMembership);
+            }}
+            filterOptions={membershipsFilterOptions}
+            renderInput={(params) => <TextField {...params} label="Абонементы" variant="standard" 
+            InputProps={{
+              ...params.InputProps,
+              style: { width: 'auto', minWidth: '300px' },
+            }}/>}
+            />
+           </FormControl>
         </Stack>
       </DialogContent>
       <DialogActions>
-         <Button onClick={handleClose}>Отмена</Button>
+         <Button onClick={handleClose} >Отмена</Button>
          <Button onClick={handleSave}>Добавить</Button>
       </DialogActions>
     </Dialog>            

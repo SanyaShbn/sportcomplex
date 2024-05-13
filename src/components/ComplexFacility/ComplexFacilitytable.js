@@ -51,7 +51,11 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
         // headers: { 'Authorization' : token }
       })
       .then(response => response.json())
-      .then(data => setFacilities(data._embedded.complexFacilities))
+      .then(data => {
+        const sortedFacilities = data._embedded.complexFacilities.sort((a, b) => a._links.self.href.slice(a._links.self.href.lastIndexOf('/') + 1) 
+        - b._links.self.href.slice(b._links.self.href.lastIndexOf('/') + 1) );
+        setFacilities(sortedFacilities)
+    })
       .catch(err => console.error(err));    
     }
     const onDelClick = (id, amount) => {
@@ -141,9 +145,9 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
     }
     
     const columns = [
-      {field: 'name', headerName: 'Наименование', width: 300},
-      {field: 'trainingsAmount', headerName: 'Количество тренировок', width: 300},
-      {field: 'capacity', headerName: 'Вместимость (чел.)', width: 400},
+      {field: 'name', headerName: 'Наименование', width: 420},
+      {field: 'trainingsAmount', headerName: 'Количество тренировок', width: 420},
+      {field: 'capacity', headerName: 'Вместимость (чел.)', width: 380},
       {
         field: '_links.facility.href', 
         headerName: '', 

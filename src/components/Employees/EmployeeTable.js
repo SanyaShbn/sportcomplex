@@ -52,7 +52,9 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
       .then(response => response.json())
       .then(data => {
         const nonAdminUsers = data._embedded.users.filter(user => user.role !== "ADMIN");
-        setUsers(nonAdminUsers);
+        const sortedNonAdminUsers = nonAdminUsers.sort((a, b) => a._links.self.href.slice(a._links.self.href.lastIndexOf('/') + 1) 
+        - b._links.self.href.slice(b._links.self.href.lastIndexOf('/') + 1) );
+        setUsers(sortedNonAdminUsers);
       }
       )
       .catch(err => console.error(err));    

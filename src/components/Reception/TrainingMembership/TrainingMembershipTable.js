@@ -14,6 +14,7 @@ import EditTrainingMembership from './EditTrainingMembership.js';
 import { grey } from '@mui/material/colors';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useValue } from '../../../context/ContextProvider.js';
 
 function CustomToolbar() {
   return (
@@ -29,6 +30,9 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
     setSelectedButtonLink(link);
   }, []);
 
+  const {
+    dispatch,
+  } = useValue();
 
     const [training_memberships, setTrainingMemberships] = useState([]);
     const [delOpen, setDelOpen] = useState(false);
@@ -48,7 +52,11 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
         // headers: { 'Authorization' : token }
       })
       .then(response => response.json())
-      .then(data => setTrainingMemberships(data._embedded.trainingMemberships))
+      .then(data => {
+        const sortedTrainingMemberships = data._embedded.trainingMemberships.sort((a, b) => a._links.self.href.slice(a._links.self.href.lastIndexOf('/') + 1) 
+        - b._links.self.href.slice(b._links.self.href.lastIndexOf('/') + 1) );
+        setTrainingMemberships(sortedTrainingMemberships)
+    })
       .catch(err => console.error(err));    
     }
 
@@ -96,7 +104,13 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
           setAddOpen(true)
         }
         else {
-          alert('Что-то пошло не так!');
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'error',
+              message: 'Не удалось добавить новую запись. Проверьте корректность ввода данных!',
+            },});
         }
       })
       .catch(err => console.error(err))
@@ -121,7 +135,13 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
           setEditOpen(true)
         }
         else {
-          alert('Что-то пошло не так!');
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'error',
+              message: 'Не удалось сохранить изменения. Проверьте корректность ввода данных',
+            },});
         }
       })
       .catch(err => console.error(err))
@@ -272,19 +292,19 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
           open={delOpen}
           autoHideDuration={2000}
           onClose={() => setDelOpen(false)}
-          message="Запись о пакете тренировок удалена"
+          message="Запись о пакете услуг удалена"
         />
         <Snackbar
           open={addOpen}
           autoHideDuration={2000}
           onClose={() => setAddOpen(false)}
-          message="Запись о новом согласовании занятий успешно добавлена"
+          message="Запись о новом пакете услуг успешно добавлена"
         />
         <Snackbar
           open={editOpen}
           autoHideDuration={2000}
           onClose={() => setEditOpen(false)}
-          message="Информация о согласовании занятий успешно обновлена"
+          message="Информация о пакете услуг успешно обновлена"
         />
       </div>
     </React.Fragment>

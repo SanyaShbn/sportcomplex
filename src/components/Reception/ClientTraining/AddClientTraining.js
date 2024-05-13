@@ -11,6 +11,8 @@ import { SERVER_URL } from '../../../constants.js';
 import '../../CSS/employeeCSS.css';
 import '../../CSS/table.css';
 import { useValue } from '../../../context/ContextProvider.js';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 
 
 function AddClientTraining(props){
@@ -28,6 +30,17 @@ function AddClientTraining(props){
     fetchTrainings();
     fetchClients();
   }, []);
+
+  const clientsFilterOptions = createFilterOptions({
+    matchFrom: 'any',
+    stringify: (option) => "Клиент №" + option.idClient + ": " + option.surName + " " + option.firstName + " " + option.patrSurName + 
+    " (" + option.phoneNumber + ")",
+  });
+  
+  const trainingsFilterOptions = createFilterOptions({
+    matchFrom: 'any',
+    stringify: (option) => "Тренировка №" + option.idTraining + ". " + option.name,
+  });
 
   const fetchTrainings = () => {
       // const token = sessionStorage.getItem("jwt");
@@ -87,39 +100,39 @@ function AddClientTraining(props){
       <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
             <FormControl fullWidth>
-            <InputLabel required>Тренировки</InputLabel>
-             <Select
-             name='training'
-             autoFocus variant="standard"
-             label="Тренировки"
-             value={trainingId} 
-             onChange={(event) => { setTrainingId(event.target.value) }}>
-            {trainings.map(training => {
-              if (training.capacity > training.clients_amount) {
-                return (
-                  <MenuItem key={training.idTraining} value={training.idTraining}>
-                    {"Тренировка №" + training.idTraining + ". " + training.name}
-                  </MenuItem>
-                );
-              }
-              return null;
-            })}
-            </Select>
+            <Autocomplete
+            options={trainings}
+            noOptionsText="Тренировки не найдены"
+            getOptionLabel={(option) => "Тренировка №" + option.idTraining + ". " + option.name}
+            value={trainings.find(training => training.idTraining  === trainingId)}
+            onChange={(event, newValue) => {
+             setTrainingId(newValue?.idTraining);
+            }}
+            filterOptions={trainingsFilterOptions}
+            renderInput={(params) => <TextField {...params} label="Тренировки" variant="standard" 
+            InputProps={{
+              ...params.InputProps,
+              style: { width: 'auto', minWidth: '300px' },
+            }}/>}
+            />
             </FormControl>
             <FormControl fullWidth>
-            <InputLabel required>Клиенты</InputLabel>
-             <Select
-             name='client'
-             autoFocus variant="standard"
-             label="Клиенты"
-             value={clientId} 
-             onChange={(event) => { setClientId(event.target.value) }}>
-             {clients.map(client => (
-               <MenuItem key={client.idClient}
-                value={client.idClient}>{"Клиент №" + client.idClient + ": " + client.surName + " " + client.firstName + " " + client.patrSurName + 
-                " (" + client.phoneNumber + ")"}</MenuItem>
-             ))}
-            </Select>
+            <Autocomplete
+            options={clients}
+            noOptionsText="Клиенты не найдены"
+            getOptionLabel={(option) => "Клиент №" + option.idClient + ": " + option.surName + " " + option.firstName + " " + option.patrSurName + 
+            " (" + option.phoneNumber + ")"}
+            value={clients.find(client => client.idClient  === clientId)}
+            onChange={(event, newValue) => {
+             setClientId(newValue?.idClient);
+            }}
+            filterOptions={clientsFilterOptions}
+            renderInput={(params) => <TextField {...params} label="Клиенты" variant="standard" 
+            InputProps={{
+              ...params.InputProps,
+              style: { width: 'auto', minWidth: '300px' },
+            }}/>}
+            />
             </FormControl>
         </Stack>
       </DialogContent>

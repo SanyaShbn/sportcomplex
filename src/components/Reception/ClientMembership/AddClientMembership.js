@@ -11,6 +11,8 @@ import { SERVER_URL } from '../../../constants.js';
 import '../../CSS/employeeCSS.css';
 import '../../CSS/table.css';
 import { useValue } from '../../../context/ContextProvider.js';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 
 
 function AddClientMembership(props){
@@ -24,6 +26,17 @@ function AddClientMembership(props){
     dispatch,
   } = useValue();
   
+  const clientsFilterOptions = createFilterOptions({
+    matchFrom: 'any',
+    stringify: (option) => "Клиент №" + option.idClient + ": " + option.surName + " " + option.firstName + " " + option.patrSurName + 
+    " (" + option.phoneNumber + ")",
+  });
+  
+  const membershipsFilterOptions = createFilterOptions({
+    matchFrom: 'any',
+    stringify: (option) => "Абонемент №" + option.idSportComplexMembership + ": " + option.name,
+  });
+
   useEffect(() => {
     fetchClients();
     fetchMemberships();
@@ -55,6 +68,8 @@ function AddClientMembership(props){
     
   const handleClose = () => {
     setOpen(false);
+    setClientId('')
+    setMembershipId('')
   };
 
   const handleSave = () => {
@@ -83,34 +98,40 @@ function AddClientMembership(props){
       <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
         <FormControl fullWidth>
-            <InputLabel required>Клиенты</InputLabel>
-             <Select
-             name='client'
-             autoFocus variant="standard"
-             label="Клиенты"
-             value={clientId} 
-             onChange={(event) => { setClientId(event.target.value) }}>
-             {clients.map(client => (
-               <MenuItem key={client.idClient}
-                value={client.idClient}>{"Клиент №" + client.idClient + ": " + client.surName + " " + client.firstName + " " + client.patrSurName + 
-                " (" + client.phoneNumber + ")"}</MenuItem>
-             ))}
-            </Select>
-            </FormControl>
-            <FormControl fullWidth>
-            <InputLabel required>Абонементы</InputLabel>
-             <Select
-             name='client'
-             autoFocus variant="standard"
-             label="Абонементы"
-             value={membershipId}
-             onChange={(event) => { setMembershipId(event.target.value) }}>
-             {memberships.map(membership => (
-               <MenuItem key={membership.idSportComplexMembership}
-                value={membership.idSportComplexMembership}>{"Абонемент №" + membership.idSportComplexMembership + ": " + membership.name}</MenuItem>
-             ))}
-            </Select>
-            </FormControl>
+            <Autocomplete
+            options={clients}
+            noOptionsText="Клиенты не найдены"
+            getOptionLabel={(option) => "Клиент №" + option.idClient + ": " + option.surName + " " + option.firstName + " " + option.patrSurName + 
+            " (" + option.phoneNumber + ")"}
+            value={clients.find(client => client.idClient  === clientId)}
+            onChange={(event, newValue) => {
+             setClientId(newValue?.idClient);
+            }}
+            filterOptions={clientsFilterOptions}
+            renderInput={(params) => <TextField {...params} label="Клиенты" variant="standard" 
+            InputProps={{
+              ...params.InputProps,
+              style: { width: 'auto', minWidth: '300px' },
+            }}/>}
+            />
+          </FormControl>
+          <FormControl fullWidth>
+            <Autocomplete
+            options={memberships}
+            noOptionsText="Абонементы не найдены"
+            getOptionLabel={(option) => "Абонемент №" + option.idSportComplexMembership + ": " + option.name}
+            value={memberships.find(membership => membership.idSportComplexMembership === membershipId)}
+            onChange={(event, newValue) => {
+             setMembershipId(newValue?.idSportComplexMembership);
+            }}
+            filterOptions={membershipsFilterOptions}
+            renderInput={(params) => <TextField {...params} label="Абонементы" variant="standard" 
+            InputProps={{
+              ...params.InputProps,
+              style: { width: 'auto', minWidth: '300px' },
+            }}/>}
+            />
+          </FormControl>
         </Stack>
       </DialogContent>
       <DialogActions>

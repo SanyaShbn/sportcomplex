@@ -51,7 +51,11 @@ const ClientTable = ({ setSelectedLink, link }) => {
         // headers: { 'Authorization' : token }
       })
       .then(response => response.json())
-      .then(data => setClients(data._embedded.clients))
+      .then(data => {
+        const sortedClietns = data._embedded.clients.sort((a, b) => a._links.self.href.slice(a._links.self.href.lastIndexOf('/') + 1) 
+        - b._links.self.href.slice(b._links.self.href.lastIndexOf('/') + 1) );
+        setClients(sortedClietns)
+    })
       .catch(err => console.error(err));    
     }
     const onDelClick = (id) => {

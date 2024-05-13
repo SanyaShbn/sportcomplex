@@ -12,6 +12,7 @@ import { grey } from '@mui/material/colors';
 import EditSportComplexMembership from './EditSportComplexMembership.js';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useValue } from '../../context/ContextProvider';
 
 
 function CustomToolbar() {
@@ -34,6 +35,9 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
     const [editOpen, setEditOpen] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [rowIdToDelete, setRowIdToDelete] = useState([]);
+    const {
+      dispatch,
+    } = useValue();
   
     useEffect(() => {
       fetchMemberships();
@@ -45,7 +49,11 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
         // headers: { 'Authorization' : token }
       })
       .then(response => response.json())
-      .then(data => setMemberships(data._embedded.sportComplexMemberships))
+      .then(data => {
+        const sortedMemberships = data._embedded.sportComplexMemberships.sort((a, b) => a._links.self.href.slice(a._links.self.href.lastIndexOf('/') + 1) 
+        - b._links.self.href.slice(b._links.self.href.lastIndexOf('/') + 1) );
+        setMemberships(sortedMemberships)
+    })
       .catch(err => console.error(err));    
     }
 
@@ -92,7 +100,13 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
           setAddOpen(true)
         }
         else {
-          alert('Что-то пошло не так!');
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'error',
+              message: 'Не удалось добавить новую запись. Абонемент с установленным наименованием уже существует (данное поле должно быть уникальным)',
+            },})
         }
       })
       .catch(err => console.error(err))
@@ -118,7 +132,13 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
           setEditOpen(true)
         }
         else {
-          alert('Что-то пошло не так!');
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'error',
+              message: 'Не удалось сохранить изменения. Абонемент с установленным новым наименованием уже существует (данное поле должно быть уникальным)',
+            },})
         }
       })
       .catch(err => console.error(err))

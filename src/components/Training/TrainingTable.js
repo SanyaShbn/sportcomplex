@@ -41,6 +41,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
     const [editOpen, setEditOpen] = useState(false);
     const [rows, setRows] = useState([]);
     const [dialogOpen, setDialogOpen] = useState(false);
+  
 
     // const token = sessionStorage.getItem("jwt");
       
@@ -68,7 +69,11 @@ const TrainingTable = ({ setSelectedLink, link }) => {
         // headers: { 'Authorization' : token }
       })
       .then(response => response.json())
-      .then(data => setTrainings(data._embedded.trainings))
+      .then(data => {
+        const sortedTrainings = data._embedded.trainings.sort((a, b) => a._links.self.href.slice(a._links.self.href.lastIndexOf('/') + 1) 
+        - b._links.self.href.slice(b._links.self.href.lastIndexOf('/') + 1) );
+        setTrainings(sortedTrainings)
+    })
       .catch(err => console.error(err)); 
   }
 
@@ -116,12 +121,17 @@ const TrainingTable = ({ setSelectedLink, link }) => {
           setAddOpen(true)
         }
         else {
-          alert('Что-то пошло не так!');
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'error',
+              message: 'Не удалось добавить новую запись. Проверьте корректность ввода данных!',
+            },});
         }
       })
       .catch(err => console.error(err))
     }
-  
 
     const updateTraining = (training, link, complexFacilityId, userId) => {
       const trainingProperties = [training.cost, training.name, training.capacity, training.type];
@@ -140,7 +150,13 @@ const TrainingTable = ({ setSelectedLink, link }) => {
           setEditOpen(true)
         }
         else {
-          alert('Что-то пошло не так!');
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'error',
+              message: 'Не удалось сохранить изменения. Проверьте корректность ввода данных',
+            },});
         }
       })
       .catch(err => console.error(err))
@@ -178,11 +194,11 @@ const TrainingTable = ({ setSelectedLink, link }) => {
  
     const columns = [
       {field: 'name', headerName: 'Наименование', width: 180},
-      {field: 'type', headerName: 'Тип занятия', width: 150},
+      {field: 'type', headerName: 'Тип занятия', width: 120},
       {field: 'cost', headerName: 'Стоимость (бел.руб.)', width: 180},
-      {field: 'capacity', headerName: 'Емкость', width: 150},
+      {field: 'capacity', headerName: 'Емкость', width: 100},
       {field: 'clients_amount', headerName: 'Кол-во клиентов', width: 180},
-      {field: 'complexFacility', headerName: 'Место проведения', width: 200},
+      {field: 'complexFacility', headerName: 'Место проведения', width: 270},
       {field: 'coach', headerName: 'Тренер', width: 290},
       {
         field: '_links.training.href', 

@@ -15,6 +15,7 @@ import '../CSS/employeeCSS.css';
 import '../CSS/table.css';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 
 
 function AddTraining(props){
@@ -40,6 +41,16 @@ function AddTraining(props){
     fetchFacilities()
     fetchCoaches()
   }, []);
+
+  const facilitiesFilterOptions = createFilterOptions({
+    matchFrom: 'any',
+    stringify: (option) => "Сооружение №" + option.idComplexFacility + ": " + option.name,
+  });
+  
+  const coachesFilterOptions = createFilterOptions({
+    matchFrom: 'any',
+    stringify: (option) => "Тренер №" + option.userId + ": " + option.firstName + " " + option.surName,
+  });
 
   const handleCostErrorChange = (event) => {
     const { value } = event.target;
@@ -203,34 +214,40 @@ function AddTraining(props){
             startAdornment={<InputAdornment position="start">BYN</InputAdornment>}
             label="Стоимость (бел.руб.)"
           />
-        </FormControl>
+          </FormControl>
+          <FormControl fullWidth>
+            <Autocomplete
+            options={facilities}
+            noOptionsText="Сооружения не найдены"
+            getOptionLabel={(option) => "Сооружение №" + option.idComplexFacility + ": " + option.name}
+            value={facilities.find(facility => facility.idComplexFacility === complexFacilityId)}
+            onChange={(event, newValue) => {
+             setComplexFacilityId(newValue?.idComplexFacility);
+            }}
+            filterOptions={facilitiesFilterOptions}
+            renderInput={(params) => <TextField {...params} label="Место проведения" variant="standard" 
+            InputProps={{
+              ...params.InputProps,
+              style: { width: 'auto', minWidth: '300px' },
+            }}/>}
+            />
+          </FormControl>
             <FormControl fullWidth>
-            <InputLabel required>Место проведения</InputLabel>
-             <Select
-             name='complexFacility'
-             autoFocus variant="standard"
-             label="Место проведения"
-             value={complexFacilityId}
-             onChange={(event) => { setComplexFacilityId(event.target.value) }}>
-             {facilities.map(facility => (
-               <MenuItem key={facility.idComplexFacility}
-                value={facility.idComplexFacility}>{"Сооружение №" + facility.idComplexFacility + ": " + facility.name}</MenuItem>
-             ))}
-            </Select>
-            </FormControl>
-            <FormControl fullWidth>
-            <InputLabel required>Тренер</InputLabel>
-             <Select
-             name='coach'
-             autoFocus variant="standard"
-             label="Тренер"
-             value={coachId}
-             onChange={(event) => { setCoachId(event.target.value) }}>
-             {coaches.map(coach => (
-               <MenuItem key={coach.userId}
-                value={coach.userId}>{"Тренер №" + coach.userId + ": " + coach.firstName + " " + coach.surName}</MenuItem>
-             ))}
-            </Select>
+            <Autocomplete
+            options={coaches}
+            noOptionsText="Тренеры не найдены"
+            getOptionLabel={(option) => "Тренер №" + option.userId + ": " + option.firstName + " " + option.surName}
+            value={coaches.find(coach => coach.userId === coachId)}
+            onChange={(event, newValue) => {
+             setCoachId(newValue?.userId);
+            }}
+            filterOptions={coachesFilterOptions}
+            renderInput={(params) => <TextField {...params} label="Тренер" variant="standard" 
+            InputProps={{
+              ...params.InputProps,
+              style: { width: 'auto', minWidth: '300px' },
+            }}/>}
+            />
             </FormControl>
         </Stack>
       </DialogContent>

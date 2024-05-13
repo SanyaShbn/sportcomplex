@@ -52,7 +52,11 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
         // headers: { 'Authorization' : token }
       })
       .then(response => response.json())
-      .then(data => setClientTrainings(data._embedded.clientTrainings))
+      .then(data => {
+        const sortedClientTrainings = data._embedded.clientTrainings.sort((a, b) => a._links.self.href.slice(a._links.self.href.lastIndexOf('/') + 1) 
+        - b._links.self.href.slice(b._links.self.href.lastIndexOf('/') + 1) );
+        setClientTrainings(sortedClientTrainings)
+    })
       .catch(err => console.error(err));    
     }
 
@@ -122,7 +126,24 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
             });
           }
           else{
-          alert('Что-то пошло не так!');
+            if(response.status === 500){
+              dispatch({
+                type: 'UPDATE_ALERT',
+                payload: {
+                  open: true,
+                  severity: 'error',
+                  message: 'На выбранную тренировку уже записано максимально допустимое количество клиентов',
+                },
+              });
+            }else{
+            dispatch({
+              type: 'UPDATE_ALERT',
+              payload: {
+                open: true,
+                severity: 'error',
+                message: 'Не удалось добавить новую запись. Проверьте корректность ввода данных!',
+              },});
+            }
           }
         }
       })
@@ -171,7 +192,24 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
             });
           }
           else{
-          alert('Что-то пошло не так!');
+            if(response.status === 500){
+              dispatch({
+                type: 'UPDATE_ALERT',
+                payload: {
+                  open: true,
+                  severity: 'error',
+                  message: 'На выбранную тренировку уже записано максимально допустимое количество клиентов',
+                },
+              });
+            }else{
+            dispatch({
+              type: 'UPDATE_ALERT',
+              payload: {
+                open: true,
+                severity: 'error',
+                message: 'Не удалось сохранить изменения. Проверьте корректность ввода данных',
+              },});
+            }
           }
         }
       })

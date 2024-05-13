@@ -14,6 +14,7 @@ import EditClientMembership from './EditClientMembership.js';
 import { grey } from '@mui/material/colors';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useValue } from '../../../context/ContextProvider.js';
 
 function CustomToolbar() {
   return (
@@ -37,6 +38,9 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
     const [rows, setRows] = useState([]);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [rowIdToDelete, setRowIdToDelete] = useState([]);
+    const {
+      dispatch,
+    } = useValue();
   
     useEffect(() => {
       fetchClientMemberships();
@@ -48,7 +52,11 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
         // headers: { 'Authorization' : token }
       })
       .then(response => response.json())
-      .then(data => setClientMemberships(data._embedded.clientMemberships))
+      .then(data => {
+        const sortedClientMemberships = data._embedded.clientMemberships.sort((a, b) => a._links.self.href.slice(a._links.self.href.lastIndexOf('/') + 1) 
+        - b._links.self.href.slice(b._links.self.href.lastIndexOf('/') + 1) );
+        setClientMemberships(sortedClientMemberships)
+    })
       .catch(err => console.error(err));    
     }
 
@@ -94,7 +102,13 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
           setAddOpen(true)
         }
         else {
-          alert('Что-то пошло не так!');
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'error',
+              message: 'Не удалось добавить новую запись. Проверьте корректность ввода данных',
+            },});
         }
       })
       .catch(err => console.error(err))
@@ -119,7 +133,13 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
           setEditOpen(true)
         }
         else {
-          alert('Что-то пошло не так!');
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'error',
+              message: 'Не удалось сохранить изменения. Проверьте корректность ввода данных',
+            },});
         }
       })
       .catch(err => console.error(err))

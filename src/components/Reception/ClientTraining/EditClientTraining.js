@@ -11,11 +11,13 @@ import {FormControl, InputLabel, MenuItem} from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import { useValue } from '../../../context/ContextProvider.js';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 
 function EditClientTraining(props) {
 
-    const [clientId, setClientId] = useState([]);
-    const [trainingId, setTrainingId] = useState([]);
+    const [clientId, setClientId] = useState('');
+    const [trainingId, setTrainingId] = useState('');
     const [clients, setClients] = useState([]);
     const [trainings, setTrainings] = useState([]);
     const [open, setOpen] = useState(false);
@@ -25,6 +27,17 @@ function EditClientTraining(props) {
     const {
       dispatch,
     } = useValue();
+
+    const clientsFilterOptions = createFilterOptions({
+      matchFrom: 'any',
+      stringify: (option) => "Клиент №" + option.idClient + ": " + option.surName + " " + option.firstName + " " + option.patrSurName + 
+      " (" + option.phoneNumber + ")",
+    });
+    
+    const trainingsFilterOptions = createFilterOptions({
+      matchFrom: 'any',
+      stringify: (option) => "Тренировка №" + option.idTraining + ". " + option.name,
+    });
 
   useEffect(() => {
     fetchTrainings();
@@ -71,20 +84,9 @@ function EditClientTraining(props) {
     setTrainingId('')
     setClientId('')
   };
-
-  const handleChangeTraining = (event) => {
-    setTrainingId(event.target.value) 
-    setClientTraining({...client_training, 
-      [event.target.name]: event.target.value});
-  }
-  const handleChangeClient = (event) => {
-    setClientId(event.target.value)
-    setClientTraining({...client_training, 
-      [event.target.name]: event.target.value});
-  }
  
   const handleSave = () => {
-    if(clientId.length === 0 | trainingId.length === 0){
+    if(clientId === '' | trainingId === ''){
       dispatch({
         type: 'UPDATE_ALERT',
         payload: {
@@ -109,39 +111,39 @@ function EditClientTraining(props) {
           <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
         <FormControl fullWidth>
-            <InputLabel required>Тренировки</InputLabel>
-             <Select
-             name='training'
-             autoFocus variant="standard"
-             label="Тренировки"
-             value={client_training.training}
-             onChange={handleChangeTraining}>
-             {trainings.map(training => {
-              if (training.capacity > training.clients_amount) {
-                  return (
-                   <MenuItem key={training.idTraining}
-                    value={training.idTraining}>{"Тренировка №" + training.idTraining
-                    + ". " + training.name}</MenuItem>
-                  );
-              }
-              return null;
-            })}
-            </Select>
+            <Autocomplete
+            options={trainings}
+            noOptionsText="Тренировки не найдены"
+            getOptionLabel={(option) => "Тренировка №" + option.idTraining + ". " + option.name}
+            value={trainings.find(training => training.idTraining  === trainingId)}
+            onChange={(event, newValue) => {
+             setTrainingId(newValue?.idTraining);
+            }}
+            filterOptions={trainingsFilterOptions}
+            renderInput={(params) => <TextField {...params} label="Тренировки" variant="standard" 
+            InputProps={{
+              ...params.InputProps,
+              style: { width: 'auto', minWidth: '300px' },
+            }}/>}
+            />
             </FormControl>
             <FormControl fullWidth>
-            <InputLabel required>Клиенты</InputLabel>
-             <Select
-             name='client'
-             autoFocus variant="standard"
-             label="Клиенты"
-             value={client_training.client}
-             onChange={handleChangeClient}>
-             {clients.map(client => (
-               <MenuItem key={client.idClient}
-                value={client.idClient}>{"Клиент №" + client.idClient + ": " + client.surName + " " + client.firstName + " " + client.patrSurName + 
-                " (" + client.phoneNumber + ")"}</MenuItem>
-             ))}
-            </Select>
+            <Autocomplete
+            options={clients}
+            noOptionsText="Клиенты не найдены"
+            getOptionLabel={(option) => "Клиент №" + option.idClient + ": " + option.surName + " " + option.firstName + " " + option.patrSurName + 
+            " (" + option.phoneNumber + ")"}
+            value={clients.find(client => client.idClient  === clientId)}
+            onChange={(event, newValue) => {
+             setClientId(newValue?.idClient);
+            }}
+            filterOptions={clientsFilterOptions}
+            renderInput={(params) => <TextField {...params} label="Клиенты" variant="standard" 
+            InputProps={{
+              ...params.InputProps,
+              style: { width: 'auto', minWidth: '300px' },
+            }}/>}
+            />
             </FormControl>
         </Stack>
       </DialogContent>
