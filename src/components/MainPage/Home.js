@@ -88,6 +88,7 @@ const Home = ({ setSelectedLink, link }) => {
     ):( */}
         <>
         <div className='main-cards'>
+          
         <Paper elevation={3} sx={{ p: 3 }}>
         <Typography variant="h6">АБОНЕМЕНТЫ</Typography>
         <Box

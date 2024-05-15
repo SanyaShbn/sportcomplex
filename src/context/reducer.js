@@ -16,10 +16,10 @@ const reducer = (state, action) => {
   
       case 'UPDATE_USER':
         return { ...state, currentUser: action.payload };
-  
+
       default:
-        throw new Error('No matched action!');
+          return state;
     }
   };
-  
+
   export default reducer;
