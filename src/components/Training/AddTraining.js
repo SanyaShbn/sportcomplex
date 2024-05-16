@@ -16,6 +16,7 @@ import '../CSS/table.css';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import { jwtDecode } from 'jwt-decode';
 
 
 function AddTraining(props){
@@ -33,6 +34,7 @@ function AddTraining(props){
   const [costInputValue, setCostValue] = useState('');
   const [isNameError, setIsNameError] = useState(false);
   const [isCostError, setIsCostError] = useState(false);
+  const [isCoach, setIsCoach] = useState(false);
   const {
     dispatch,
   } = useValue();
@@ -68,9 +70,9 @@ function AddTraining(props){
     setTraining({...training, [event.target.name]: event.target.value});
   };
   const fetchFacilities = () => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/view_facilities', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => response.json())
       .then(data => setFacilities(data))
@@ -78,9 +80,9 @@ function AddTraining(props){
     }
 
     const fetchCoaches= () => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/view_coaches', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => response.json())
       .then(data => setCoaches(data))
@@ -88,11 +90,18 @@ function AddTraining(props){
     }
 
   const handleClickOpen = () => {
+    const token = sessionStorage.getItem("jwt");
+    const decodedToken = jwtDecode(token);
+    const roles = decodedToken.roles
     setTraining({
       ...training, type: 'групповое'
     })
     setIsGroup(true)
-    setOpen(true);
+    if(roles.toString() === 'COACH'){
+      setCoachId(parseInt(decodedToken.id))
+      setIsCoach(true)
+    }
+    setOpen(true)
   };
     
   const handleClose = () => {
@@ -235,6 +244,7 @@ function AddTraining(props){
             <FormControl fullWidth>
             <Autocomplete
             options={coaches}
+            readOnly={isCoach}
             noOptionsText="Тренеры не найдены"
             getOptionLabel={(option) => "Тренер №" + option.userId + ": " + option.firstName + " " + option.surName}
             value={coaches.find(coach => coach.userId === coachId)}

@@ -19,7 +19,8 @@ export default class ScheduleCalendar extends Component {
             return;
         }
 
-        const onDataUpdated = this.props.onDataUpdated;
+        const onDataUpdated = this.props.onDataUpdated
+        let oldEvent
  
         scheduler.attachEvent('onEventAdded', (id, ev) => {
             const token = sessionStorage.getItem("jwt");
@@ -35,8 +36,8 @@ export default class ScheduleCalendar extends Component {
                 body: JSON.stringify(ev)
             })
             .then(response => response.text())
-            .then(data => {
-            if (data !== "Saved") {
+            .then(data => {   
+            if (data === "Event duration is overlapping with other events. Cannot save.") {
             scheduler.deleteEvent(id);
             scheduler.message({
                 text: "Новое событие не удалось создать. Создаваемое событие не может пересекаться по времени с уже существующими"
@@ -44,17 +45,30 @@ export default class ScheduleCalendar extends Component {
                 type: "error",
                 expire:30000
             })
-            }
+            } else if (data !== "Saved"){
+                scheduler.message({
+                    text: "Новое событие не удалось создать. Проверьте корректность ввода данных", 
+                    type: "error",
+                    expire:30000
+                })
+                scheduler.deleteEvent(id);
+            } else{}
             })
             .catch(err => console.error(err))
         });
- 
+
+        scheduler.attachEvent("onBeforeEventChanged", function(ev, e, is_new, original){
+            oldEvent = scheduler.copy(original); 
+            return true;
+        });
+
         scheduler.attachEvent('onEventChanged', (id, ev) => {
             const token = sessionStorage.getItem("jwt");
+            const decodedToken = jwtDecode(token);
             if (onDataUpdated) {
                 onDataUpdated('update', ev, id);
             }
-            fetch(SERVER_URL + '/api/events/' + id, {
+            fetch(SERVER_URL + '/api/events/' + id + '?userLogin=' + decodedToken.sub, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -64,7 +78,7 @@ export default class ScheduleCalendar extends Component {
             })
             .then(response => response.text())
             .then(data => {
-            if (data !== "Updated") {
+            if (data === "Event duration is overlapping with other events. Cannot save.") {
                 scheduler.message({
                     text: "Обновляемое событие не может пересекаться по времени с уже существующими"
                     + ", проводимыми в том же помещении (кроме персональных занятий) или тем же тренером. Данное изменение" 
@@ -72,7 +86,23 @@ export default class ScheduleCalendar extends Component {
                     type: "warning",
                     expire:10000
                 })
-            }
+                scheduler.setEvent(oldEvent.id, oldEvent); 
+                scheduler.updateEvent(oldEvent.id);
+            } else if (data === "Access denied!"){
+                scheduler.message({
+                    text: "Недостаточный уровень доступа. Сотрудник тренерского персонала имеет право редактировать информацию только о проводимых лично им тренировочных занятиях", 
+                    type: "error",
+                    expire:30000
+                })
+                scheduler.setEvent(oldEvent.id, oldEvent); 
+                scheduler.updateEvent(oldEvent.id);
+            } else if (data !== "Updated"){
+                scheduler.message({
+                    text: "Не удалось сохранить изменения. Проверьте корректность ввода данных", 
+                    type: "error",
+                    expire:30000
+                })
+            } else{}
             })
             .catch(err => console.error(err))
         });
@@ -110,15 +140,24 @@ export default class ScheduleCalendar extends Component {
         });
 
         scheduler.attachEvent("onLightbox", function(id) {
-            const token = sessionStorage.getItem("jwt");
-            const decodedToken = jwtDecode(token);
+            const token = sessionStorage.getItem("jwt")
+            const decodedToken = jwtDecode(token)
             var lightbox = scheduler.getLightbox(); 
+            var event = scheduler.getEvent(id)
             lightbox.style.top = "80px";
             if(decodedToken.roles.toString() === 'ADMIN'){
             setTimeout(function() {
             var node = scheduler.formSection("Тип события").node;
             var radios = node.getElementsByTagName("input");
-            // radios[0].checked = true;
+            if(event.data_type === 'тренировочное занятие'){
+               radios[0].checked = true;
+            }
+            else if(event.data_type === 'уборка и обслуживание'){
+                radios[1].checked = true;
+            }
+            else{
+                radios[0].checked = true;
+            }
             for (var i = 0; i < radios.length; i++) {
                 radios[i].addEventListener("change", function() {
                     var data_type = this.value;
@@ -136,15 +175,9 @@ export default class ScheduleCalendar extends Component {
                     .then(response => response.json())
                     .then(data => {
                         var events
-                        fetch(SERVER_URL + '/api/events', {
-                            headers: {
-                            'Authorization' : token
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(eventsData => {
-                            events = Object.values(scheduler._events)
-                            var options;
+                        scheduler.render()
+                        events = Object.values(scheduler._events)
+                        var options;
                         if(data_type === "тренировочное занятие") {
                             options = data.filter(item => 
                                 !events.some(event => event.text === 'Тренировка №' + item.idTraining + '. ' + item.name)
@@ -167,13 +200,10 @@ export default class ScheduleCalendar extends Component {
                         options.forEach(function(option) {
                             scheduler.formSection("Событие").control.options.add(new Option(option.label, option.key));
                         });
-                        var event = scheduler.getEvent(id)
                         scheduler.formSection("Событие").setValue(event.text)
                         scheduler.formSection("Описание").setValue(event.description)
                         })
                         .catch(error => console.error(error));
-                    })
-                    .catch(err => console.error(err));
                 });
             }
           }, 0);

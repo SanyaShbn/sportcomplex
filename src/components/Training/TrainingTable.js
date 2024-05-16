@@ -41,14 +41,10 @@ const TrainingTable = ({ setSelectedLink, link }) => {
     const [editOpen, setEditOpen] = useState(false);
     const [rows, setRows] = useState([]);
     const [dialogOpen, setDialogOpen] = useState(false);
-  
 
-    // const token = sessionStorage.getItem("jwt");
-      
-    // const decodedToken = jwtDecode(token);
-
-    // const roles = decodedToken.roles
-
+    const token = sessionStorage.getItem("jwt")
+    const decodedToken = jwtDecode(token)
+    const roles = decodedToken.roles
 
     const showError = () => {
       dispatch({
@@ -66,7 +62,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
   
     const fetchTrainings = () => {
       fetch(SERVER_URL + '/api/trainings', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => response.json())
       .then(data => {
@@ -89,9 +85,9 @@ const TrainingTable = ({ setSelectedLink, link }) => {
       // }
       // else{
 
-        fetch(url, {
+        fetch(url + "?userLogin=" + decodedToken.sub, {
           method: 'DELETE',
-          // headers: { 'Authorization' : token }
+          headers: { 'Authorization' : token }
           })
         .then(response => {
           if (response.ok) {
@@ -99,7 +95,15 @@ const TrainingTable = ({ setSelectedLink, link }) => {
             setDelOpen(true);
           }
           else {
-            alert('Что-то пошло не так!');
+            if(decodedToken.roles.toString() === "COACH"){
+            dispatch({
+              type: 'UPDATE_ALERT',
+              payload: {
+                open: true,
+                severity: 'error',
+                message: 'Недостаточный уровень доступа. Сотрудник тренерского персонала имеет право редактировать только проводимые лично им тренировки',
+              },});
+            }
           }
           setDialogOpen(false)
         })
@@ -111,7 +115,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
       fetch(SERVER_URL + '/api/save_trainings?complexFacilityId='+ complexFacilityId + "&userId=" + userId,
         { method: 'POST', headers: {
           'Content-Type':'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
         body: JSON.stringify(training)
       })
@@ -140,7 +144,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
           method: 'PUT', 
           headers: {
           'Content-Type':  'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
         body: JSON.stringify(trainingProperties)
       })
@@ -166,7 +170,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
       try {
         const config = {
           headers: {
-            // 'Authorization' : token
+            'Authorization' : token
           }
         };
         const response = await axios.get(url, config);
@@ -181,7 +185,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
       try {
         const config = {
           headers: {
-            // 'Authorization' : token
+            'Authorization' : token
           }
         };
         const response = await axios.get(url, config);

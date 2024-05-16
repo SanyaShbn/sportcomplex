@@ -16,6 +16,7 @@ import { NumberInput } from '../../constants';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import { jwtDecode } from 'jwt-decode';
 
 function EditTraining(props) {
 
@@ -32,6 +33,7 @@ function EditTraining(props) {
   const [costInputValue, setCostValue] = useState('');
   const [isNameError, setIsNameError] = useState(false);
   const [isCostError, setIsCostError] = useState(false);
+  const [isCoach, setIsCoach] = useState(false);
   
   const {
     dispatch,
@@ -68,9 +70,9 @@ function EditTraining(props) {
     setTraining({...training, [event.target.name]: event.target.value});
   };
   const fetchFacilities = () => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/view_facilities', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => response.json())
       .then(data => setFacilities(data))
@@ -78,9 +80,9 @@ function EditTraining(props) {
     }
 
     const fetchCoaches= () => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/view_coaches', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => response.json())
       .then(data => setCoaches(data))
@@ -88,6 +90,9 @@ function EditTraining(props) {
     }
 
   const handleClickOpen = () => {
+    const token = sessionStorage.getItem("jwt");
+    const decodedToken = jwtDecode(token);
+    const roles = decodedToken.roles
     if(props.data.row.type !== "групповое"){
       setIsGroup(false)
     }
@@ -109,25 +114,27 @@ function EditTraining(props) {
      })      
     setCapacityValue(props.data.row.capacity)
     setCostValue(props.data.row.cost)
-    setOpen(true);
+    if(roles.toString() === 'COACH'){
+      setIsCoach(true)
+      if(decodedToken.id === idCoach){
+        setOpen(true)
+        }
+        else{
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'error',
+              message: 'Недостаточный уровень доступа. Сотрудник тренерского персонала имеет право редактировать только проводимые лично им тренировки',
+            },});
+        }
+    }else{setOpen(true)}
   }
 
   const handleClose = () => {
     setOpen(false);
     setIsNameError(false)
   };
-
-  const handleChangeComplexFacility = (event) => {
-    setComplexFacilityId(event.target.value)
-    setTraining({...training, 
-      [event.target.name]: event.target.value});
-  }
- 
-  const handleChangeCoach = (event) => {
-    setCoachId(event.target.value)
-    setTraining({...training, 
-      [event.target.name]: event.target.value});
-  }
   const handleSave = () => {
     if(training.name.length === 0 | coachId === '' | complexFacilityId === ''){
       dispatch({
@@ -236,6 +243,7 @@ function EditTraining(props) {
           <FormControl fullWidth>
             <Autocomplete
             options={facilities}
+            
             noOptionsText="Сооружения не найдены"
             getOptionLabel={(option) => "Сооружение №" + option.idComplexFacility + ": " + option.name}
             value={facilities.find(facility => facility.idComplexFacility === complexFacilityId)}
@@ -253,6 +261,7 @@ function EditTraining(props) {
             <FormControl fullWidth>
             <Autocomplete
             options={coaches}
+            readOnly={isCoach}
             noOptionsText="Тренеры не найдены"
             getOptionLabel={(option) => "Тренер №" + option.userId + ": " + option.firstName + " " + option.surName}
             value={coaches.find(coach => coach.userId === coachId)}
