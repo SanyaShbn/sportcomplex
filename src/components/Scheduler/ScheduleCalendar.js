@@ -8,7 +8,8 @@ import { jwtDecode } from 'jwt-decode';
 const scheduler = window.scheduler
 scheduler.plugins({
     recurring: true,
-    editors: true 
+    editors: true,
+    readonly: true
 });
 
 export default class ScheduleCalendar extends Component {
@@ -40,8 +41,8 @@ export default class ScheduleCalendar extends Component {
             if (data === "Event duration is overlapping with other events. Cannot save.") {
             scheduler.deleteEvent(id);
             scheduler.message({
-                text: "Новое событие не удалось создать. Создаваемое событие не может пересекаться по времени с уже существующими"
-                + ", проводимыми в том же помещении (кроме персональных занятий) или тем же тренером", 
+                text: "Новое событие не удалось создать. Тренировочное занятие не может пересекаться по времени с уже существующими"
+                + ", проводимыми в том же помещении (кроме персональных занятий) или тем же тренером. Уборка и обслуживание сооружения не могут назначаться на вермя проведения занятия в этом сооружении", 
                 type: "error",
                 expire:30000
             })
@@ -59,6 +60,10 @@ export default class ScheduleCalendar extends Component {
 
         scheduler.attachEvent("onBeforeEventChanged", function(ev, e, is_new, original){
             oldEvent = scheduler.copy(original); 
+            return true;
+        });
+        scheduler.attachEvent("onBeforeEventDelete", function(id,ev){
+            oldEvent = scheduler.copy(ev); 
             return true;
         });
 
@@ -80,22 +85,21 @@ export default class ScheduleCalendar extends Component {
             .then(data => {
             if (data === "Event duration is overlapping with other events. Cannot save.") {
                 scheduler.message({
-                    text: "Обновляемое событие не может пересекаться по времени с уже существующими"
-                    + ", проводимыми в том же помещении (кроме персональных занятий) или тем же тренером. Данное изменение" 
-                    + " не будет отображаться другим сотрудникам. Устраните данную несостыковку самостоятельно или изменение не будет сохранено!", 
+                    text: "Не удалось сохранить изменения. Тренировочное занятие не может пересекаться по времени с уже существующими"
+                    + ", проводимыми в том же помещении (кроме персональных занятий) или тем же тренером. Уборка и обслуживание сооружения не могут назначаться на вермя проведения занятия в этом сооружении", 
                     type: "warning",
                     expire:10000
                 })
-                scheduler.setEvent(oldEvent.id, oldEvent); 
-                scheduler.updateEvent(oldEvent.id);
+                scheduler.setEvent(oldEvent.id, oldEvent) 
+                scheduler.updateEvent(oldEvent.id)
             } else if (data === "Access denied!"){
                 scheduler.message({
                     text: "Недостаточный уровень доступа. Сотрудник тренерского персонала имеет право редактировать информацию только о проводимых лично им тренировочных занятиях", 
                     type: "error",
                     expire:30000
                 })
-                scheduler.setEvent(oldEvent.id, oldEvent); 
-                scheduler.updateEvent(oldEvent.id);
+                scheduler.setEvent(oldEvent.id, oldEvent) 
+                scheduler.updateEvent(oldEvent.id)
             } else if (data !== "Updated"){
                 scheduler.message({
                     text: "Не удалось сохранить изменения. Проверьте корректность ввода данных", 
@@ -109,16 +113,27 @@ export default class ScheduleCalendar extends Component {
  
         scheduler.attachEvent('onEventDeleted', (id, ev) => {
             const token = sessionStorage.getItem("jwt");
+            const decodedToken = jwtDecode(token);
             if (onDataUpdated) {
                 onDataUpdated('delete', ev, id);
             }
-            fetch(SERVER_URL + "/api/events/" + id, {
+            fetch(SERVER_URL + "/api/events/" + id + '?userLogin=' + decodedToken.sub + '&eventText=' + ev.text, {
                 method: 'DELETE',
-                headers: { 'Authorization' : token }
+                headers: { 'Authorization' : token },
             })
-            .then(() => {
-                //
-            });
+            .then(response => response.text())
+            .then(data => {
+            if (data === "Access denied!") {
+                scheduler.message({
+                    text: "Недостаточный уровень доступа. Сотрудник тренерского персонала имеет право редактировать информацию только о проводимых лично им тренировочных занятиях", 
+                    type: "error",
+                    expire:10000
+                })
+                scheduler.setEvent(oldEvent.id, oldEvent)
+                scheduler.updateEvent(oldEvent.id)
+            } else{}
+            })
+            .catch(err => console.error(err))
         });
         scheduler.attachEvent("onBeforeEventChanged",function(dev){
             var parts = scheduler.getState().drag_id.toString().split("#");
@@ -142,12 +157,12 @@ export default class ScheduleCalendar extends Component {
         scheduler.attachEvent("onLightbox", function(id) {
             const token = sessionStorage.getItem("jwt")
             const decodedToken = jwtDecode(token)
-            var lightbox = scheduler.getLightbox(); 
+            var lightbox = scheduler.getLightbox() 
             var event = scheduler.getEvent(id)
-            lightbox.style.top = "80px";
+            lightbox.style.top = "80px"
             if(decodedToken.roles.toString() === 'ADMIN'){
             setTimeout(function() {
-            var node = scheduler.formSection("Тип события").node;
+            var node = scheduler.formSection("Тип события").node
             var radios = node.getElementsByTagName("input");
             if(event.data_type === 'тренировочное занятие'){
                radios[0].checked = true;
@@ -165,7 +180,7 @@ export default class ScheduleCalendar extends Component {
                     if (data_type === "тренировочное занятие") {
                         url = SERVER_URL + '/api/view_trainings';
                     } else if (data_type === "уборка и обслуживание") {
-                        url = SERVER_URL + '/api/view_facilities';
+                        url = SERVER_URL + '/api/view_cleaned_facilities';
                     }
                     fetch(url, {
                         headers: {
@@ -199,15 +214,15 @@ export default class ScheduleCalendar extends Component {
                         scheduler.formSection("Событие").control.options.length = 0;
                         options.forEach(function(option) {
                             scheduler.formSection("Событие").control.options.add(new Option(option.label, option.key));
-                        });
-                        scheduler.formSection("Событие").setValue(event.text)
-                        scheduler.formSection("Описание").setValue(event.description)
+                        })
                         })
                         .catch(error => console.error(error));
                 });
             }
           }, 0);
         } else{
+            var section = scheduler.formSection("Тип события");
+            section.control.disabled = true;
         }
         });      
         scheduler._$initialized = true;
@@ -217,7 +232,6 @@ export default class ScheduleCalendar extends Component {
                 message_cancel: "Отменить",
             }
         });
-
   }
   
      componentDidMount() {
@@ -303,7 +317,6 @@ export default class ScheduleCalendar extends Component {
                         map_to: "data_type",
                         default_value: "тренировочное занятие",
                         value: "тренировочное занятие",
-                        disabled: true
                     },
                     {name:"recurring", height:115, type:"recurring", map_to:"rec_type", 
                     button:"recurring"},

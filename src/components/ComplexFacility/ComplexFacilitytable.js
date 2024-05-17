@@ -14,6 +14,7 @@ import { grey } from '@mui/material/colors';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useValue } from '../../context/ContextProvider';
+import axios from 'axios';
 
 function CustomToolbar() {
   return (
@@ -40,6 +41,7 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [rowIdToDelete, setRowIdToDelete] = useState([]);
     const [rowTrainingsAmount, setRowTrainingsAmount] = useState([]);
+    const [rows, setRows] = useState([]);
   
     useEffect(() => {
       fetchFacilities();
@@ -63,6 +65,21 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
       setRowIdToDelete(id)
       setRowTrainingsAmount(amount)
     }
+
+    const fetchCleaner = async (url) => {
+      try {
+        const config = {
+          headers: {
+            // 'Authorization' : token
+          }
+        };
+        const response = await axios.get(url, config);
+        let id = response.data._links.self.href;
+        return "Сотрудник обслуживающего персонала №" + id.slice(id.lastIndexOf("/") + 1) + ": " + response.data.surName + " " + response.data.firstName;
+      } catch (error) {
+        return 'не назначен';
+      }
+    };
     
     const handleConfirmDelete = (url, trainingsAmount) => {
       // const token = sessionStorage.getItem("jwt");
@@ -95,11 +112,12 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
       setDialogOpen(false);
     };
      
-    const addFacility = (facility) => {
-
+    const addFacility = (facility, cleanerId) => {
+      
+      cleanerId = cleanerId.length === 0 ? 0: cleanerId
       // const token = sessionStorage.getItem("jwt");
 
-      fetch(SERVER_URL + '/api/complexFacilities',
+      fetch(SERVER_URL + '/api/save_complex_facility?cleanerId=' + cleanerId,
         { method: 'POST', headers: {
           'Content-Type':'application/json',
           // 'Authorization' : token
@@ -108,6 +126,15 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
       })
       .then(response => {
         if (response.ok) {
+          if(cleanerId === 0){
+            dispatch({
+              type: 'UPDATE_ALERT',
+              payload: {
+                open: true,
+                severity: 'info',
+                message: 'Для сохраненного сооружения не назначен сотрудник обслуживающего персонала. В модуле "Расписание" нельзя будет назначить дату и время уборки и обслуживания данного сохраненного сооружения.',
+              },});
+          }
           fetchFacilities();
           setAddOpen(true)
         }
@@ -119,21 +146,32 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
     }
   
 
-    const updateFacility = (facility, link) => {
-
+    const updateFacility = (facility, link, cleanerId) => {
+      const facilityProperties = [facility.name, facility.capacity];
       // const token = sessionStorage.getItem("jwt");
-
-      fetch(link,
+      if(typeof cleanerId !== 'undefined'){
+      cleanerId = cleanerId.length === 0 ? 0: cleanerId
+      }else{cleanerId = 0}
+      fetch(link + '?cleanerId=' + cleanerId,
         { 
           method: 'PUT', 
           headers: {
           'Content-Type':  'application/json',
           // 'Authorization' : token
         },
-        body: JSON.stringify(facility)
+        body: JSON.stringify(facilityProperties)
       })
       .then(response => {
         if (response.ok) {
+          if(cleanerId === 0){
+            dispatch({
+              type: 'UPDATE_ALERT',
+              payload: {
+                open: true,
+                severity: 'info',
+                message: 'Для сохраненного сооружения не назначен сотрудник обслуживающего персонала. В модуле "Расписание" нельзя будет назначить дату и время уборки и обслуживания данного сохраненного сооружения.',
+              },});
+          }
           fetchFacilities();
           setEditOpen(true)
         }
@@ -146,8 +184,9 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
     
     const columns = [
       {field: 'name', headerName: 'Наименование', width: 420},
-      {field: 'trainingsAmount', headerName: 'Количество тренировок', width: 420},
-      {field: 'capacity', headerName: 'Вместимость (чел.)', width: 380},
+      {field: 'trainingsAmount', headerName: 'Количество тренировок', width: 200},
+      {field: 'capacity', headerName: 'Вместимость (чел.)', width: 200},
+      {field: 'cleaner', headerName: 'Сотрудник обслуживающего персонала', width: 400},
       {
         field: '_links.facility.href', 
         headerName: '', 
@@ -198,6 +237,21 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
       </div>
       }
     ];
+
+    useEffect(() => {
+      const updateRows = async () => {
+        const updatedRows = await Promise.all(facilities.map(async facility => ({
+          id: facility._links.self.href,
+          name: facility.name,
+          trainingsAmount: facility.trainingsAmount,
+          capacity: facility.capacity,
+          cleaner: await fetchCleaner(facility._links.cleaner.href),
+        })));
+        setRows(updatedRows);
+      };
+  
+      updateRows();
+    }, [facilities]);
     
   return (
     <Box
@@ -219,9 +273,9 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
       <div className="container" style={{ height: 400, width: "100%"}}>
         <StyledDataGrid localeText={ruRU.components.MuiDataGrid.defaultProps.localeText} className="grid_component" 
           columns={columns} 
-          rows={facilities} 
+          rows={rows} 
           disableSelectionOnClick={true}
-          getRowId={row => row._links.self.href}
+          getRowId={row => row.id}
           {...facilities}
           initialState={{
             ...facilities.initialState,
