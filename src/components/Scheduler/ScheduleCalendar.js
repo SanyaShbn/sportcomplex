@@ -117,7 +117,7 @@ export default class ScheduleCalendar extends Component {
             if (onDataUpdated) {
                 onDataUpdated('delete', ev, id);
             }
-            fetch(SERVER_URL + "/api/events/" + id + '?userLogin=' + decodedToken.sub + '&eventText=' + ev.text, {
+            fetch(SERVER_URL + "/api/events/" + id + '?userLogin=' + decodedToken.sub, {
                 method: 'DELETE',
                 headers: { 'Authorization' : token },
             })
@@ -154,6 +154,103 @@ export default class ScheduleCalendar extends Component {
             return true;
         });
 
+        scheduler.attachEvent("onBeforeLightbox", function (id){
+            const token = sessionStorage.getItem("jwt")
+            const decodedToken = jwtDecode(token)
+            let lightbox = scheduler.getLightbox() 
+            let event = scheduler.getEvent(id)
+            scheduler.render()
+            let events = Object.values(scheduler._events)
+            let options
+            let url
+            lightbox.style.top = "80px"
+            fetch(SERVER_URL + '/api/user_profile?userLogin=' + decodedToken.sub, {
+                headers: { 'Authorization' : token }
+            })
+                .then(response => response.json())
+                .then(profileData => {
+                    setTimeout(function() {
+                    if (profileData.role === "COACH") {
+                        var section = scheduler.formSection("Тип события")
+                        section.control.disabled = true
+                        fetch(SERVER_URL + '/api/view_trainings', {
+                            headers: {
+                                  'Authorization' : token
+                                }
+                              })
+                              .then(response => response.json())
+                              .then(data => {
+                        options = data.filter(item => 
+                            {
+                                if(event.text === 'Тренировка №' + item.idTraining + '. ' + item.name){
+                                    return item.coach.userLogin === profileData.userLogin && events.some(event => event.text === 'Тренировка №' + item.idTraining + '. ' + item.name)
+                                }
+                                else{return item.coach.userLogin === profileData.userLogin && !events.some(event => event.text === 'Тренировка №' + item.idTraining + '. ' + item.name)}
+                            }
+                        )
+                        .map(item => ({
+                            key: "Тренировка №" + item.idTraining + '. ' + item.name,
+                            label: "Тренировка №" + item.idTraining + '. ' + item.name,
+                        }))
+                        scheduler.formSection("Событие").control.options.length = 0;
+                        options.forEach(function(option) {
+                            scheduler.formSection("Событие").control.options.add(new Option(option.label, option.key));
+                        }) 
+                        scheduler.formSection("Событие").setValue(event.text)
+                    }).catch(error => console.error(error))
+                    } else {
+                        if (event.data_type === "тренировочное занятие") {
+                            url = SERVER_URL + '/api/view_trainings';
+                        } else if (event.data_type === "уборка и обслуживание") {
+                            url = SERVER_URL + '/api/view_cleaned_facilities';
+                        }
+                        fetch(url, {
+                            headers: {
+                                  'Authorization' : token
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if(event.data_type === "тренировочное занятие") {
+                                options = data.filter(item => {
+                                    if(event.text === 'Тренировка №' + item.idTraining + '. ' + item.name){
+                                        return events.some(event => event.text === 'Тренировка №' + item.idTraining + '. ' + item.name)
+                                    }
+                                    else{return !events.some(event => event.text === 'Тренировка №' + item.idTraining + '. ' + item.name)}
+                                }
+                                )
+                                .map(item => ({
+                                    key: "Тренировка №" + item.idTraining + '. ' + item.name,
+                                    label: "Тренировка №" + item.idTraining + '. ' + item.name,
+                                }));  
+                            }
+                            else{
+                                options = data.filter(item => 
+                                    {
+                                        if(event.text === "Уборка и обслуживание. " + item.name + " №" + item.idComplexFacility){
+                                            return events.some(event => event.text === "Уборка и обслуживание. " + item.name + " №" + item.idComplexFacility)
+                                        }
+                                        else{return !events.some(event => event.text === "Уборка и обслуживание. " + item.name + " №" + item.idComplexFacility)}
+                                    }
+                                )
+                                .map(item => ({
+                                    key: "Уборка и обслуживание. " + item.name + " №" + item.idComplexFacility,
+                                    label: "Уборка и обслуживание. " + item.name + " №" + item.idComplexFacility,
+                                }));
+                            }
+                            scheduler.formSection("Событие").control.options.length = 0;
+                            options.forEach(function(option) {
+                                scheduler.formSection("Событие").control.options.add(new Option(option.label, option.key));
+                            }) 
+                            scheduler.formSection("Событие").setValue(event.text)
+                            })
+                            .catch(error => console.error(error))
+                    }
+                }, 0);
+                }).catch(err => console.error(err))
+            return true   
+        });
+
         scheduler.attachEvent("onLightbox", function(id) {
             const token = sessionStorage.getItem("jwt")
             const decodedToken = jwtDecode(token)
@@ -163,7 +260,7 @@ export default class ScheduleCalendar extends Component {
             if(decodedToken.roles.toString() === 'ADMIN'){
             setTimeout(function() {
             var node = scheduler.formSection("Тип события").node
-            var radios = node.getElementsByTagName("input");
+            var radios = node.getElementsByTagName("input")
             if(event.data_type === 'тренировочное занятие'){
                radios[0].checked = true;
             }
@@ -194,8 +291,12 @@ export default class ScheduleCalendar extends Component {
                         events = Object.values(scheduler._events)
                         var options;
                         if(data_type === "тренировочное занятие") {
-                            options = data.filter(item => 
-                                !events.some(event => event.text === 'Тренировка №' + item.idTraining + '. ' + item.name)
+                            options = data.filter(item => {
+                                if(event.text === 'Тренировка №' + item.idTraining + '. ' + item.name){
+                                    return events.some(event => event.text === 'Тренировка №' + item.idTraining + '. ' + item.name)
+                                }
+                                else{return !events.some(event => event.text === 'Тренировка №' + item.idTraining + '. ' + item.name)}
+                            }
                             )
                             .map(item => ({
                                 key: "Тренировка №" + item.idTraining + '. ' + item.name,
@@ -204,19 +305,24 @@ export default class ScheduleCalendar extends Component {
                         }
                         else{
                             options = data.filter(item => 
-                                !events.some(event => event.text === "Уборка и обслуживание. " + item.name + " №" + item.idComplexFacility)
+                                {
+                                    if(event.text === "Уборка и обслуживание. " + item.name + " №" + item.idComplexFacility){
+                                        return events.some(event => event.text === "Уборка и обслуживание. " + item.name + " №" + item.idComplexFacility)
+                                    }
+                                    else{return !events.some(event => event.text === "Уборка и обслуживание. " + item.name + " №" + item.idComplexFacility)}
+                                }
                             )
                             .map(item => ({
                                 key: "Уборка и обслуживание. " + item.name + " №" + item.idComplexFacility,
                                 label: "Уборка и обслуживание. " + item.name + " №" + item.idComplexFacility,
-                             }));
+                            }));
                         }
                         scheduler.formSection("Событие").control.options.length = 0;
                         options.forEach(function(option) {
                             scheduler.formSection("Событие").control.options.add(new Option(option.label, option.key));
                         })
                         })
-                        .catch(error => console.error(error));
+                        .catch(error => console.error(error))
                 });
             }
           }, 0);
@@ -224,7 +330,8 @@ export default class ScheduleCalendar extends Component {
             var section = scheduler.formSection("Тип события");
             section.control.disabled = true;
         }
-        });      
+        });   
+
         scheduler._$initialized = true;
         scheduler.i18n.setLocale("ru");
         scheduler.i18n.setLocale({
@@ -234,155 +341,119 @@ export default class ScheduleCalendar extends Component {
         });
   }
   
-     componentDidMount() {
-        const token = sessionStorage.getItem("jwt");
-        const decodedToken = jwtDecode(token);
-        var events
-        fetch(SERVER_URL + '/api/events', {
-             headers: {
+  componentDidMount() {
+    const token = sessionStorage.getItem("jwt")
+    const decodedToken = jwtDecode(token)
+    var events
+    fetch(SERVER_URL + '/api/events', {
+         headers: {
+          'Authorization' : token
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        scheduler.parse(data, 'json');
+        events = data
+    })
+    .catch(error => console.error(error));
+
+    fetch(SERVER_URL + '/api/view_trainings', {
+        headers: {
               'Authorization' : token
             }
-        })
-        .then(response => response.json())
-        .then(data => {
-            scheduler.parse(data, 'json');
-            events = data
-        })
-        .catch(error => console.error(error));
-
-        fetch(SERVER_URL + '/api/view_trainings', {
-            headers: {
-                  'Authorization' : token
-                }
-              })
-              .then(response => response.json())
-              .then(data => {
-              fetch(SERVER_URL + '/api/user_profile?userLogin=' + decodedToken.sub, {
-              headers: { 'Authorization' : token }
-              })
-              .then(response => response.json())
-              .then(profileData => {
-                let options;
-                if (profileData.role === "COACH") {
-                    options = data.filter(item => 
-                        item.coach.userLogin === profileData.userLogin && 
-                        !events.some(event => event.text === 'Тренировка №' + item.idTraining + '. ' + item.name)
-                    )
-                    .map(item => ({
-                        key: "Тренировка №" + item.idTraining + '. ' + item.name,
-                        label: "Тренировка №" + item.idTraining + '. ' + item.name,
-                    }));
-                } else {
-                    options = data.filter(item => 
-                        !events.some(event => event.text === 'Тренировка №' + item.idTraining + '. ' + item.name)
-                    )
-                    .map(item => ({
-                        key: "Тренировка №" + item.idTraining + '. ' + item.name,
-                        label: "Тренировка №" + item.idTraining + '. ' + item.name,
-                    }));
-                }
-                scheduler.config.lightbox.sections = [
-                    {   
-                        name:"Событие", 
-                        height:21, 
-                        inputWidth:400, 
-                        map_to:"text", 
-                        type:"select", 
-                        options: options,
-                    },
-                    {   
-                      name:"Описание", 
-                      height:21, 
-                      inputWidth:800, 
-                      default_value: "Новое событие",
-                      map_to:"description", 
-                      type:"textarea", 
-                    },
-                    decodedToken.roles.toString() === 'ADMIN' ? 
-                    {
+          })
+          .then(response => response.json())
+          .then(data => {
+          fetch(SERVER_URL + '/api/user_profile?userLogin=' + decodedToken.sub, {
+          headers: { 'Authorization' : token }
+          })
+          .then(response => response.json())
+          .then(profileData => {
+            let options
+            if (profileData.role === "COACH") {
+                options = data.filter(item => 
+                    item.coach.userLogin === profileData.userLogin && 
+                    !events.some(event => event.text === 'Тренировка №' + item.idTraining + '. ' + item.name)
+                )
+                .map(item => ({
+                    key: "Тренировка №" + item.idTraining + '. ' + item.name,
+                    label: "Тренировка №" + item.idTraining + '. ' + item.name,
+                }));
+            } else {
+                options = data.filter(item => 
+                    !events.some(event => event.text === 'Тренировка №' + item.idTraining + '. ' + item.name)
+                )
+                .map(item => ({
+                    key: "Тренировка №" + item.idTraining + '. ' + item.name,
+                    label: "Тренировка №" + item.idTraining + '. ' + item.name,
+                }));
+            }
+            scheduler.config.lightbox.sections = [
+                {   
+                    name:"Событие", 
+                    height:21, 
+                    inputWidth:400, 
+                    map_to:"text", 
+                    type:"select", 
+                    options: options,
+                },
+                {   
+                  name:"Описание", 
+                  height:21, 
+                  inputWidth:800, 
+                  default_value: "Новое событие",
+                  map_to:"description", 
+                  type:"textarea", 
+                },
+                decodedToken.roles.toString() === 'ADMIN' ? 
+                {
+                name: "Тип события",
+                  height: 70,
+                  type: "radio",
+                  map_to: "data_type",
+                  options: [
+                      { id: "radio1", key: "тренировочное занятие", label: "Тренировочные занятия"} , 
+                      { id: "radio2", key: "уборка и обслуживание", label: "Уборка/обслуживание сооружений и помещений комплекса" }
+                  ],
+                  vertical:true,
+                } :
+                {
                     name: "Тип события",
-                      height: 70,
-                      type: "radio",
-                      map_to: "data_type",
-                      options: [
-                          { id: "radio1", key: "тренировочное занятие", label: "Тренировочные занятия"} , 
-                          { id: "radio2", key: "уборка и обслуживание", label: "Уборка/обслуживание сооружений и помещений комплекса" }
-                      ],
-                      vertical:true,
-                    } :
-                    {
-                        name: "Тип события",
-                        height: 21,
-                        type:"textarea", 
-                        map_to: "data_type",
-                        default_value: "тренировочное занятие",
-                        value: "тренировочное занятие",
-                    },
-                    {name:"recurring", height:115, type:"recurring", map_to:"rec_type", 
-                    button:"recurring"},
-                    {name:"time", height:72, type:"time", map_to:"auto"},
-                ];
-            })
-              .catch(err => console.error(err));    
-                // const options = data.map(item => ({
-                //     key: "Тренировка №" + item.idTraining,
-                //     label: "Тренировка №" + item.idTraining,
-                // }));
-                
-                //   scheduler.config.lightbox.sections = [
-                //       {   
-                //           name:"Событие", 
-                //           height:21, 
-                //           inputWidth:400, 
-                //           map_to:"text", 
-                //           type:"select", 
-                //           options: options,
-                //       },
-                //       {   
-                //         name:"Описание", 
-                //         height:21, 
-                //         inputWidth:800, 
-                //         map_to:"description", 
-                //         type:"textarea", 
-                //     },
-                //     {
-                //         name: "Тип события",
-                //         height: 70,
-                //         type: "radio",
-                //         map_to: "data_type",
-                //         options: [
-                //             { id: "radio1", key: "тренировочное занятие", label: "Тренировочные занятия"} , 
-                //             { id: "radio2", key: "уборка и обслуживание", label: "Уборка/обслуживание сооружений и помещений комплекса" }
-                //         ],
-                //         vertical:true
-                //       },
-                //       {name:"recurring", height:115, type:"recurring", map_to:"rec_type", 
-                //       button:"recurring"},
-                //       {name:"time", height:72, type:"time", map_to:"auto"},
-                //   ];
-              })
-        .catch(err => console.error(err));
+                    height: 21,
+                    type:"textarea", 
+                    map_to: "data_type",
+                    default_value: "тренировочное занятие",
+                    value: "тренировочное занятие",
+                },
+                {name:"recurring", height:115, type:"recurring", map_to:"rec_type", 
+                button:"recurring"},
+                {name:"time", height:72, type:"time", map_to:"auto"},
+            ];
+        })
+          .catch(err => console.error(err));    
+          })
+    .catch(err => console.error(err));
 
-        scheduler.config.header = [
-            'day',
-            'week',
-            'month',
-            'date',
-            'prev',
-            'today',
-            'next'
-        ];
- 
-        this.initSchedulerEvents();
+    scheduler.config.header = [
+        'day',
+        'week',
+        'month',
+        'date',
+        'prev',
+        'today',
+        'next'
+    ];
 
-        scheduler.config.repeat_date = "%m/%d/%Y";
-        scheduler.config.include_end_by = true;
-        scheduler.config.hour_date = '%g:%i %A';
-        scheduler.message.position = 'bottom'
-        scheduler.xy.scale_width = 70;
+    this.initSchedulerEvents();
 
-        scheduler.init(this.schedulerContainer, new Date());
-    }
+    scheduler.config.repeat_date = "%m/%d/%Y";
+    scheduler.config.include_end_by = true;
+    scheduler.config.hour_date = '%g:%i %A';
+    scheduler.message.position = 'bottom'
+    scheduler.xy.scale_width = 70;
+
+    scheduler.init(this.schedulerContainer, new Date());
+}
     
     componentWillUnmount() {
       scheduler.clearAll();
