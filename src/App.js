@@ -9,14 +9,10 @@ import Loading from './components/Loading';
 import Notification from './components/Notification';
 import Login from './components/User/Login';
 import NavBar from './components/NavBar';
-import {
-  Button,
-  Container,
-  Toolbar,
-  Typography,
-} from '@mui/material';
+import logo from '../src/components/MainPage/logo.png';
 
 function App() {
+
   return (
     <div>
      <Loading/>
@@ -27,8 +23,12 @@ function App() {
           {/* <Route path="*" element={<Dashboard/>} /> */}
 
           <Route path="/" element={[
-          <div className="welcome_page">
+          <div key="NavBarAndLogin" className="welcome_page">
           <NavBar/>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+            <img className="welcome_logo" src={logo} alt="" />
+            <span className='welcome_company_title'>BestSports</span>
+          </div>
           <Login/>
          </div>
            ]} />

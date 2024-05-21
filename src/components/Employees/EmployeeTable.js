@@ -87,10 +87,10 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
 }
 
 
-    const handleConfirmDeleteCoach = (id) => {
+    const handleConfirmDeleteCoachOrCleaner = (id, role) => {
         // const token = sessionStorage.getItem("jwt");
 
-        fetch(SERVER_URL + '/api/delete_coach?coach_id=' + id.slice(id.lastIndexOf('/') + 1), {
+        fetch(SERVER_URL + '/api/delete_coach_or_cleaner?employee_id=' + id.slice(id.lastIndexOf('/') + 1), {
           method: 'DELETE',
           // headers: { 'Authorization' : token }
           })
@@ -98,14 +98,23 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
           if (response.ok) {
             fetchUsers();
             setDelOpen(true);
+            role === 'COACH' ?
             dispatch({
               type: 'UPDATE_ALERT',
               payload: {
                 open: true,
                 severity: 'info',
                 message: 'Необходимо назначить новых сотрудников тренерского персонала для занятий, которые планировалось' + 
-                ' проводить под руководством сотрудника, запись о котором была вами удалена  (если таковые занятия имеются)',
-              },});
+                ' проводить под руководством сотрудника, запись о котором была вами удалена (если таковые занятия имеются)',
+              },}) : 
+              dispatch({
+                type: 'UPDATE_ALERT',
+                payload: {
+                  open: true,
+                  severity: 'info',
+                  message: 'Необходимо назначить новых сотрудников обслуживающего персонала для тех сооружений комплекса, уборку которых' + 
+                  ' должен был проводить сотрудник, запись о котором была вами удалена (если таковые сооружения имеются)',
+                },})
             setDialogOpen(false)
           }
           else {
@@ -147,10 +156,12 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
   
 
     const updateEmployee = (user, link) => {
-
+      let url
+      user.role === 'MANAGER' ? url = link : 
+      url = SERVER_URL + '/api/update_coach_or_cleaner?employee_id=' + link.slice(link.lastIndexOf('/') + 1)
       // const token = sessionStorage.getItem("jwt");
 
-      fetch(link,
+      fetch(url,
         { 
           method: 'PUT', 
           headers: {
@@ -183,9 +194,9 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
       {field: 'surName', headerName: 'Фамилия', width: 150},
       {field: 'patrSurName', headerName: 'Отчество', width: 150},
       {field: 'email', headerName: 'Email', width: 200},
-      {field: 'phoneNumber', headerName: 'Номер телефона', width: 200},
-      {field: 'birthDate', headerName: 'Дата рождения', width: 170},
-      {field: 'post', headerName: 'Должность', width: 220},
+      {field: 'phoneNumber', headerName: 'Номер телефона', width: 180},
+      {field: 'birthDate', headerName: 'Дата рождения', width: 140},
+      {field: 'post', headerName: 'Должность', width: 270},
       {
         field: '_links.employee.href', 
         headerName: '', 
@@ -199,7 +210,7 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
       {
         field: '_links.self.href', 
         headerName: '', 
-        width:50,
+        width: 50,
         sortable: false,
         filterable: false,
         renderCell: row => 
@@ -228,8 +239,8 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
           <Button onClick={() => setDialogOpen(false)} color="primary">
             Отменить
           </Button>
-          <Button onClick={() => { row.row.role !== "COACH" ? handleConfirmDelete(rowIdToDelete):
-            handleConfirmDeleteCoach(rowIdToDelete)}} color="primary" autoFocus>
+          <Button onClick={() => { row.row.role === "MANAGER"  ? handleConfirmDelete(rowIdToDelete):
+            handleConfirmDeleteCoachOrCleaner(rowIdToDelete, row.row.role)}} color="primary" autoFocus>
             Удалить
           </Button>
         </DialogActions>

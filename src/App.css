@@ -1,40 +1,45 @@
-/* .App {
-    text-align: center;
-  }
-  
-  .App-logo {
-    height: 40vmin;
-    pointer-events: none;
-  }
-  
-  @media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-      animation: App-logo-spin infinite 20s linear;
-    }
-  }
-  
-  .App-header {
-    background-color: #282c34;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
-  }
-  
-  .App-link {
-    color: #61dafb;
-  }
-  
-  @keyframes App-logo-spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+.welcome_company_title{
+    position: relative;
+    top: 250px;
+    font-family: "Pacifico", bold;
+    color: #1976d2;
+    font-size: 120px;
+    left: 5px;
+    bottom: 10px;
+    margin-left: 20px;
   }
 
-   */
+.welcome_logo{
+  position: relative;
+  top:250px;
+  height: 100px;
+  width: 100px;
+}
+
+@media screen and (max-width: 600px) {
+  .welcome_company_title {
+    font-size: 56px;
+    top: 350px;
+    margin-left: 1px;
+  }
+
+  .welcome_logo {
+    top: 350px;
+    height: 50px;
+    width: 50px;
+  }
+}
+
+@media screen and (max-height: 500px) {
+  .welcome_company_title {
+    font-size: 80px;
+    top: 180px;
+    margin-left: 1px;
+  }
+
+  .welcome_logo {
+    top: 180px;
+    height: 65px;
+    width: 65px;
+  }
+}

@@ -75,7 +75,7 @@ export default function Dashboard() {
               component="div"
               sx={{ flexGrow: 1 }}
             >
-            <img src= {logo} className='system_logo'/>
+            <img src= {logo} className='system_logo' alt=""/>
             <span className='company_title'>BestSports</span>
             </Typography>
             <IconButton onClick={() => setDark(!dark)}>
