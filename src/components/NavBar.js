@@ -2,20 +2,16 @@ import { React, useEffect } from 'react';
 import { useLocation } from 'react-router-dom'
 import {
   AppBar,
-  Box,
   Button,
   Container,
-  IconButton,
   Toolbar,
   Typography,
 } from '@mui/material';
-import { Lock, Menu } from '@mui/icons-material';
+import { Lock } from '@mui/icons-material';
 import { useValue } from '../context/ContextProvider'
-import UserIcons from './User/UserIcons'
 
 const NavBar = () => {
   const {
-    state: { currentUser },
     dispatch,
   } = useValue();
 
@@ -32,11 +28,6 @@ const NavBar = () => {
     <AppBar>
       <Container maxWidth="lg">
         <Toolbar disableGutters>
-          <Box sx={{ mr: 1 }}>
-            <IconButton size="large" color="inherit">
-              <Menu />
-            </IconButton>
-          </Box>
           <Typography
             variant="h6"
             component="h1"
@@ -51,9 +42,8 @@ const NavBar = () => {
             noWrap
             sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
           >
-            YRW
+            Добро пожаловать
           </Typography>
-          {!currentUser ? (
             <Button
               color="inherit"
               startIcon={<Lock />}
@@ -61,9 +51,6 @@ const NavBar = () => {
             >
             Войти
             </Button>
-          ) : (
-            <UserIcons />
-          )}
         </Toolbar>
       </Container>
     </AppBar>

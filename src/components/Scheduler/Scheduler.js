@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import './Scheduler.css';
 import './Toolbar.css';
-import './MessageArea.css';
 import Toolbar from "./Toolbar.js"
 import ScheduleCalendar from "./ScheduleCalendar.js"
 // import { SERVER_URL } from '../../constants.js';

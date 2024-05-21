@@ -44,7 +44,7 @@ import { jwtDecode } from 'jwt-decode';
 import FinanciesMain from "../Financies/FinanciesMain.js"
 import { useValue } from '../../context/ContextProvider'
 import ReportViewer from '../Reports/ReportViewer.js'
-import ReportDesigner from '../Reports/ReportDesigner.js'
+import Designer from '../Reports/ReportDesigner'
   
   const drawerWidth = 250;
 
@@ -228,7 +228,7 @@ import ReportDesigner from '../Reports/ReportDesigner.js'
             title: 'Отчеты',
             icon: <BiSolidReport />,
             link: 'reports',
-            component: <ReportViewer {...{ setSelectedLink, link: 'reports' }}/>,
+            component: <Designer {...{ setSelectedLink, link: 'reports' }}/>,
           },
       ];
 

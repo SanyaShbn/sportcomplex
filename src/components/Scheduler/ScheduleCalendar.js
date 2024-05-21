@@ -159,8 +159,6 @@ export default class ScheduleCalendar extends Component {
             const decodedToken = jwtDecode(token)
             let lightbox = scheduler.getLightbox() 
             let event = scheduler.getEvent(id)
-            scheduler.render()
-            let events = Object.values(scheduler._events)
             let options
             let url
             lightbox.style.top = "80px"
@@ -180,13 +178,15 @@ export default class ScheduleCalendar extends Component {
                               })
                               .then(response => response.json())
                               .then(data => {
-                        options = data.filter(item => 
-                            {
+                                scheduler.render()
+                                let events = Object.values(scheduler._events)
+                                options = data.filter(item => 
+                                {
                                 if(event.text === 'Тренировка №' + item.idTraining + '. ' + item.name){
                                     return item.coach.userLogin === profileData.userLogin && events.some(event => event.text === 'Тренировка №' + item.idTraining + '. ' + item.name)
                                 }
                                 else{return item.coach.userLogin === profileData.userLogin && !events.some(event => event.text === 'Тренировка №' + item.idTraining + '. ' + item.name)}
-                            }
+                                }
                         )
                         .map(item => ({
                             key: "Тренировка №" + item.idTraining + '. ' + item.name,
@@ -211,6 +211,8 @@ export default class ScheduleCalendar extends Component {
                         })
                         .then(response => response.json())
                         .then(data => {
+                            scheduler.render()
+                            let events = Object.values(scheduler._events)
                             if(event.data_type === "тренировочное занятие") {
                                 options = data.filter(item => {
                                     if(event.text === 'Тренировка №' + item.idTraining + '. ' + item.name){
@@ -244,7 +246,6 @@ export default class ScheduleCalendar extends Component {
                             }) 
                             scheduler.formSection("Событие").setValue(event.text)
                             })
-                            .catch(error => console.error(error))
                     }
                 }, 0);
                 }).catch(err => console.error(err))
@@ -483,30 +484,3 @@ export default class ScheduleCalendar extends Component {
         );
     }
 }
-
-// const ScheduleCalendar = ({ events }) => {
-//     useEffect(() => {
-
-//       scheduler.config.header = [
-//         "day",
-//         "week",
-//         "month",
-//         "date",
-//         "prev",
-//         "today",
-//         "next"
-//       ]
-      
-//       scheduler.init('scheduler_here', new Date(), 'month');
-
-//       scheduler.parse(events, 'json');
-
-//       return () => scheduler.clearAll();
-//     }, [events]);
-
-//     return (
-//       <div id="scheduler_here" style={{ width: '100%', height: '100%' }}></div>
-//     );
-//   };
-  
-//   export default ScheduleCalendar;

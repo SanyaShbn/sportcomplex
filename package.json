@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@boldreports/global": "^6.1.35",
-    "@boldreports/react-reporting-components": "^6.1.35",
+    "@boldreports/react-reporting-components": "^6.1.36",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@fullcalendar/core": "^6.1.11",

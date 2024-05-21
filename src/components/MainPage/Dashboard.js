@@ -10,7 +10,7 @@ import MuiAppBar from '@mui/material/AppBar';
 import { Brightness4, Brightness7, Menu } from '@mui/icons-material';
 import { useMemo, useState } from 'react';
 import SideList from './SideList';
-import logo from '../MainNavs/nav_images/logo.png'
+import logo from './logo.png'
 import '../CSS/main.css';
 
 const drawerWidth = 250;
