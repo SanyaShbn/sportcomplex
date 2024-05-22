@@ -30,7 +30,7 @@ const renderCustomizedLabel = ({
     </text>
   );
 };
-export default function PieRoomsCost() {
+export default function PieMembershipsCost() {
   const [memberships, setMemberships] = useState([]);
   const fetchMemberships = () => {
     // const token = sessionStorage.getItem("jwt");

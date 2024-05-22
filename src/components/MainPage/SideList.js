@@ -43,8 +43,8 @@ import { blue } from '@mui/material/colors';
 import { jwtDecode } from 'jwt-decode';
 import FinanciesMain from "../Financies/FinanciesMain.js"
 import { useValue } from '../../context/ContextProvider'
-import ReportViewer from '../Reports/ReportViewer.js'
-import Designer from '../Reports/ReportDesigner'
+import { PDFViewer } from '@react-pdf/renderer'
+import Report from "../Reports/Report.js"
   
   const drawerWidth = 250;
 
@@ -160,7 +160,6 @@ import Designer from '../Reports/ReportDesigner'
 
     const list = useMemo(
       () => {
-        
         let componentsToShow = [
         {
           title: 'Главная страница',
@@ -228,7 +227,10 @@ import Designer from '../Reports/ReportDesigner'
             title: 'Отчеты',
             icon: <BiSolidReport />,
             link: 'reports',
-            component: <Designer {...{ setSelectedLink, link: 'reports' }}/>,
+            component: 
+          <PDFViewer style={{ flex: 1, height: '100vh', width: '100%' }}>
+            <Report {...{ setSelectedLink, link: 'reports' }}/>
+          </PDFViewer>,
           },
       ];
 

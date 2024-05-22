@@ -20,9 +20,9 @@ function App() {
      <BrowserRouter>
       <Routes>
           <Route path="dashboard/*" element={<Dashboard/>} />
-          {/* <Route path="*" element={<Dashboard/>} /> */}
+          <Route path="*" element={<Dashboard/>} />
 
-          <Route path="/" element={[
+          {/* <Route path="/" element={[
           <div key="NavBarAndLogin" className="welcome_page">
           <NavBar/>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
@@ -31,7 +31,7 @@ function App() {
           </div>
           <Login/>
          </div>
-           ]} />
+           ]} /> */}
       </Routes>
     </BrowserRouter>
    </div>
