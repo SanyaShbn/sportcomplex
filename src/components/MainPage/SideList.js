@@ -45,9 +45,11 @@ import FinanciesMain from "../Financies/FinanciesMain.js"
 import { useValue } from '../../context/ContextProvider'
 import { PDFViewer } from '@react-pdf/renderer'
 import Report from "../Reports/Report.js"
+import domToImage from 'dom-to-image'
+import RevenueBarChart from '../Financies/RevenueBarChart.js'
+import ReportsButtonsList from "./ReportsButtonsList.js"
   
   const drawerWidth = 250;
-
 
   // const StyledBadge = styled(Badge)(({ theme }) => ({
   //   '& .MuiBadge-badge': {
@@ -126,6 +128,11 @@ import Report from "../Reports/Report.js"
   }));
   
   const SideList = ({ open, setOpen }) => {
+      
+  // useEffect(() => {
+  //   generateImage();
+  // }, []);
+    const [dataUrl, setDataUrl] = useState('')
     const {
       dispatch,
     } = useValue();
@@ -139,7 +146,17 @@ import Report from "../Reports/Report.js"
     }, 1000);
     }
   
-    const [selectedLink, setSelectedLink] = useState('');
+    const [selectedLink, setSelectedLink] = useState('')
+    const generateImage = () => {
+      const node = document.getElementById('financiesMain')
+      domToImage.toPng(node)
+        .then((dataUrl) => {
+          setDataUrl(dataUrl)
+        })
+        .catch((error) => {
+          console.error('Error generating image:', error);
+        });
+    }
     // const token = sessionStorage.getItem("jwt");
     // const decodedToken = jwtDecode(token);
     // const [user, setUser] = useState([]);
@@ -215,7 +232,7 @@ import Report from "../Reports/Report.js"
             title: 'Выручка',
             icon: <MdAttachMoney />,
             link: 'financies',
-            component: <FinanciesMain {...{ setSelectedLink, link: 'financies' }}/>,
+            component: <FinanciesMain {...{ setSelectedLink, link: 'financies'}}/>,
           },
           {
             title: 'Рецепция',
@@ -226,11 +243,8 @@ import Report from "../Reports/Report.js"
           {
             title: 'Отчеты',
             icon: <BiSolidReport />,
-            link: 'reports',
-            component: 
-          <PDFViewer style={{ flex: 1, height: '100vh', width: '100%' }}>
-            <Report {...{ setSelectedLink, link: 'reports' }}/>
-          </PDFViewer>,
+            link: 'reports/*',
+            component: <ReportsButtonsList {...{ setSelectedLink, link: 'reports/*' }}/>,
           },
       ];
 
@@ -254,6 +268,9 @@ import Report from "../Reports/Report.js"
     const navigate = useNavigate();
     const theme = useTheme();
     let color = theme.palette.mode;
+    const invisibleStyle = {
+      display: 'none'
+  };
     return (
       <>
         <Drawer variant="permanent" open={open}>

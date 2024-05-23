@@ -31,7 +31,7 @@ const FinanciesMain = ({ setSelectedLink, link }) => {
 
   return (
 
-        <>
+        <div>
         <Typography
         variant="h4"
         component="h4"
@@ -47,7 +47,7 @@ const FinanciesMain = ({ setSelectedLink, link }) => {
         <Paper elevation={3} sx={{ p: 2, gridColumn: '1/3', mb: 2 }}>
         <RevenueBarChart/>
         </Paper>
-        </>
+        </div>
 
   )
 }

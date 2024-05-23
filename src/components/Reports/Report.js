@@ -3,8 +3,10 @@ import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/render
 import logo from "../MainPage/logo.png"
 import { SERVER_URL } from '../../constants.js'
 import { Font } from '@react-pdf/renderer'
+import domToImage from 'dom-to-image'
 import PieMembershipsCost from '../MainPage/PieMembershipsCost.js'
-import ClientTable from '../Client/ClientTable.js'
+import ClientsTable from './ClientsTable.js'
+import TrainingsTable from './TrainingsTable.js'
 
 Font.register({
   family: 'Pacifico', 
@@ -12,8 +14,8 @@ Font.register({
 });
 
 Font.register({
-  family: 'Roboto', 
-  src: 'https://fonts.gstatic.com/s/roboto/v27/KFOmCnqEu92Fr1Mu72xKKTU1Kvnz.woff2', 
+  family: "Roboto",
+  src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf"
 });
 
 const styles = StyleSheet.create({
@@ -52,8 +54,25 @@ const styles = StyleSheet.create({
       marginTop: 5, 
       fontSize: 10 
     },
+    title: {
+      fontSize: 24,
+      textAlign: 'center',
+      fontFamily: 'Roboto'
+    },
+    subtitle: {
+      fontSize: 18,
+      textAlign: 'center',
+      fontFamily: 'Roboto'
+    },
     text: {
       fontFamily: "Pacifico",
+    },
+    contentText: { 
+      fontFamily: "Roboto",
+      margin: "auto", 
+      marginTop: 5, 
+      marginLeft: 10,
+      fontSize: 14
     },
     row: {
       flexDirection: 'row',
@@ -64,20 +83,29 @@ const styles = StyleSheet.create({
       width: 30, 
       height: 30,
     },
+    diagram: {
+      margin: 10,
+      width: 100, 
+      height: 300,
+    },
   });
 
-const Report = ({ setSelectedLink, link }) => {
+const Report = ({ setSelectedButtonLink, link }) => {
 
   useEffect(() => {
-    setSelectedLink(link)
+    setSelectedButtonLink(link)
   }, []);
 
   useEffect(() => {
-    fetchClients()
+    ChooseWichDataToFetch()
   }, []);
-
+  const data = JSON.parse(localStorage.getItem('reportData'));
   const [clients, setClients] = useState([])
+  const [trainings, setTrainings] = useState([])
 
+  const ChooseWichDataToFetch = () =>{
+     data.option === 'clients'? fetchClients() : fetchTrainings()
+  }
   const fetchClients = () => {
     // const token = sessionStorage.getItem("jwt")
     fetch(SERVER_URL + '/api/view_clients', {
@@ -87,9 +115,18 @@ const Report = ({ setSelectedLink, link }) => {
     .then(data => setClients(data))
     .catch(err => console.error(err));    
   }
+  const fetchTrainings = () => {
+    // const token = sessionStorage.getItem("jwt");
+    fetch(SERVER_URL + '/api/view_trainings', {
+      // headers: { 'Authorization' : token }
+    })
+    .then(response => response.json())
+    .then(data => setTrainings(data))
+    .catch(err => console.error(err));    
+  }
 
   return (
-  <Document title='document' subject='document' author={''}>
+  <Document title={data.title} subject={data.subject} author={''}>
     <Page size="A4" style={styles.page} >
       <View style={styles.row}>
         <Image
@@ -98,29 +135,23 @@ const Report = ({ setSelectedLink, link }) => {
         />
         <Text style={styles.text}>BestSports</Text>
       </View>
-      <View style={styles.section}>
-        <View style={styles.table}> 
-          <View style={styles.tableRow}> 
-            <View style={styles.tableCol}> 
-              <Text style={styles.tableCell}>Имя</Text> 
-            </View> 
-            <View style={styles.tableCol}> 
-              <Text style={styles.tableCell}>Email</Text> 
-            </View> 
-          </View> 
-          {clients.map(client => 
-            <View style={styles.tableRow}> 
-              <View style={styles.tableCol}> 
-                <Text style={styles.tableCell}>{client.firstName}</Text> 
-              </View> 
-              <View style={styles.tableCol}> 
-                <Text style={styles.tableCell}>{client.email}</Text> 
-              </View> 
-            </View> 
-          )}
-        </View>
-        <Text>Author: Alex</Text>
+      <View>
+      <Text style={styles.title}>ОТЧЕТ</Text>
+      <Text style={styles.subtitle}>{data.option === 'clients' ? 'Данные зарегистрированных клиентов' :
+       'Данные планируемых тренировочных занятий'}</Text>
+      <Text style={styles.contentText}>{data.textContent}</Text> 
       </View>
+      <View>
+      {data.option === 'clients' && <ClientsTable clients={clients} />}
+      {data.option === 'trainings' && <TrainingsTable trainings={trainings} />}
+      </View>
+        <View>
+        {/* <Image
+        style={styles.diagram}
+          src={dataUrl}
+        /> */}
+      </View>
+        <Text>Author: Alex</Text>
     </Page>
   </Document>
 )
