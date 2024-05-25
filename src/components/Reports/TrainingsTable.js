@@ -20,7 +20,21 @@ const styles = StyleSheet.create({
       flexDirection: "row" 
     }, 
     tableCol: { 
-      width: "20%", 
+      width: "14.3%", 
+      borderStyle: "solid", 
+      borderWidth: 1, 
+      borderLeftWidth: 0, 
+      borderTopWidth: 0 
+    }, 
+    tableColCapacityAndCost: { 
+      width: "12.3%", 
+      borderStyle: "solid", 
+      borderWidth: 1, 
+      borderLeftWidth: 0, 
+      borderTopWidth: 0 
+    }, 
+    tableColCoach: { 
+      width: "18.3%", 
       borderStyle: "solid", 
       borderWidth: 1, 
       borderLeftWidth: 0, 
@@ -28,9 +42,9 @@ const styles = StyleSheet.create({
     }, 
     tableCell: { 
       fontFamily: "Roboto",
-      margin: "auto", 
+      margin: 2, 
       marginTop: 5, 
-      fontSize: 10 
+      fontSize: 8
     },
   });
 
@@ -45,10 +59,10 @@ return (
             <View style={styles.tableCol}> 
               <Text style={styles.tableCell}>Тип занятия</Text> 
             </View> 
-            <View style={styles.tableCol}> 
+            <View style={styles.tableColCapacityAndCost}> 
               <Text style={styles.tableCell}>Стоимость (бел.руб.)</Text> 
             </View> 
-            <View style={styles.tableCol}> 
+            <View style={styles.tableColCapacityAndCost}> 
               <Text style={styles.tableCell}>Емкость</Text> 
             </View> 
             <View style={styles.tableCol}> 
@@ -57,7 +71,7 @@ return (
             <View style={styles.tableCol}> 
               <Text style={styles.tableCell}>Место проведения</Text> 
             </View> 
-            <View style={styles.tableCol}> 
+            <View style={styles.tableColCoach}> 
               <Text style={styles.tableCell}>Тренер</Text> 
             </View> 
         </View> 
@@ -69,10 +83,10 @@ return (
              <View style={styles.tableCol}> 
                 <Text style={styles.tableCell}>{training.type}</Text> 
               </View> 
-              <View style={styles.tableCol}> 
+              <View style={styles.tableColCapacityAndCost}> 
                 <Text style={styles.tableCell}>{training.cost}</Text> 
               </View> 
-              <View style={styles.tableCol}> 
+              <View style={styles.tableColCapacityAndCost}> 
                 <Text style={styles.tableCell}>{training.capacity}</Text> 
               </View> 
               <View style={styles.tableCol}> 
@@ -81,8 +95,8 @@ return (
               <View style={styles.tableCol}> 
                 <Text style={styles.tableCell}>{training.complexFacility.name + ' №' + training.complexFacility.idComplexFacility}</Text> 
               </View> 
-              <View style={styles.tableCol}> 
-                <Text style={styles.tableCell}>{training.coach.surName + training.coach.firstName + '(' 
+              <View style={styles.tableColCoach}> 
+                <Text style={styles.tableCell}>{training.coach.surName + ' ' + training.coach.firstName + ' (' 
                 + training.coach.phoneNumber + ')'}</Text> 
               </View> 
             </View> 

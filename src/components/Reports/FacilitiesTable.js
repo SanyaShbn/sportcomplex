@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
       flexDirection: "row" 
     }, 
     tableCol: { 
-      width: "16.68%", 
+      width: "25%", 
       borderStyle: "solid", 
       borderWidth: 1, 
       borderLeftWidth: 0, 
@@ -29,59 +29,49 @@ const styles = StyleSheet.create({
     tableCell: { 
       fontFamily: "Roboto",
       margin: 2, 
-      fontSize: 8
+      marginTop: 5, 
+      fontSize: 8 
     },
   });
 
-function ClientsTable({clients}){
-return(
+function FacilitiesTable({facilities}){
+return (
 <View style={styles.section}>
         <View style={styles.table}> 
           <View style={styles.tableRow}> 
             <View style={styles.tableCol}> 
-              <Text style={styles.tableCell}>Фамилия</Text> 
+              <Text style={styles.tableCell}>Наименование</Text> 
             </View> 
             <View style={styles.tableCol}> 
-              <Text style={styles.tableCell}>Имя</Text> 
+              <Text style={styles.tableCell}>Количество запланированных тренировок в помещении</Text> 
             </View> 
             <View style={styles.tableCol}> 
-              <Text style={styles.tableCell}>Отчество</Text> 
+              <Text style={styles.tableCell}>Вместимость помещения (чел.)</Text> 
             </View> 
             <View style={styles.tableCol}> 
-              <Text style={styles.tableCell}>Дата рождения</Text> 
-            </View> 
-            <View style={styles.tableCol}> 
-              <Text style={styles.tableCell}>Номер телефона</Text> 
-            </View> 
-            <View style={styles.tableCol}> 
-              <Text style={styles.tableCell}>Email</Text> 
+              <Text style={styles.tableCell}>Сотрудник обслуживающего персонала</Text> 
             </View> 
         </View> 
-          {clients.map(client => 
+          {facilities.map(facility => 
             <View style={styles.tableRow}> 
              <View style={styles.tableCol}> 
-                <Text style={styles.tableCell}>{client.surName}</Text> 
+                <Text style={styles.tableCell}>{facility.name}</Text> 
               </View> 
              <View style={styles.tableCol}> 
-                <Text style={styles.tableCell}>{client.firstName}</Text> 
+                <Text style={styles.tableCell}>{facility.trainingsAmount}</Text> 
               </View> 
               <View style={styles.tableCol}> 
-                <Text style={styles.tableCell}>{client.patrSurName}</Text> 
+                <Text style={styles.tableCell}>{facility.capacity}</Text> 
               </View> 
               <View style={styles.tableCol}> 
-                <Text style={styles.tableCell}>{client.birthDate}</Text> 
-              </View> 
-              <View style={styles.tableCol}> 
-                <Text style={styles.tableCell}>{client.phoneNumber}</Text> 
-              </View> 
-              <View style={styles.tableCol}> 
-                <Text style={styles.tableCell}>{client.email}</Text> 
+                <Text style={styles.tableCell}>{facility.cleaner.surName + ' ' + facility.cleaner.firstName + ' (' 
+                + facility.cleaner.phoneNumber + ')'}</Text> 
               </View> 
             </View> 
           )}
         </View>
-    </View>   
-) 
+    </View>
+    )    
 }
 
-export default ClientsTable;
+export default FacilitiesTable;

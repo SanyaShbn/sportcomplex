@@ -22,7 +22,7 @@ function EditClientTraining(props) {
     const [trainings, setTrainings] = useState([]);
     const [open, setOpen] = useState(false);
     const [client_training, setClientTraining] = useState({
-      status: '', client: '', training: ''
+      client: '', training: ''
     });
     const {
       dispatch,
@@ -70,7 +70,6 @@ function EditClientTraining(props) {
     setClientId(parseInt(id_client))
     setTrainingId(parseInt(id_training))
     setClientTraining({
-      status: props.data.row.status,
       client: parseInt(id_client),
       training: parseInt(id_training),
      })     

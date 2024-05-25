@@ -43,10 +43,7 @@ import { blue } from '@mui/material/colors';
 import { jwtDecode } from 'jwt-decode';
 import FinanciesMain from "../Financies/FinanciesMain.js"
 import { useValue } from '../../context/ContextProvider'
-import { PDFViewer } from '@react-pdf/renderer'
-import Report from "../Reports/Report.js"
 import domToImage from 'dom-to-image'
-import RevenueBarChart from '../Financies/RevenueBarChart.js'
 import ReportsButtonsList from "./ReportsButtonsList.js"
   
   const drawerWidth = 250;
@@ -128,11 +125,7 @@ import ReportsButtonsList from "./ReportsButtonsList.js"
   }));
   
   const SideList = ({ open, setOpen }) => {
-      
-  // useEffect(() => {
-  //   generateImage();
-  // }, []);
-    const [dataUrl, setDataUrl] = useState('')
+
     const {
       dispatch,
     } = useValue();
@@ -147,16 +140,6 @@ import ReportsButtonsList from "./ReportsButtonsList.js"
     }
   
     const [selectedLink, setSelectedLink] = useState('')
-    const generateImage = () => {
-      const node = document.getElementById('financiesMain')
-      domToImage.toPng(node)
-        .then((dataUrl) => {
-          setDataUrl(dataUrl)
-        })
-        .catch((error) => {
-          console.error('Error generating image:', error);
-        });
-    }
     // const token = sessionStorage.getItem("jwt");
     // const decodedToken = jwtDecode(token);
     // const [user, setUser] = useState([]);
@@ -266,11 +249,7 @@ import ReportsButtonsList from "./ReportsButtonsList.js"
 // }, [roles]); - для авторизации
 
     const navigate = useNavigate();
-    const theme = useTheme();
-    let color = theme.palette.mode;
-    const invisibleStyle = {
-      display: 'none'
-  };
+
     return (
       <>
         <Drawer variant="permanent" open={open}>

@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
       flexDirection: "row" 
     }, 
     tableCol: { 
-      width: "16.68%", 
+      width: "25%", 
       borderStyle: "solid", 
       borderWidth: 1, 
       borderLeftWidth: 0, 
@@ -29,59 +29,49 @@ const styles = StyleSheet.create({
     tableCell: { 
       fontFamily: "Roboto",
       margin: 2, 
-      fontSize: 8
+      marginTop: 5, 
+      fontSize: 8 
     },
   });
 
-function ClientsTable({clients}){
-return(
+function SoldMembershipsTable({sold_memberships}){
+return (
 <View style={styles.section}>
         <View style={styles.table}> 
           <View style={styles.tableRow}> 
             <View style={styles.tableCol}> 
-              <Text style={styles.tableCell}>Фамилия</Text> 
+              <Text style={styles.tableCell}>Абонемент</Text> 
             </View> 
             <View style={styles.tableCol}> 
-              <Text style={styles.tableCell}>Имя</Text> 
+              <Text style={styles.tableCell}>Клиент</Text> 
             </View> 
             <View style={styles.tableCol}> 
-              <Text style={styles.tableCell}>Отчество</Text> 
+              <Text style={styles.tableCell}>Дата продажи</Text> 
             </View> 
             <View style={styles.tableCol}> 
-              <Text style={styles.tableCell}>Дата рождения</Text> 
-            </View> 
-            <View style={styles.tableCol}> 
-              <Text style={styles.tableCell}>Номер телефона</Text> 
-            </View> 
-            <View style={styles.tableCol}> 
-              <Text style={styles.tableCell}>Email</Text> 
+              <Text style={styles.tableCell}>Выручка с продажи (бел.руб.)</Text> 
             </View> 
         </View> 
-          {clients.map(client => 
+          {sold_memberships.map(sold_membership => 
             <View style={styles.tableRow}> 
              <View style={styles.tableCol}> 
-                <Text style={styles.tableCell}>{client.surName}</Text> 
+                <Text style={styles.tableCell}>{sold_membership.sportComplexMembership.name}</Text> 
               </View> 
              <View style={styles.tableCol}> 
-                <Text style={styles.tableCell}>{client.firstName}</Text> 
+                <Text style={styles.tableCell}>{sold_membership.client.surName + ' ' + sold_membership.client.firstName + ' (' 
+                + sold_membership.client.phoneNumber + ')'}</Text> 
               </View> 
               <View style={styles.tableCol}> 
-                <Text style={styles.tableCell}>{client.patrSurName}</Text> 
+                <Text style={styles.tableCell}>{sold_membership.soldAt}</Text> 
               </View> 
               <View style={styles.tableCol}> 
-                <Text style={styles.tableCell}>{client.birthDate}</Text> 
-              </View> 
-              <View style={styles.tableCol}> 
-                <Text style={styles.tableCell}>{client.phoneNumber}</Text> 
-              </View> 
-              <View style={styles.tableCol}> 
-                <Text style={styles.tableCell}>{client.email}</Text> 
+                <Text style={styles.tableCell}>{sold_membership.revenue}</Text> 
               </View> 
             </View> 
           )}
         </View>
-    </View>   
-) 
+    </View>
+    )    
 }
 
-export default ClientsTable;
+export default SoldMembershipsTable;

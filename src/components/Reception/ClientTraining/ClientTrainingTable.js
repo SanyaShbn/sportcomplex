@@ -251,9 +251,8 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
 
 
     const columns = [
-      {field: 'status', headerName: 'Статус тренировки', width: 160},
-      {field: 'client', headerName: 'Клиент, записываемый на тренировку', width: 520},
-      {field: 'training', headerName: 'Тренировка', width: 500},
+      {field: 'client', headerName: 'Клиент, записываемый на тренировку', width: 600},
+      {field: 'training', headerName: 'Тренировка', width: 580},
       {
         field: '_links.client_training.href', 
         headerName: '', 
@@ -309,7 +308,6 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
       const updateRows = async () => {
         const updatedRows = await Promise.all(client_trainings.map(async client_training => ({
           id: client_training._links.clientTraining.href,
-          status: client_training.status,
           client: await fetchClients(client_training._links.client.href),
           training: await fetchTrainings(client_training._links.training.href),
         })));

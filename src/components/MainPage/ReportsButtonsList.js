@@ -16,7 +16,7 @@ import { PDFViewer } from '@react-pdf/renderer'
   
 const ReportsButtonsList = ({ open, setSelectedLink, link}) => {
   
-    const [selectedButtonLink, setSelectedButtonLink] = useState('');
+  const [selectedButtonLink, setSelectedButtonLink] = useState('');
     
   useEffect(() => {
     setSelectedLink(link);

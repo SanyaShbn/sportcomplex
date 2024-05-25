@@ -7,6 +7,14 @@ import domToImage from 'dom-to-image'
 import PieMembershipsCost from '../MainPage/PieMembershipsCost.js'
 import ClientsTable from './ClientsTable.js'
 import TrainingsTable from './TrainingsTable.js'
+import Chart from "./Chart.js"
+import FacilitiesTable from './FacilitiesTable.js'
+import MembershipsTable from './MembershipsTable.js'
+import EmployeesTable from './EmployeesTable.js'
+import EventsTable from './EventsTable.js'
+import PackagesOfServicesTable from './PackagesOfServicesTable.js'
+import TrainingsRegistrationsTable from './TrainingsRegistrationsTable.js'
+import SoldMembershipsTable from './SoldMembershipsTable.js'
 
 Font.register({
   family: 'Pacifico', 
@@ -85,8 +93,8 @@ const styles = StyleSheet.create({
     },
     diagram: {
       margin: 10,
-      width: 100, 
-      height: 300,
+      width: 500, 
+      height: 600,
     },
   });
 
@@ -100,11 +108,48 @@ const Report = ({ setSelectedButtonLink, link }) => {
     ChooseWichDataToFetch()
   }, []);
   const data = JSON.parse(localStorage.getItem('reportData'));
+  const diagramDataUrl = JSON.parse(localStorage.getItem('diagramImgUrl'));
   const [clients, setClients] = useState([])
   const [trainings, setTrainings] = useState([])
+  const [facilities, setFacilities] = useState([])
+  const [memberships, setMemberships] = useState([])
+  const [events, setEvents] = useState([])
+  const [employees, setEmployees] = useState([])
+  const [client_trainings, setClientTrainings] = useState([])
+  const [training_memberships, setTrainingMemberships] = useState([])
+  const [client_memberships, setClinetMemberships] = useState([])
 
   const ChooseWichDataToFetch = () =>{
-     data.option === 'clients'? fetchClients() : fetchTrainings()
+    switch (data.option) {
+      case 'clients':
+        fetchClients()
+        break;
+      case 'trainings':
+        fetchTrainings()
+        break;
+      case 'facilities':
+        fetchFacilities()
+        break;
+        case 'memberships':
+        fetchMemberships()
+        break;
+      case 'events':
+        fetchEvents()
+        break;
+      case 'employees':
+        fetchEmployees()
+        break;
+        case 'service_packages':
+        fetchTrainingMemberships()
+        break;
+      case 'trainings_registrations':
+        fetchClientTrainings()
+        break;
+      case 'sold_memberships':
+        fetchClientMemberships()
+        break;
+      default: break;
+    }
   }
   const fetchClients = () => {
     // const token = sessionStorage.getItem("jwt")
@@ -122,6 +167,76 @@ const Report = ({ setSelectedButtonLink, link }) => {
     })
     .then(response => response.json())
     .then(data => setTrainings(data))
+    .catch(err => console.error(err));    
+  }
+
+  const fetchFacilities = () => {
+    // const token = sessionStorage.getItem("jwt");
+    fetch(SERVER_URL + '/api/view_facilities', {
+      // headers: { 'Authorization' : token }
+    })
+    .then(response => response.json())
+    .then(data => setFacilities(data))
+    .catch(err => console.error(err));    
+  }
+
+  const fetchMemberships = () => {
+    // const token = sessionStorage.getItem("jwt");
+    fetch(SERVER_URL + '/api/view_memberships', {
+      // headers: { 'Authorization' : token }
+    })
+    .then(response => response.json())
+    .then(data => setMemberships(data))
+    .catch(err => console.error(err));    
+  }
+
+  const fetchEvents = () => {
+    // const token = sessionStorage.getItem("jwt");
+    fetch(SERVER_URL + '/api/events', {
+      // headers: { 'Authorization' : token }
+    })
+    .then(response => response.json())
+    .then(data => setEvents(data))
+    .catch(err => console.error(err));    
+  }
+
+  const fetchEmployees = () => {
+    // const token = sessionStorage.getItem("jwt");
+    fetch(SERVER_URL + '/api/view_all_employees', {
+      // headers: { 'Authorization' : token }
+    })
+    .then(response => response.json())
+    .then(data => setEmployees(data))
+    .catch(err => console.error(err));    
+  }
+
+  const fetchClientTrainings = () => {
+    // const token = sessionStorage.getItem("jwt");
+    fetch(SERVER_URL + '/client_trainings', {
+      // headers: { 'Authorization' : token }
+    })
+    .then(response => response.json())
+    .then(data => setClientTrainings(data))
+    .catch(err => console.error(err));    
+  }
+
+  const fetchTrainingMemberships = () => {
+    // const token = sessionStorage.getItem("jwt");
+    fetch(SERVER_URL + '/training_memberships', {
+      // headers: { 'Authorization' : token }
+    })
+    .then(response => response.json())
+    .then(data => setTrainingMemberships(data))
+    .catch(err => console.error(err));    
+  }
+
+  const fetchClientMemberships = () => {
+    // const token = sessionStorage.getItem("jwt");
+    fetch(SERVER_URL + '/client_memberships', {
+      // headers: { 'Authorization' : token }
+    })
+    .then(response => response.json())
+    .then(data => setClinetMemberships(data))
     .catch(err => console.error(err));    
   }
 
@@ -144,13 +259,23 @@ const Report = ({ setSelectedButtonLink, link }) => {
       <View>
       {data.option === 'clients' && <ClientsTable clients={clients} />}
       {data.option === 'trainings' && <TrainingsTable trainings={trainings} />}
+      {data.option === 'facilities' && <FacilitiesTable facilities={facilities} />}
+      {data.option === 'memberships' && <MembershipsTable memberships={memberships} />}
+      {data.option === 'employees' && <EmployeesTable employees={employees}/>}
+      {data.option === 'events' && <EventsTable events={events} />}
+      {data.option === 'service_packages' && <PackagesOfServicesTable service_packages={training_memberships}/>}
+      {data.option === 'trainings_registrations' && <TrainingsRegistrationsTable trainings_registrations={client_trainings} />}
+      {data.option === 'sold_memberships' && <SoldMembershipsTable sold_memberships={client_memberships}/>}
       </View>
         <View>
         {/* <Image
         style={styles.diagram}
-          src={dataUrl}
+          src={diagramDataUrl}
         /> */}
       </View>
+      {/* <View>
+        <Chart/>
+      </View> */}
         <Text>Author: Alex</Text>
     </Page>
   </Document>
