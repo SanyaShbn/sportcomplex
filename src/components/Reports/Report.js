@@ -7,7 +7,6 @@ import domToImage from 'dom-to-image'
 import PieMembershipsCost from '../MainPage/PieMembershipsCost.js'
 import ClientsTable from './ClientsTable.js'
 import TrainingsTable from './TrainingsTable.js'
-import Chart from "./Chart.js"
 import FacilitiesTable from './FacilitiesTable.js'
 import MembershipsTable from './MembershipsTable.js'
 import EmployeesTable from './EmployeesTable.js'
@@ -15,6 +14,7 @@ import EventsTable from './EventsTable.js'
 import PackagesOfServicesTable from './PackagesOfServicesTable.js'
 import TrainingsRegistrationsTable from './TrainingsRegistrationsTable.js'
 import SoldMembershipsTable from './SoldMembershipsTable.js'
+import { jwtDecode } from 'jwt-decode'
 
 Font.register({
   family: 'Pacifico', 
@@ -31,6 +31,24 @@ const styles = StyleSheet.create({
       flexDirection: 'column',
       backgroundColor: '#E4E4E4',
       alignItems: 'stretch',
+      paddingBottom: 60,
+      paddingTop: 30
+    },
+    footer: {
+      fontFamily: "Roboto",
+      position: 'absolute',
+      fontSize: 8,
+      bottom: 30,
+      left: 5,
+      right: 0,
+      color: 'grey',
+    },
+    pageNumber: {
+      position: 'absolute',
+      fontSize: 8,
+      bottom: 30,
+      right: 30,
+      color: 'grey',
     },
     section: {
       margin: 10,
@@ -77,10 +95,11 @@ const styles = StyleSheet.create({
     },
     contentText: { 
       fontFamily: "Roboto",
-      margin: "auto", 
       marginTop: 5, 
-      marginLeft: 10,
-      fontSize: 14
+      marginLeft: 20,
+      marginRight: 15,
+      textAlign:'justify',
+      fontSize: 12
     },
     row: {
       flexDirection: 'row',
@@ -88,6 +107,7 @@ const styles = StyleSheet.create({
     },
     logo: {
       margin: 10,
+      marginTop: 0,
       width: 30, 
       height: 30,
     },
@@ -107,6 +127,24 @@ const Report = ({ setSelectedButtonLink, link }) => {
   useEffect(() => {
     ChooseWichDataToFetch()
   }, []);
+  
+    const token = sessionStorage.getItem("jwt");
+    const decodedToken = jwtDecode(token);
+    const [user, setUser] = useState([]);
+
+
+    useEffect(() => {
+      fetchUser();
+    }, []);
+  
+    const fetchUser = () => {
+      fetch(SERVER_URL + '/api/user_profile?userLogin=' + decodedToken.sub, {
+        headers: { 'Authorization' : token }
+      })
+      .then(response => response.json())
+      .then(data => {setUser(data)})
+      .catch(err => console.error(err));    
+    }
   const data = JSON.parse(localStorage.getItem('reportData'));
   const diagramDataUrl = JSON.parse(localStorage.getItem('diagramImgUrl'));
   const [clients, setClients] = useState([])
@@ -152,18 +190,18 @@ const Report = ({ setSelectedButtonLink, link }) => {
     }
   }
   const fetchClients = () => {
-    // const token = sessionStorage.getItem("jwt")
+    const token = sessionStorage.getItem("jwt")
     fetch(SERVER_URL + '/api/view_clients', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setClients(data))
     .catch(err => console.error(err));    
   }
   const fetchTrainings = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/view_trainings', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setTrainings(data))
@@ -171,9 +209,9 @@ const Report = ({ setSelectedButtonLink, link }) => {
   }
 
   const fetchFacilities = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/view_facilities', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setFacilities(data))
@@ -181,9 +219,9 @@ const Report = ({ setSelectedButtonLink, link }) => {
   }
 
   const fetchMemberships = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/view_memberships', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setMemberships(data))
@@ -191,9 +229,9 @@ const Report = ({ setSelectedButtonLink, link }) => {
   }
 
   const fetchEvents = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/events', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setEvents(data))
@@ -201,9 +239,9 @@ const Report = ({ setSelectedButtonLink, link }) => {
   }
 
   const fetchEmployees = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/view_all_employees', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setEmployees(data))
@@ -211,9 +249,9 @@ const Report = ({ setSelectedButtonLink, link }) => {
   }
 
   const fetchClientTrainings = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/client_trainings', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setClientTrainings(data))
@@ -221,9 +259,9 @@ const Report = ({ setSelectedButtonLink, link }) => {
   }
 
   const fetchTrainingMemberships = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/training_memberships', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setTrainingMemberships(data))
@@ -231,9 +269,9 @@ const Report = ({ setSelectedButtonLink, link }) => {
   }
 
   const fetchClientMemberships = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/client_memberships', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setClinetMemberships(data))
@@ -241,7 +279,7 @@ const Report = ({ setSelectedButtonLink, link }) => {
   }
 
   return (
-  <Document title={data.title} subject={data.subject} author={''}>
+  <Document title={data.title} subject={data.subject} author={user.surName + ' ' + user.firstName + ' ' + user.patrSurName}>
     <Page size="A4" style={styles.page} >
       <View style={styles.row}>
         <Image
@@ -252,8 +290,7 @@ const Report = ({ setSelectedButtonLink, link }) => {
       </View>
       <View>
       <Text style={styles.title}>ОТЧЕТ</Text>
-      <Text style={styles.subtitle}>{data.option === 'clients' ? 'Данные зарегистрированных клиентов' :
-       'Данные планируемых тренировочных занятий'}</Text>
+      <Text style={styles.subtitle}>{data.subject}</Text>
       <Text style={styles.contentText}>{data.textContent}</Text> 
       </View>
       <View>
@@ -273,10 +310,12 @@ const Report = ({ setSelectedButtonLink, link }) => {
           src={diagramDataUrl}
         /> */}
       </View>
-      {/* <View>
-        <Chart/>
-      </View> */}
-        <Text>Author: Alex</Text>
+         <Text style={styles.footer} fixed>
+       Автор: {user.surName + ' ' + user.firstName + ' ' + user.patrSurName} | Дата создания: {new Date().toLocaleDateString()}
+      </Text>
+      <Text style={styles.pageNumber} render={({ pageNumber, totalPages }) => (
+       `${pageNumber} / ${totalPages}`
+      )} fixed />
     </Page>
   </Document>
 )

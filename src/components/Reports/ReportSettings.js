@@ -7,6 +7,7 @@ import PieMembershipsCost from '../MainPage/PieMembershipsCost'
 import SoldMembershipsAreaChart from '../MainPage/SoldMembershipsAreaChart'
 import RevenueChart from '../Financies/RevenueChart'
 import html2canvas from 'html2canvas'
+import { jwtDecode } from 'jwt-decode'
 
 const ReportForm = ({ setSelectedButtonLink, link }) => {
     // const token = sessionStorage.getItem("jwt");
@@ -30,6 +31,10 @@ const ReportForm = ({ setSelectedButtonLink, link }) => {
   const [amountValueOpen, setAmountValueOpen] = useState(false)
   const [selectedMonthOpen, setSelectedMonthOpen] = useState(false)
   const [idToGenerateImage, setIdToGenerateImage] = useState('')
+  const token = sessionStorage.getItem("jwt");
+  const decodedToken = jwtDecode(token);
+  const xs = 12
+  const sm = decodedToken.roles.toString() === 'ADMIN' ? 3 : 2
 
   useEffect(() => {
     if (idToGenerateImage) {
@@ -97,7 +102,7 @@ const ReportForm = ({ setSelectedButtonLink, link }) => {
     localStorage.removeItem('reportData')
     localStorage.setItem('reportData', JSON.stringify(data))
     // Navigate to the Report page
-    navigate('/reports/viewReport')
+    navigate('/dashboard/reports/viewReport')
   };
 
   return (
@@ -105,54 +110,62 @@ const ReportForm = ({ setSelectedButtonLink, link }) => {
     <Stack direction="row" spacing={2} mt={1}>
       <TextField name="title" label="Заголовок" value={data.title} onChange={handleChange} />
       <TextField name="subject" label="Тема" value={data.subject} onChange={handleChange} />
-      <FormControl component="fieldset">
-      <FormLabel >Тип отчета</FormLabel>
-        <RadioGroup name="option" value={data.option} onChange={handleChange}>
-        <Grid container>
-        <Grid item xs={4}>
-          <FormControlLabel value="clients" control={<Radio />} label="Клиенты" />
-        </Grid>
-        <Grid item xs={4}>
-          <FormControlLabel value="trainings" control={<Radio />} label="Тренировки" />
-        </Grid>
-        <Grid item xs={4}>
-          <FormControlLabel value="facilities" control={<Radio />} label="Сооружения комплекса" />
-        </Grid>
-        <Grid item xs={4}>
-          <FormControlLabel value="memberships" control={<Radio />} label="Абонементы" />
-        </Grid>
-        <Grid item xs={4}>
-          <FormControlLabel value="events" control={<Radio />} label="График планируемых событий" />
-        </Grid>
-        <Grid item xs={4}>
-          <FormControlLabel value="employees" control={<Radio />} label="Сотрудники" />
-        </Grid>
-        <Grid item xs={4}>
-          <FormControlLabel value="service_packages" control={<Radio />} label="Пакеты услуг" />
-        </Grid>
-        <Grid item xs={4}>
-          <FormControlLabel value="trainings_registrations" control={<Radio />} label="Согласование занятий" />
-        </Grid>
-        <Grid item xs={4}>
-          <FormControlLabel value="sold_memberships" control={<Radio />} label="Продажа абонементов" />
-        </Grid>
-      </Grid>
-        </RadioGroup>
-      </FormControl>
     </Stack>
-    <Stack mb={2}>
+    <Stack mt={3}>
       <TextField name="textContent" label="Текстовое содержание отчета" multiline maxRows={50}  value={data.textContent} onChange={handleChange} />
     </Stack>
     <Stack direction="row" spacing={2} mt={1}>
-      <FormControl component="fieldset">
+      {/* <FormControl component="fieldset">
         <RadioGroup name="Диаграмма" value={data.option_diagram} onChange={handleChangeDiagram}>
           <FormControlLabel value="revenue" control={<Radio />} label="Показатель выручки с продажи абонементов" />
           <FormControlLabel value="costValue" control={<Radio />} label="Показатель соотношения стоимости предлагаемых абонементов"/>
           <FormControlLabel value="amountValue" control={<Radio />} label="Количество проданных абонементов"/>
         </RadioGroup>
-      </FormControl>
+      </FormControl> */}
     </Stack>
-    {selectedMonthOpen && (<MonthsDropdown onChange={(e) => setSelectedMonths(Number(e.target.value))} />)}
+    <FormControl component="fieldset">
+      <FormLabel >Табличные данные</FormLabel>
+        <RadioGroup name="option" value={data.option} onChange={handleChange}>
+        <Grid container>
+        <Grid item xs={xs} sm={sm}>
+          <FormControlLabel value="clients" control={<Radio />} label="Клиенты" />
+        </Grid>
+        {(decodedToken.roles.toString() === "ADMIN" || decodedToken.roles.toString() === "COACH")
+         && <Grid item xs={xs} sm={decodedToken.roles.toString() === "COACH" ? 12 : sm }>
+          <FormControlLabel value="trainings" control={<Radio />} label="Тренировки" />
+        </Grid>}
+        {decodedToken.roles.toString() === "ADMIN"&&
+        <Grid item xs={xs} sm={sm}>
+          <FormControlLabel value="facilities" control={<Radio />} label="Сооружения комплекса" />
+        </Grid>}
+        {(decodedToken.roles.toString() === "ADMIN" || decodedToken.roles.toString() === "MANAGER")
+         && <Grid item xs={xs} sm={decodedToken.roles.toString() === "MANAGER" ? 12 : sm }>
+          <FormControlLabel value="memberships" control={<Radio />} label="Абонементы" />
+        </Grid>}
+        {(decodedToken.roles.toString() === "ADMIN" || decodedToken.roles.toString() === "COACH")
+         && <Grid item xs={xs} sm={decodedToken.roles.toString() === "COACH" ? 12 : sm }>
+          <FormControlLabel value="events" control={<Radio />} label="График планируемых событий" />
+        </Grid>}
+        {decodedToken.roles.toString() === "ADMIN" && 
+        <Grid item xs={xs} sm={sm}>
+          <FormControlLabel value="employees" control={<Radio />} label="Сотрудники" />
+        </Grid>}
+        {(decodedToken.roles.toString() === "ADMIN" || decodedToken.roles.toString() === "MANAGER")
+         && <Grid item xs={xs} sm={decodedToken.roles.toString() === "MANAGER" ? 12 : sm }>
+          <FormControlLabel value="service_packages" control={<Radio />} label="Пакеты услуг" />
+        </Grid>}
+        {(decodedToken.roles.toString() === "ADMIN" || decodedToken.roles.toString() === "COACH")
+         && <Grid item xs={xs} sm={decodedToken.roles.toString() === "COACH" ? 12 : sm }>
+          <FormControlLabel value="trainings_registrations" control={<Radio />} label="Согласование занятий" />
+        </Grid>}
+        {(decodedToken.roles.toString() === "ADMIN" || decodedToken.roles.toString() === "MANAGER")
+         && <Grid item xs={xs} sm={decodedToken.roles.toString() === "MANAGER" ? 12 : sm }>
+          <FormControlLabel value="sold_memberships" control={<Radio />} label="Продажа абонементов" />
+        </Grid>}
+      </Grid>
+        </RadioGroup>
+      </FormControl>
+    {/* {selectedMonthOpen && (<MonthsDropdown onChange={(e) => setSelectedMonths(Number(e.target.value))} />)}
     {amountValueOpen && (<Paper id='amountValueId' elevation={3} sx={{ p: 3 }}>
       <SoldMembershipsAreaChart months={selectedMonths} /></Paper>)}
         <Box
@@ -164,8 +177,10 @@ const ReportForm = ({ setSelectedButtonLink, link }) => {
         >
         {costValueOpen && (<div id='costValueId'><PieMembershipsCost/></div>)}
         {revenueOpen && (<div id='revenueId'><RevenueChart months={selectedMonths}/></div>)}
-    </Box>
+    </Box> */}
+    <Box>
       <Button type="submit">Сохранить</Button>
+    </Box>
     </form>
   );
 };

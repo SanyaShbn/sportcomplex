@@ -73,7 +73,7 @@ function UpdateProfile(props){
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState({
     firstName: '', surName: '', patrSurName: '', phoneNumber: '', email: '',
-    post: '', rights: '', userLogin: '', isUpdate: '',
+    post: '', userLogin: '', isUpdate: '',
     userPassword: '',
   });
 
@@ -101,15 +101,6 @@ function UpdateProfile(props){
   const [isUpdate, setIsUpdate] = useState(false);
 
   const handleClickOpen = () => {
-    let userRights;
-    switch(props.data.role) {
-    case 'ADMIN': userRights = "Полные права в системе: работа со всеми модулями программы"; break;
-    case 'MANAGER': userRights = "Доступные модули в режиме чтения: ,\nДоступные модули для редактирования данных:"; break;
-    case 'COACH': userRights = "Доступные модули в режиме чтения: ,\nДоступные модули для редактирования данных:"; break;
-    case 'MARKETER': userRights = "Доступные модули в режиме чтения: ,\nДоступные модули для редактирования данных:"; break;
-    default:
-        userRights = "Отсутствуют права для работы в системе";
-    }
     setUser({
       firstName: props.data.firstName,
       surName: props.data.surName,
@@ -118,7 +109,6 @@ function UpdateProfile(props){
       phoneNumber: props.data.phoneNumber,
       userLogin: props.data.email,
       email: props.data.email,
-      rights: userRights,
       isUpdate: "Просмотр",
      })      
     setOpen(true);
@@ -314,12 +304,6 @@ function UpdateProfile(props){
             InputLabelProps={{
               shrink: true,
             }} name="post" type="text" fullWidth required value={user.post}  disabled multiline
-        />)}
-        {!isUpdate && (
-        <TextField margin="normal" variant="standard" label="Права в системе"
-            InputLabelProps={{
-              shrink: true,
-            }} name="post" type="text" fullWidth required value={user.rights}  disabled multiline
         />)}
         {isUpdate && (
          <TextField

@@ -1,5 +1,4 @@
-import { BiTask } from "react-icons/bi"
-import { LuPackage2 } from "react-icons/lu"
+import { TbFileSettings, TbReportSearch } from "react-icons/tb"
 import {
     Box,
     List,
@@ -26,13 +25,13 @@ const ReportsButtonsList = ({ open, setSelectedLink, link}) => {
       () => [
         {
           title: 'Настройка',
-          icon: <LuPackage2 />,
+          icon: <TbFileSettings />,
           link: 'reportSettings',
           component: <ReportSettings {...{ setSelectedButtonLink, link: 'reportSettings' }} />,
         },
         {
           title: 'Просмотр',
-          icon: <BiTask />,
+          icon: <TbReportSearch />,
           link: 'viewReport',
           component:
           <PDFViewer style={{ flex: 1, height: '100vh', width: '100%' }}>

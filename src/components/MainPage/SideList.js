@@ -135,10 +135,22 @@ import ReportsButtonsList from "./ReportsButtonsList.js"
     setTimeout(() => {
       dispatch({ type: 'END_LOADING' });
       sessionStorage.setItem("jwt", "");
+      ClearLocalStorage()
       navigate("/", { replace: true });
     }, 1000);
     }
   
+  const ClearLocalStorage = () => {
+    const reportData = JSON.parse(localStorage.getItem('reportData'));
+    reportData.title = ''
+    reportData.subject = ''
+    reportData.textContent = ''
+    reportData.option = ''
+    localStorage.removeItem('reportData')
+    localStorage.setItem('reportData', JSON.stringify(reportData))
+  }
+
+
     const [selectedLink, setSelectedLink] = useState('')
     // const token = sessionStorage.getItem("jwt");
     // const decodedToken = jwtDecode(token);
@@ -249,6 +261,8 @@ import ReportsButtonsList from "./ReportsButtonsList.js"
 // }, [roles]); - для авторизации
 
     const navigate = useNavigate();
+    const theme = useTheme();
+    let color = theme.palette.mode;
 
     return (
       <>
