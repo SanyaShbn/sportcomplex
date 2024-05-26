@@ -15,6 +15,7 @@ import { grey } from '@mui/material/colors';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useValue } from '../../../context/ContextProvider.js';
+import { jwtDecode } from 'jwt-decode';
 
 function CustomToolbar() {
   return (
@@ -47,9 +48,9 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
     }, []);
   
     const fetchClientMemberships = () => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/clientMemberships', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => response.json())
       .then(data => {
@@ -61,17 +62,28 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
     }
 
     const onDelClick = (id) => {
-      setDialogOpen(true);
+      if(jwtDecode(sessionStorage.getItem("jwt")).roles.toString() === 'COACH'){
+        dispatch({
+          type: 'UPDATE_ALERT',
+          payload: {
+          open: true,
+          severity: 'error',
+          message: 'Недостаточный уровень доступа. Сотрудник тренерского персонала не имеет прав на редактирование информации о продажах абонементов (исключительно просмотр)',
+        },});
+      }
+      else{
+      setDialogOpen(true)
       setRowIdToDelete(id)
+      }
     }
 
     const handleConfirmDelete = (id) => {
 
-        // const token = sessionStorage.getItem("jwt");
+        const token = sessionStorage.getItem("jwt");
 
         fetch(SERVER_URL + '/api/deleteClientMemberships?id=' + id.slice(id.lastIndexOf("/") + 1), {
           method: 'DELETE',
-          // headers: { 'Authorization' : token }
+          headers: { 'Authorization' : token }
           })
         .then(response => {
           if (response.ok) {
@@ -88,12 +100,12 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
 
     const addClientMembership = (membershipId, clientId) => {
 
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
 
       fetch(SERVER_URL + '/api/save_client_membership?membershipId=' + membershipId + "&clientId=" + clientId,
         { method: 'POST', headers: {
           'Content-Type':'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
       })
       .then(response => {
@@ -117,14 +129,14 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
 
     const updateClientMembership = (link, membershipId, clientId) => {
 
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
 
       fetch(link + '?membershipId=' + membershipId + "&clientId=" + clientId ,
         { 
           method: 'PUT', 
           headers: {
           'Content-Type':  'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
       })
       .then(response => {
@@ -146,11 +158,11 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
     }
      
     const fetchMemberships = async (url) => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       try {
         const config = {
           headers: {
-            // 'Authorization' : token
+            'Authorization' : token
           }
         };
           const response = await axios.get(url, config);
@@ -162,11 +174,11 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
     };
 
     const fetchClients = async (url) => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       try {
         const config = {
           headers: {
-            // 'Authorization' : token
+            'Authorization' : token
           }
         };
           const response = await axios.get(url, config);
@@ -180,14 +192,16 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
 
 
     const columns = [
-      {field: 'sportComplexMembership', headerName: 'Наименование приобретаемого абонемента', width: 600},
-      {field: 'client', headerName: 'Клиент, приобретающий абонемент', width: 580},
+      {field: 'sportComplexMembership', headerName: 'Наименование приобретаемого абонемента', width: 400},
+      {field: 'client', headerName: 'Клиент, приобретающий абонемент', width: 530},
+      {field: 'soldAt', headerName: 'Дата и время продажи', width: 220},
+      {field: 'revenue', headerName: 'Выручка (бел.руб.)', width: 150},
       {
         field: '_links.client_membership.href', 
         headerName: '', 
         sortable: false,
         filterable: false,
-        width: 100,
+        width: 50,
         renderCell: row => <EditClientMembership
                               data={row} 
                               updateClientMembership={updateClientMembership} />
@@ -195,7 +209,7 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
       {
         field: '_links.self.href', 
         headerName: '', 
-        width:120,
+        width:50,
         sortable: false,
         filterable: false,
         renderCell: row => 
@@ -237,6 +251,8 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
       const updateRows = async () => {
         const updatedRows = await Promise.all(client_memberships.map(async client_membership => ({
           id: client_membership._links.clientMembership.href,
+          soldAt: client_membership.soldAt,
+          revenue: client_membership.revenue,
           client: await fetchClients(client_membership._links.client.href),
           sportComplexMembership: await fetchMemberships(client_membership._links.sportComplexMembership.href),
         })));

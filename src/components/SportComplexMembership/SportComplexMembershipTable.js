@@ -44,9 +44,9 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
     }, []);
   
     const fetchMemberships = () => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/sportComplexMemberships', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => response.json())
       .then(data => {
@@ -64,11 +64,11 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
 
     const handleConfirmDelete = (url) => {
 
-        // const token = sessionStorage.getItem("jwt");
+        const token = sessionStorage.getItem("jwt");
 
         fetch(url, {
           method: 'DELETE',
-          // headers: { 'Authorization' : token }
+          headers: { 'Authorization' : token }
           })
         .then(response => {
           if (response.ok) {
@@ -85,12 +85,12 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
 
     const addMembership = (membership) => {
 
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
 
       fetch(SERVER_URL + '/api/sportComplexMemberships',
         { method: 'POST', headers: {
           'Content-Type':'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
         body: JSON.stringify(membership)
       })
@@ -115,14 +115,14 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
 
     const updateMembership = (membership, link) => {
 
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
 
       fetch(link,
         { 
           method: 'PUT', 
           headers: {
           'Content-Type':  'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
         body: JSON.stringify(membership)
       })
@@ -252,7 +252,7 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
           open={editOpen}
           autoHideDuration={2000}
           onClose={() => setEditOpen(false)}
-          message="Информация об абонементе занятий успешно обновлена"
+          message="Информация об абонементе успешно обновлена"
         />
       </div>
     </React.Fragment>

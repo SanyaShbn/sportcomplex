@@ -44,17 +44,6 @@ const TrainingTable = ({ setSelectedLink, link }) => {
 
     const token = sessionStorage.getItem("jwt")
     const decodedToken = jwtDecode(token)
-    const roles = decodedToken.roles
-
-    const showError = () => {
-      dispatch({
-        type: 'UPDATE_ALERT',
-        payload: {
-          open: true,
-          severity: 'error',
-          message: 'Ошибка! Не соответствующий уровень доступа',
-        },});
-    }
   
     useEffect(() => {
       fetchTrainings();
@@ -79,11 +68,6 @@ const TrainingTable = ({ setSelectedLink, link }) => {
   }
 
     const handleConfirmDelete = (url) => {
-      
-      // if(roles.toString()!=="ADMIN"){
-      //   showError()
-      // }
-      // else{
 
         fetch(url + "?userLogin=" + decodedToken.sub, {
           method: 'DELETE',
@@ -108,7 +92,6 @@ const TrainingTable = ({ setSelectedLink, link }) => {
           setDialogOpen(false)
         })
         .catch(err => console.error(err))
-      // }
     }
     const addTraining = (training, complexFacilityId, userId) => {
 

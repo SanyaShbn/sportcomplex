@@ -26,7 +26,7 @@ function AddFacility(props){
   const {
     dispatch,
   } = useValue();
-  // Open the modal form
+
   const handleClickOpen = () => {
     setOpen(true);
     setIsNameError(false)
@@ -42,9 +42,9 @@ function AddFacility(props){
   });
 
   const fetchCleaners= () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/view_cleaners', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setCleaners(data))
@@ -57,7 +57,6 @@ function AddFacility(props){
     setIsNameError(isInvalid)
     setFacility({...facility, [event.target.name]: event.target.value})
   };
-  // Close the modal form 
   const handleClose = () => {
     setOpen(false)
     setValue(null)
@@ -67,7 +66,6 @@ function AddFacility(props){
     })
   };
 
-  // Save car and close modal form 
   const handleSave = () => {
     if(facility.name.length === 0 | capacityInputValue === null){
       dispatch({

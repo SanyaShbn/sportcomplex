@@ -5,14 +5,14 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
-import Select from '@mui/material/Select';
 import { SERVER_URL } from '../../../constants.js';
-import {FormControl, InputLabel, MenuItem, TextField} from '@mui/material';
+import {FormControl, TextField} from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import { useValue } from '../../../context/ContextProvider.js';
 import { NumberInput } from '../../../constants.js';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import { jwtDecode } from 'jwt-decode';
 
 function EditTrainingMembership(props) {
 
@@ -45,9 +45,9 @@ function EditTrainingMembership(props) {
   });
 
   const fetchTrainings = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/view_trainings', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setTrainings(data))
@@ -55,9 +55,9 @@ function EditTrainingMembership(props) {
   }
 
     const fetchMemberships = () => {
-        // const token = sessionStorage.getItem("jwt");
+        const token = sessionStorage.getItem("jwt");
         fetch(SERVER_URL + '/api/view_memberships', {
-          // headers: { 'Authorization' : token }
+          headers: { 'Authorization' : token }
         })
         .then(response => response.json())
         .then(data => setMemberships(data))
@@ -66,7 +66,16 @@ function EditTrainingMembership(props) {
 
 
     const handleClickOpen = () => {
-      let id_membership = props.data.row.sportComplexMembership.slice(props.data.row.sportComplexMembership.indexOf("№") + 1, 
+      if(jwtDecode(sessionStorage.getItem("jwt")).roles.toString() === 'COACH'){
+        dispatch({
+          type: 'UPDATE_ALERT',
+          payload: {
+          open: true,
+          severity: 'error',
+          message: 'Недостаточный уровень доступа. Сотрудник тренерского персонала не имеет прав на редактирование информации о пакетах услуг (исключительно просмотр)',
+        },});
+      }
+      else{let id_membership = props.data.row.sportComplexMembership.slice(props.data.row.sportComplexMembership.indexOf("№") + 1, 
       props.data.row.sportComplexMembership.indexOf(":"))
       let id_training = props.data.row.training.slice(props.data.row.training.indexOf("№") + 1, props.data.row.training.indexOf("."))
       setMembershipId(parseInt(id_membership))
@@ -79,6 +88,7 @@ function EditTrainingMembership(props) {
       setOpen(true);
       setValue(props.data.row.visitsAmount)
       }
+    }
 
   const handleClose = () => {
     setOpen(false);

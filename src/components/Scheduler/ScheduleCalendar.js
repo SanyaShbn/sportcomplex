@@ -42,7 +42,8 @@ export default class ScheduleCalendar extends Component {
             scheduler.deleteEvent(id);
             scheduler.message({
                 text: "Новое событие не удалось создать. Тренировочное занятие не может пересекаться по времени с уже существующими"
-                + ", проводимыми в том же помещении (кроме персональных занятий) или тем же тренером. Уборка и обслуживание сооружения не могут назначаться на вермя проведения занятия в этом сооружении", 
+                + ", проводимыми в том же помещении (кроме персональных занятий) или тем же тренером. Уборка и обслуживание сооружения не могут назначаться на вермя проведения занятия в этом сооружении. " +
+                "Если за уборку и обслуживание нескольких сооружений ответственен один и тот же сотрудник, данные события также запрещается проставлять на одно и то же время", 
                 type: "error",
                 expire:30000
             })
@@ -57,6 +58,16 @@ export default class ScheduleCalendar extends Component {
             })
             .catch(err => console.error(err))
         });
+
+        scheduler.message.position = 'bottom';
+        if(jwtDecode(sessionStorage.getItem("jwt")).roles.toString() === 'MANAGER'){
+            scheduler.config.readonly = true;
+            scheduler.message({
+             text: "Вы находитесь в режиме 'Read-only'. Только сотрудникам тренерского персонала и администратору разрешено редактировать расписание", 
+             type: "warning",
+             expire:10000
+         })
+        }
 
         scheduler.attachEvent("onBeforeEventChanged", function(ev, e, is_new, original){
             oldEvent = scheduler.copy(original); 
@@ -86,7 +97,8 @@ export default class ScheduleCalendar extends Component {
             if (data === "Event duration is overlapping with other events. Cannot save.") {
                 scheduler.message({
                     text: "Не удалось сохранить изменения. Тренировочное занятие не может пересекаться по времени с уже существующими"
-                    + ", проводимыми в том же помещении (кроме персональных занятий) или тем же тренером. Уборка и обслуживание сооружения не могут назначаться на вермя проведения занятия в этом сооружении", 
+                    + ", проводимыми в том же помещении (кроме персональных занятий) или тем же тренером. Уборка и обслуживание сооружения не могут назначаться на вермя проведения занятия в этом сооружении. "
+                    + "Если за уборку и обслуживание нескольких сооружений ответственен один и тот же сотрудник, данные события также запрещается проставлять на одно и то же время", 
                     type: "warning",
                     expire:10000
                 })
@@ -171,7 +183,7 @@ export default class ScheduleCalendar extends Component {
                     if (profileData.role === "COACH") {
                         var section = scheduler.formSection("Тип события")
                         section.control.disabled = true
-                        fetch(SERVER_URL + '/api/view_trainings', {
+                        fetch(SERVER_URL + '/api/view_trainings_for_scheduler', {
                             headers: {
                                   'Authorization' : token
                                 }
@@ -200,7 +212,7 @@ export default class ScheduleCalendar extends Component {
                     }).catch(error => console.error(error))
                     } else {
                         if (event.data_type === "тренировочное занятие") {
-                            url = SERVER_URL + '/api/view_trainings';
+                            url = SERVER_URL + '/api/view_trainings_for_scheduler';
                         } else if (event.data_type === "уборка и обслуживание") {
                             url = SERVER_URL + '/api/view_cleaned_facilities';
                         }
@@ -276,7 +288,7 @@ export default class ScheduleCalendar extends Component {
                     var data_type = this.value;
                     var url;
                     if (data_type === "тренировочное занятие") {
-                        url = SERVER_URL + '/api/view_trainings';
+                        url = SERVER_URL + '/api/view_trainings_for_scheduler';
                     } else if (data_type === "уборка и обслуживание") {
                         url = SERVER_URL + '/api/view_cleaned_facilities';
                     }
@@ -358,7 +370,7 @@ export default class ScheduleCalendar extends Component {
     })
     .catch(error => console.error(error));
 
-    fetch(SERVER_URL + '/api/view_trainings', {
+    fetch(SERVER_URL + '/api/view_trainings_for_scheduler', {
         headers: {
               'Authorization' : token
             }
@@ -450,9 +462,11 @@ export default class ScheduleCalendar extends Component {
     scheduler.config.repeat_date = "%m/%d/%Y";
     scheduler.config.include_end_by = true;
     scheduler.config.hour_date = '%g:%i %A';
-    scheduler.message.position = 'bottom'
+    scheduler.message.position = 'bottom';
     scheduler.xy.scale_width = 70;
-
+    if(decodedToken.roles.toString() === 'MANAGER'){
+       scheduler.config.readonly = true;
+    }else{scheduler.config.readonly = false}
     scheduler.init(this.schedulerContainer, new Date());
 }
     

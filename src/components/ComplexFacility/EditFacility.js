@@ -37,9 +37,9 @@ function EditFacility(props) {
   });
 
   const fetchCleaners= () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt")
     fetch(SERVER_URL + '/api/view_cleaners', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setCleaners(data))

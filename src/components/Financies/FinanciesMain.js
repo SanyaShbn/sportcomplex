@@ -1,15 +1,12 @@
 import React,  { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom'
 import {
-  Box,
   Paper,
 } from '@mui/material';
 
-import { Backdrop, CircularProgress, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import RevenueChart from './RevenueChart.js';
-import RevenueBarChart from './RevenueBarChart.js';
 import MonthsDropdown from '../MainPage/MonthsDropdown.js';
-import { display } from '@mui/system';
 
 const FinanciesMain = ({ setSelectedLink, link }) => {
 
@@ -19,7 +16,6 @@ const FinanciesMain = ({ setSelectedLink, link }) => {
 
   const location = useLocation();
   const [selectedMonths, setSelectedMonths] = useState(3);
-  const [isLoading, setIsLoading] = useState(true);
 
 
   useEffect(() => {
@@ -30,7 +26,6 @@ const FinanciesMain = ({ setSelectedLink, link }) => {
   }, [location]);
 
   return (
-
         <div>
         <Typography
         variant="h4"
@@ -41,11 +36,7 @@ const FinanciesMain = ({ setSelectedLink, link }) => {
         </Typography>
         <Paper elevation={3} sx={{ p: 3, gridColumn: '1/3', mb: 2 }}>
         <MonthsDropdown onChange={(e) => setSelectedMonths(Number(e.target.value))} />
-        <RevenueChart months={selectedMonths}/>
-        </Paper>
-
-        <Paper elevation={3} sx={{ p: 2, gridColumn: '1/3', mb: 2 }}>
-        <RevenueBarChart/>
+        <RevenueChart months={selectedMonths} />
         </Paper>
         </div>
 

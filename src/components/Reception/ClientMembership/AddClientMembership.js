@@ -3,8 +3,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import Select from '@mui/material/Select';
-import { FormControl, InputLabel, MenuItem} from '@mui/material';
+import { FormControl } from '@mui/material';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import { SERVER_URL } from '../../../constants.js';
@@ -13,7 +12,7 @@ import '../../CSS/table.css';
 import { useValue } from '../../../context/ContextProvider.js';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-
+import { jwtDecode } from 'jwt-decode';
 
 function AddClientMembership(props){
 
@@ -43,9 +42,9 @@ function AddClientMembership(props){
   }, []);
 
   const fetchClients = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/view_clients', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setClients(data))
@@ -53,9 +52,9 @@ function AddClientMembership(props){
   }
 
     const fetchMemberships = () => {
-        // const token = sessionStorage.getItem("jwt");
+        const token = sessionStorage.getItem("jwt");
         fetch(SERVER_URL + '/api/view_memberships', {
-          // headers: { 'Authorization' : token }
+          headers: { 'Authorization' : token }
         })
         .then(response => response.json())
         .then(data => setMemberships(data))
@@ -63,7 +62,18 @@ function AddClientMembership(props){
   }
 
   const handleClickOpen = () => {
+    if(jwtDecode(sessionStorage.getItem("jwt")).roles.toString() === 'COACH'){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+        open: true,
+        severity: 'error',
+        message: 'Недостаточный уровень доступа. Сотрудник тренерского персонала не имеет прав на оформление продаж абонементов (исключительно просмотр)',
+      },});
+    }
+    else{
     setOpen(true);
+    }
   };
     
   const handleClose = () => {

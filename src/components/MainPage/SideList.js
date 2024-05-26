@@ -37,45 +37,14 @@ import TrainingTable from "../Training/TrainingTable"
 import SportComplexMembershipTable from "../SportComplexMembership/SportComplexMembershipTable"
 import ReceptionButtonsList from "./ReceptionButtonsList"
 import SetTheme from "../Scheduler/SetTheme"
-import Registration from "../User/Registration"
 import UpdateProfile from "../User/UpdateProfile.js"
 import { blue } from '@mui/material/colors';
 import { jwtDecode } from 'jwt-decode';
 import FinanciesMain from "../Financies/FinanciesMain.js"
 import { useValue } from '../../context/ContextProvider'
-import domToImage from 'dom-to-image'
 import ReportsButtonsList from "./ReportsButtonsList.js"
   
   const drawerWidth = 250;
-
-  // const StyledBadge = styled(Badge)(({ theme }) => ({
-  //   '& .MuiBadge-badge': {
-  //     backgroundColor: '#44b700',
-  //     color: '#44b700',
-  //     boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-  //     '&::after': {
-  //       position: 'absolute',
-  //       top: 0,
-  //       left: 0,
-  //       width: '100%',
-  //       height: '100%',
-  //       borderRadius: '50%',
-  //       animation: 'ripple 1.2s infinite ease-in-out',
-  //       border: '1px solid currentColor',
-  //       content: '""',
-  //     },
-  //   },
-  //   '@keyframes ripple': {
-  //     '0%': {
-  //       transform: 'scale(.8)',
-  //       opacity: 1,
-  //     },
-  //     '100%': {
-  //       transform: 'scale(2.4)',
-  //       opacity: 0,
-  //     },
-  //   },
-  // }));
   
   const openedMixin = (theme) => ({
     width: drawerWidth,
@@ -152,71 +121,145 @@ import ReportsButtonsList from "./ReportsButtonsList.js"
 
 
     const [selectedLink, setSelectedLink] = useState('')
-    // const token = sessionStorage.getItem("jwt");
-    // const decodedToken = jwtDecode(token);
-    // const [user, setUser] = useState([]);
-    // const [profileIcon, setProfileIcon] = useState([]);
+    const token = sessionStorage.getItem("jwt");
+    const decodedToken = jwtDecode(token);
+    const [user, setUser] = useState([]);
+    const [profileIcon, setProfileIcon] = useState([]);
+    const role = decodedToken.roles.toString();
 
-    // useEffect(() => {
-    //   fetchUser();
-    // }, []);
+    useEffect(() => {
+      fetchUser();
+    }, []);
   
-    // const fetchUser = () => {
-    //   fetch(SERVER_URL + '/api/user_profile?userLogin=' + decodedToken.sub, {
-    //     headers: { 'Authorization' : token }
-    //   })
-    //   .then(response => response.json())
-    //   .then(data => {setUser(data); setProfileIcon(data.firstName[0] + data.surName[0])})
-    //   .catch(err => console.error(err));    
-    // }
+    const fetchUser = () => {
+      fetch(SERVER_URL + '/api/user_profile?userLogin=' + decodedToken.sub, {
+        headers: { 'Authorization' : token }
+      })
+      .then(response => response.json())
+      .then(data => {setUser(data); setProfileIcon(data.firstName[0] + data.surName[0])})
+      .catch(err => console.error(err));    
+    }
 
     const list = useMemo(
       () => {
-        let componentsToShow = [
-        {
-          title: 'Главная страница',
-          icon: <GrDomain />,
-          link: 'main',
-          component: <Home {...{ setSelectedLink, link: 'main' }} />,
-        },
-        {
-          title: 'Сотрудники',
-          icon: <BsPeopleFill />,
-          link: 'service_employees',
-          component: <EmployeeTable {...{ setSelectedLink, link: 'service_employees' }} />,
-        },
-        {
-          title: 'Клиенты',
-          icon: <BsFillPersonVcardFill/>,
-          link: 'clients',
-          component: <ClientTable {...{ setSelectedLink, link: 'clients' }}/>,
-        },
-        {
-          title: 'Сооружения комплекса',
-          icon: <IoIosFitness />,
-          link: 'complex_facilities',
-          component: <ComplexFacilityTable {...{ setSelectedLink, link: 'complex_facilities' }}/>,
-        },
-        {
-          title: 'Тренировки',
-          icon: <MdOutlineSportsGymnastics />,
-          link: 'trainings',
-          component: <TrainingTable {...{ setSelectedLink, link: 'trainings' }}/>,
-        },
-        {
-          title: 'Расписание',
-          icon: <FaCalendarAlt />,
-          link: 'shedule',
-          component:
-          <div>
-          <div>
-          <SetTheme/>
-          </div>
-          <div> 
-          <Scheduler {...{ setSelectedLink, link: 'shedule' }}/>
-          </div>
-          </div>
-        },
+        let componentsToShow = [];
+      if (role === 'ADMIN') {
+        componentsToShow.push(
+          {
+            title: 'Главная страница',
+            icon: <GrDomain />,
+            link: 'main',
+            component: <Home {...{ setSelectedLink, link: 'main' }} />,
+          },
+          {
+            title: 'Сотрудники',
+            icon: <BsPeopleFill />,
+            link: 'service_employees',
+            component: <EmployeeTable {...{ setSelectedLink, link: 'service_employees' }} />,
+          },
+          {
+            title: 'Клиенты',
+            icon: <BsFillPersonVcardFill/>,
+            link: 'clients',
+            component: <ClientTable {...{ setSelectedLink, link: 'clients' }}/>,
+          },
+          {
+            title: 'Сооружения комплекса',
+            icon: <IoIosFitness />,
+            link: 'complex_facilities',
+            component: <ComplexFacilityTable {...{ setSelectedLink, link: 'complex_facilities' }}/>,
+          },
+          {
+            title: 'Тренировки',
+            icon: <MdOutlineSportsGymnastics />,
+            link: 'trainings',
+            component: <TrainingTable {...{ setSelectedLink, link: 'trainings' }}/>,
+          },
+          {
+            title: 'Расписание',
+            icon: <FaCalendarAlt />,
+            link: 'shedule',
+            component:
+            <div>
+            <div>
+            <SetTheme/>
+            </div>
+            <div> 
+            <Scheduler {...{ setSelectedLink, link: 'shedule' }}/>
+            </div>
+            </div>
+          },
+            {
+              title: 'Абонементы',
+              icon: <MdCardMembership />,
+              link: 'memberships',
+              component: <SportComplexMembershipTable {...{ setSelectedLink, link: 'memberships' }}/>,
+            },
+            {
+              title: 'Выручка',
+              icon: <MdAttachMoney />,
+              link: 'financies',
+              component: <FinanciesMain {...{ setSelectedLink, link: 'financies'}}/>,
+            },
+            {
+              title: 'Рецепция',
+              icon: <BsReception4 />,
+              link: 'reception/*',
+              component: <ReceptionButtonsList {...{ setSelectedLink, link: 'reception/*' }}/>,
+            },
+            {
+              title: 'Отчеты',
+              icon: <BiSolidReport />,
+              link: 'reports/*',
+              component: <ReportsButtonsList {...{ setSelectedLink, link: 'reports/*' }}/>,
+            },
+        );
+      }
+
+      if (role === 'COACH') {
+        componentsToShow.push(
+          {
+            title: 'Тренировки',
+            icon: <MdOutlineSportsGymnastics />,
+            link: 'trainings',
+            component: <TrainingTable {...{ setSelectedLink, link: 'trainings' }}/>,
+          },
+          {
+            title: 'Клиенты',
+            icon: <BsFillPersonVcardFill/>,
+            link: 'clients',
+            component: <ClientTable {...{ setSelectedLink, link: 'clients' }}/>,
+          },
+          {
+            title: 'Расписание',
+            icon: <FaCalendarAlt />,
+            link: 'shedule',
+            component:
+            <div>
+            <div>
+            <SetTheme/>
+            </div>
+            <div> 
+            <Scheduler {...{ setSelectedLink, link: 'shedule' }}/>
+            </div>
+            </div>
+          },
+            {
+              title: 'Рецепция',
+              icon: <BsReception4 />,
+              link: 'reception/*',
+              component: <ReceptionButtonsList {...{ setSelectedLink, link: 'reception/*' }}/>,
+            },
+            {
+              title: 'Отчеты',
+              icon: <BiSolidReport />,
+              link: 'reports/*',
+              component: <ReportsButtonsList {...{ setSelectedLink, link: 'reports/*' }}/>,
+            },
+        );
+      }
+      if (role === 'MANAGER') {
+        componentsToShow.push(
           {
             title: 'Абонементы',
             icon: <MdCardMembership />,
@@ -224,41 +267,48 @@ import ReportsButtonsList from "./ReportsButtonsList.js"
             component: <SportComplexMembershipTable {...{ setSelectedLink, link: 'memberships' }}/>,
           },
           {
-            title: 'Выручка',
-            icon: <MdAttachMoney />,
-            link: 'financies',
-            component: <FinanciesMain {...{ setSelectedLink, link: 'financies'}}/>,
+            title: 'Клиенты',
+            icon: <BsFillPersonVcardFill/>,
+            link: 'clients',
+            component: <ClientTable {...{ setSelectedLink, link: 'clients' }}/>,
           },
           {
-            title: 'Рецепция',
-            icon: <BsReception4 />,
-            link: 'reception/*',
-            component: <ReceptionButtonsList {...{ setSelectedLink, link: 'reception/*' }}/>,
+            title: 'Расписание',
+            icon: <FaCalendarAlt />,
+            link: 'shedule',
+            component:
+            <div>
+            <div>
+            <SetTheme/>
+            </div>
+            <div> 
+            <Scheduler {...{ setSelectedLink, link: 'shedule' }}/>
+            </div>
+            </div>
           },
-          {
-            title: 'Отчеты',
-            icon: <BiSolidReport />,
-            link: 'reports/*',
-            component: <ReportsButtonsList {...{ setSelectedLink, link: 'reports/*' }}/>,
-          },
-      ];
+            {
+              title: 'Выручка',
+              icon: <MdAttachMoney />,
+              link: 'financies',
+              component: <FinanciesMain {...{ setSelectedLink, link: 'financies'}}/>,
+            },
+            {
+              title: 'Рецепция',
+              icon: <BsReception4 />,
+              link: 'reception/*',
+              component: <ReceptionButtonsList {...{ setSelectedLink, link: 'reception/*' }}/>,
+            },
+            {
+              title: 'Отчеты',
+              icon: <BiSolidReport />,
+              link: 'reports/*',
+              component: <ReportsButtonsList {...{ setSelectedLink, link: 'reports/*' }}/>,
+            },
+        );
+      }
 
-      // if (roles.toString() == 'ADMIN') {
-      //   componentsToShow.push(
-      //     {
-      //       title: 'Сотрудники',
-      //       icon: <BsPeopleFill />,
-      //       link: 'service_employees',
-      //       component: <EmployeeTable {...{ setSelectedLink, link: 'service_employees' }} />,
-      //     },
-      //   );
-      // }
-
- return componentsToShow;
-});
-
-//  return componentsToShow; 
-// }, [roles]); - для авторизации
+ return componentsToShow; 
+}, [role]); 
 
     const navigate = useNavigate();
     const theme = useTheme();
@@ -304,22 +354,10 @@ import ReportsButtonsList from "./ReportsButtonsList.js"
           </List>
           <Divider />
           <Box sx={{ mx: 'auto', mt: 3, mb: 1 }}>
-            {/* <Tooltip title={''}>   title либо подписать, либо Tooltip убрать вообще!!!! */} 
-              {/* <StyledBadge
-                overlap="circular"
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                variant="dot"
-              >  */}
-              
-              {/* профиль пользователя */}
-              {/* <Avatar
+              <Avatar
                 sx={{ bgcolor: color!=='dark' ? blue[500] : "null" }}
                 {...(open && { sx: { width: 60, height: 60, bgcolor: color!=='dark' ? blue[500] : "null" }})}
-              >{profileIcon}</Avatar>  */}
-              {/* профиль пользователя */}
-              
-              {/* </StyledBadge> */}
-            {/* </Tooltip> */}
+              >{profileIcon}</Avatar> 
           </Box>
           <Box sx={{ textAlign: 'center' }}>
             {open && <Typography>{}</Typography>}
@@ -327,7 +365,7 @@ import ReportsButtonsList from "./ReportsButtonsList.js"
             {open && (
               <Typography variant="body2">{}</Typography>
             )}
-              {/* <UpdateProfile data={user} fetchUser={fetchUser}/> */}
+              <UpdateProfile data={user} fetchUser={fetchUser}/>
           </Box>
           <Box sx={{ textAlign: 'center' }}>
             {open && <Typography>{}</Typography>}

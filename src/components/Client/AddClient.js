@@ -14,6 +14,7 @@ import {
 } from 'react-international-phone';
 import { PhoneNumberUtil } from 'google-libphonenumber';
 import { useValue } from '../../context/ContextProvider.js';
+import { jwtDecode } from 'jwt-decode';
 
 function AddClient(props){
   const [open, setOpen] = useState(false);
@@ -91,7 +92,16 @@ function AddClient(props){
   const isValid = isPhoneValid(phone);
 
   const handleClickOpen = () => {
-    setOpen(true);
+    if(jwtDecode(sessionStorage.getItem("jwt")).roles.toString() === 'COACH'){
+        dispatch({
+          type: 'UPDATE_ALERT',
+          payload: {
+          open: true,
+          severity: 'error',
+          message: 'Недостаточный уровень доступа. Сотрудник тренерского персонала не имеет прав на добавление информации о новых клиентах (исключительно просмотр)',
+        },});
+      }
+    else{setOpen(true)};
   };
 
   const handleClose = () => {

@@ -107,7 +107,13 @@ const Login = () => {
   };
 
   if (isAuthenticated) {
-    return navigate("dashboard/main");
+    const decodedToken = jwtDecode(sessionStorage.getItem("jwt"))
+    switch(decodedToken.roles.toString()){
+    case 'ADMIN': return navigate("dashboard/main");
+    case 'COACH': return navigate("dashboard/trainings");
+    case 'MANAGER': return navigate("dashboard/memberships");
+    default: return navigate("dashboard/")
+  }
   }
   else {  
     return(

@@ -3,8 +3,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import Select from '@mui/material/Select';
-import { FormControl, InputLabel, MenuItem } from '@mui/material';
+import { FormControl } from '@mui/material';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import { SERVER_URL } from '../../../constants.js';
@@ -14,6 +13,7 @@ import { useValue } from '../../../context/ContextProvider.js';
 import { NumberInput } from '../../../constants.js';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import { jwtDecode } from 'jwt-decode';
 
 function AddTrainingMembership(props){
 
@@ -25,7 +25,7 @@ function AddTrainingMembership(props){
   const [membership, setMembership] = useState({
     visitsAmount: ''
   });
-  const [visitsAmountInputValue, setValue] = React.useState(null);
+  const [visitsAmountInputValue, setValue] = useState(null);
 
   const {
     dispatch,
@@ -47,9 +47,9 @@ const trainingsFilterOptions = createFilterOptions({
   }, []);
 
   const fetchTrainings = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/view_trainings', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setTrainings(data))
@@ -57,9 +57,9 @@ const trainingsFilterOptions = createFilterOptions({
   }
 
     const fetchMemberships = () => {
-        // const token = sessionStorage.getItem("jwt");
+        const token = sessionStorage.getItem("jwt");
         fetch(SERVER_URL + '/api/view_memberships', {
-          // headers: { 'Authorization' : token }
+          headers: { 'Authorization' : token }
         })
         .then(response => response.json())
         .then(data => setMemberships(data))
@@ -67,7 +67,18 @@ const trainingsFilterOptions = createFilterOptions({
       }
 
   const handleClickOpen = () => {
-    setOpen(true);
+    if(jwtDecode(sessionStorage.getItem("jwt")).roles.toString() === 'COACH'){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+        open: true,
+        severity: 'error',
+        message: 'Недостаточный уровень доступа. Сотрудник тренерского персонала не имеет прав на формирование пакетов услуг (исключительно просмотр)',
+      },});
+    }
+    else{
+    setOpen(true)
+    }
   };
     
   const handleClose = () => {

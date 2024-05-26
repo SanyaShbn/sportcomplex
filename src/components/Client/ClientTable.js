@@ -14,6 +14,7 @@ import { grey } from '@mui/material/colors';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useValue } from '../../context/ContextProvider';
+import { jwtDecode } from 'jwt-decode';
 
 function CustomToolbar() {
   return (
@@ -46,9 +47,9 @@ const ClientTable = ({ setSelectedLink, link }) => {
     }, []);
   
     const fetchClients = () => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/clients', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => response.json())
       .then(data => {
@@ -59,16 +60,26 @@ const ClientTable = ({ setSelectedLink, link }) => {
       .catch(err => console.error(err));    
     }
     const onDelClick = (id) => {
-      setDialogOpen(true);
+      if(jwtDecode(sessionStorage.getItem("jwt")).roles.toString() === 'COACH'){
+        dispatch({
+          type: 'UPDATE_ALERT',
+          payload: {
+          open: true,
+          severity: 'error',
+          message: 'Недостаточный уровень доступа. Сотрудник тренерского персонала не имеет прав на редактирование данных клиентов (исключительно просмотр)',
+        },});
+      }else{
+      setDialogOpen(true)
       setRowIdToDelete(id)
+      }
     }
     
     const handleConfirmDelete = (url) => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
     
       fetch(url, {
         method: 'DELETE',
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => {
         if (response.ok) {
@@ -86,12 +97,12 @@ const ClientTable = ({ setSelectedLink, link }) => {
 
     const addClient = (client) => {
 
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
 
       fetch(SERVER_URL + '/api/clients',
         { method: 'POST', headers: {
           'Content-Type':'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
         body: JSON.stringify(client)
       })
@@ -116,14 +127,14 @@ const ClientTable = ({ setSelectedLink, link }) => {
 
     const updateClient = (client, link) => {
 
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
 
       fetch(link,
         { 
           method: 'PUT', 
           headers: {
           'Content-Type':  'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
         body: JSON.stringify(client)
       })

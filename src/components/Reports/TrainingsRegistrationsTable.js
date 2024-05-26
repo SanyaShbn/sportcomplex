@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
       flexDirection: "row" 
     }, 
     tableCol: { 
-      width: "50%", 
+      width: "33.3%", 
       borderStyle: "solid", 
       borderWidth: 1, 
       borderLeftWidth: 0, 
@@ -45,6 +45,9 @@ return (
             <View style={styles.tableCol}> 
               <Text style={styles.tableCell}>Услуга</Text> 
             </View> 
+            <View style={styles.tableCol}> 
+              <Text style={styles.tableCell}>Планируемое количество посещений</Text> 
+            </View> 
         </View> 
           {trainings_registrations.map(trainings_registration => 
             <View style={styles.tableRow}> 
@@ -54,7 +57,10 @@ return (
             </View> 
             <View style={styles.tableCol}> 
                 <Text style={styles.tableCell}>{trainings_registration.training.name}</Text> 
-              </View> 
+            </View> 
+            <View style={styles.tableCol}> 
+                <Text style={styles.tableCell}>{trainings_registration.signingsAmount}</Text> 
+            </View> 
             </View> 
           )}
         </View>

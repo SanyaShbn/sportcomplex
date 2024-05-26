@@ -15,6 +15,7 @@ import { grey } from '@mui/material/colors';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useValue } from '../../../context/ContextProvider.js';
+import { jwtDecode } from 'jwt-decode';
 
 function CustomToolbar() {
   return (
@@ -47,9 +48,9 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
     }, []);
   
     const fetchClientTrainings = () => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/clientTrainings', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => response.json())
       .then(data => {
@@ -61,17 +62,29 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
     }
 
     const onDelClick = (id) => {
+      if(jwtDecode(sessionStorage.getItem("jwt")).roles.toString() === 'MANAGER'){
+        dispatch({
+          type: 'UPDATE_ALERT',
+          payload: {
+          open: true,
+          severity: 'error',
+          message: 'Недостаточный уровень доступа. Менеджер по клиентам не имеет прав на удаление информации о согласованных занятиях (исключительно просмотр)',
+        },});
+      }
+      else{
       setDialogOpen(true);
       setRowIdToDelete(id)
+      }
     }
 
     const handleConfirmDelete = (id) => {
 
-        // const token = sessionStorage.getItem("jwt");
+        const token = sessionStorage.getItem("jwt")
+        const decodedToken = jwtDecode(token)
 
-        fetch(SERVER_URL + '/api/deleteClientTrainings?id=' + id.slice(id.lastIndexOf("/") + 1), {
+        fetch(SERVER_URL + '/api/deleteClientTrainings?id=' + id.slice(id.lastIndexOf("/") + 1) + "&userLogin=" + decodedToken.sub, {
           method: 'DELETE',
-          // headers: { 'Authorization' : token }
+          headers: { 'Authorization' : token }
           })
         .then(response => {
           if (response.ok) {
@@ -79,7 +92,14 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
             setDelOpen(true);
           }
           else {
-            alert('Что-то пошло не так!');
+            dispatch({
+              type: 'UPDATE_ALERT',
+              payload: {
+                open: true,
+                severity: 'error',
+                message: 'Недостаточный уровень доступа. Сотрудник тренерского персонала имеет право редактировать данные о согласовании проводимых лично им занятий',
+              },
+            });
           }
           setDialogOpen(false)
         })
@@ -87,14 +107,16 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
 
 }
 
-    const addClientTraining = (trainingId, clientId) => {
+    const addClientTraining = (trainingId, clientId, signingsAmount) => {
 
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt")
+      const decodedToken = jwtDecode(token)
 
-      fetch(SERVER_URL + '/api/save_client_training?trainingId=' + trainingId + "&clientId=" + clientId,
+      fetch(SERVER_URL + '/api/save_client_training?trainingId=' + trainingId + "&clientId=" + clientId + "&signingsAmount=" + signingsAmount
+      + "&userLogin=" + decodedToken.sub,
         { method: 'POST', headers: {
           'Content-Type':'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
       })
       .then(response => {
@@ -121,7 +143,7 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
               payload: {
                 open: true,
                 severity: 'error',
-                message: 'Выбранный клиент уже записан на соответствующую выбранную тренировку. Проверьте корректность ввода данных',
+                message: 'Выбранный клиент уже записан на соответствующую выбранную тренировку. Вы можете лишь изменить количество занятий, на которое данный клиент записан',
               },
             });
           }
@@ -136,7 +158,41 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
                 },
               });
             }else{
-            dispatch({
+              if(response.status === 401){
+                dispatch({
+                  type: 'UPDATE_ALERT',
+                  payload: {
+                    open: true,
+                    severity: 'error',
+                    message: 'Для записи на выбранную тренировку у выбранного клиента нет оснований '
+                     + '(клиенту необходимо приобрести абонемент, который включает в себя выбранную услугу)',
+                  },
+                });
+              }
+            else{
+              if(response.status === 402){
+                dispatch({
+                  type: 'UPDATE_ALERT',
+                  payload: {
+                    open: true,
+                    severity: 'error',
+                    message: 'Планируемое количество посещений клиентом данного тренировочного занятия превышает включенное в приобретенный клиентом абонемент количество посещений',
+                  },
+                });
+              }
+              else{
+                if(response.status === 404){
+                  dispatch({
+                    type: 'UPDATE_ALERT',
+                    payload: {
+                      open: true,
+                      severity: 'error',
+                      message: 'Недостаточный уровень доступа. Сотрудник тренерского персонала имеет право согласовывать только проводимые лично им занятия',
+                    },
+                  });
+                }
+              else{
+              dispatch({
               type: 'UPDATE_ALERT',
               payload: {
                 open: true,
@@ -144,6 +200,9 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
                 message: 'Не удалось добавить новую запись. Проверьте корректность ввода данных!',
               },});
             }
+            }
+            }
+          }
           }
         }
       })
@@ -151,16 +210,18 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
     }
   
 
-    const updateClientTraining = (link, trainingId, clientId) => {
+    const updateClientTraining = (link, trainingId, clientId, signingsAmount) => {
 
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt")
+      const decodedToken = jwtDecode(token)
 
-      fetch(link + '?trainingId=' + trainingId + "&clientId=" + clientId ,
+      fetch(link + '?trainingId=' + trainingId + "&clientId=" + clientId + "&signingsAmount=" + signingsAmount
+       + "&userLogin=" + decodedToken.sub,
         { 
           method: 'PUT', 
           headers: {
           'Content-Type':  'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
       })
       .then(response => {
@@ -187,7 +248,7 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
               payload: {
                 open: true,
                 severity: 'error',
-                message: 'Выбранный клиент уже записан на соответствующую выбранную тренировку. Проверьте корректность ввода данных',
+                message: 'Выбранный клиент уже записан на соответствующую выбранную тренировку. Вы можете лишь изменить количество занятий, на которое данный клиент записан',
               },
             });
           }
@@ -202,14 +263,51 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
                 },
               });
             }else{
-            dispatch({
-              type: 'UPDATE_ALERT',
-              payload: {
-                open: true,
-                severity: 'error',
-                message: 'Не удалось сохранить изменения. Проверьте корректность ввода данных',
-              },});
+              if(response.status === 401){
+                dispatch({
+                  type: 'UPDATE_ALERT',
+                  payload: {
+                    open: true,
+                    severity: 'error',
+                    message: 'Для записи на выбранную тренировку у выбранного клиента нет оснований '
+                     + '(клиенту необходимо приобрести абонемент, который включает в себя выбранную услугу)',
+                  },
+                });
+              }
+              else{
+                if(response.status === 402){
+                  dispatch({
+                    type: 'UPDATE_ALERT',
+                    payload: {
+                      open: true,
+                      severity: 'error',
+                      message: 'Планируемое количество посещений клиентом данного тренировочного занятия превышает включенное в приобретенный клиентом абонемент количество посещений',
+                    },
+                  });
+                }
+                else{
+                  if(response.status === 404){
+                    dispatch({
+                      type: 'UPDATE_ALERT',
+                      payload: {
+                        open: true,
+                        severity: 'error',
+                        message: 'Недостаточный уровень доступа. Сотрудник тренерского персонала имеет право редактировать данные о согласовании проводимых лично им занятий',
+                      },
+                    });
+                  }
+                  else{
+                    dispatch({
+                    type: 'UPDATE_ALERT',
+                    payload: {
+                      open: true,
+                      severity: 'error',
+                      message: 'Не удалось сохранить изменения. Проверьте корректность ввода данных',
+                    },});
+                  }
+                }
             }
+          }
           }
         }
       })
@@ -217,11 +315,11 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
     }
      
     const fetchTrainings = async (url) => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       try {
         const config = {
           headers: {
-            // 'Authorization' : token
+            'Authorization' : token
           }
         };
         const response = await axios.get(url, config);
@@ -233,11 +331,11 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
     };
 
     const fetchClients = async (url) => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
         try {
           const config = {
             headers: {
-              // 'Authorization' : token
+              'Authorization' : token
             }
           };
           const response = await axios.get(url, config);
@@ -251,14 +349,15 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
 
 
     const columns = [
-      {field: 'client', headerName: 'Клиент, записываемый на тренировку', width: 600},
-      {field: 'training', headerName: 'Тренировка', width: 580},
+      {field: 'client', headerName: 'Клиент, записываемый на тренировку', width: 480},
+      {field: 'training', headerName: 'Тренировка', width: 350},
+      {field: 'signingsAmount', headerName: 'Планируемое количество посещений', width: 310},
       {
         field: '_links.client_training.href', 
         headerName: '', 
         sortable: false,
         filterable: false,
-        width: 100,
+        width: 80,
         renderCell: row => <EditClientTraining
                               data={row} 
                               updateClientTraining={updateClientTraining} />
@@ -266,7 +365,7 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
       {
         field: '_links.self.href', 
         headerName: '', 
-        width:120,
+        width: 80,
         sortable: false,
         filterable: false,
         renderCell: row => 
@@ -308,6 +407,7 @@ const ClientTrainingTable =({ setSelectedButtonLink, link }) => {
       const updateRows = async () => {
         const updatedRows = await Promise.all(client_trainings.map(async client_training => ({
           id: client_training._links.clientTraining.href,
+          signingsAmount: client_training.signingsAmount,
           client: await fetchClients(client_training._links.client.href),
           training: await fetchTrainings(client_training._links.training.href),
         })));

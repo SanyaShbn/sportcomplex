@@ -48,9 +48,9 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
     }, []);
   
     const fetchFacilities = () => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/complexFacilities', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => response.json())
       .then(data => {
@@ -67,10 +67,11 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
     }
 
     const fetchCleaner = async (url) => {
+      const token = sessionStorage.getItem("jwt");
       try {
         const config = {
           headers: {
-            // 'Authorization' : token
+            'Authorization' : token
           }
         };
         const response = await axios.get(url, config);
@@ -82,11 +83,11 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
     };
     
     const handleConfirmDelete = (url, trainingsAmount) => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
     
       fetch(url, {
         method: 'DELETE',
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => {
         if (response.ok) {
@@ -115,12 +116,12 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
     const addFacility = (facility, cleanerId) => {
       
       cleanerId = cleanerId.length === 0 ? 0: cleanerId
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
 
       fetch(SERVER_URL + '/api/save_complex_facility?cleanerId=' + cleanerId,
         { method: 'POST', headers: {
           'Content-Type':'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
         body: JSON.stringify(facility)
       })
@@ -148,7 +149,7 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
 
     const updateFacility = (facility, link, cleanerId) => {
       const facilityProperties = [facility.name, facility.capacity];
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       if(typeof cleanerId !== 'undefined'){
       cleanerId = cleanerId.length === 0 ? 0: cleanerId
       }else{cleanerId = 0}
@@ -157,7 +158,7 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
           method: 'PUT', 
           headers: {
           'Content-Type':  'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
         body: JSON.stringify(facilityProperties)
       })

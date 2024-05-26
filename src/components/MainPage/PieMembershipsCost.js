@@ -33,9 +33,9 @@ const renderCustomizedLabel = ({
 export default function PieMembershipsCost() {
   const [memberships, setMemberships] = useState([]);
   const fetchMemberships = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/sportComplexMemberships', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setMemberships(data._embedded.sportComplexMemberships))

@@ -29,9 +29,9 @@ for (let i = 0; i < months; i++) {
 }
 
 const fetchClientMemberships = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/clientMemberships', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setClientMemberships(data._embedded.clientMemberships))
@@ -57,7 +57,7 @@ const fetchClientMemberships = () => {
   }, [client_memberships, months]);
 
   return (
-    <div style={{ width: '100%', height: 250, minWidth: 250 }}>
+    <div style={{ width: '100%', height: 500, minWidth: 250 }}>
       <ResponsiveContainer>
         <AreaChart
           data={data}

@@ -3,8 +3,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import Select from '@mui/material/Select';
-import { FormControl, InputLabel, MenuItem } from '@mui/material';
+import { FormControl } from '@mui/material';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import { SERVER_URL } from '../../../constants.js';
@@ -13,7 +12,8 @@ import '../../CSS/table.css';
 import { useValue } from '../../../context/ContextProvider.js';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-
+import { NumberInput } from '../../../constants.js';
+import { jwtDecode } from 'jwt-decode';
 
 function AddClientTraining(props){
 
@@ -22,6 +22,7 @@ function AddClientTraining(props){
   const [clients, setClients] = useState([]);
   const [trainings, setTrainings] = useState([]);
   const [open, setOpen] = useState(false);
+  const [signingsAmountInputValue, setValue] = useState(null);
   const {
     dispatch,
   } = useValue();
@@ -43,9 +44,9 @@ function AddClientTraining(props){
   });
 
   const fetchTrainings = () => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/view_trainings', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => response.json())
       .then(data => setTrainings(data))
@@ -53,9 +54,9 @@ function AddClientTraining(props){
     }
 
     const fetchClients = () => {
-        // const token = sessionStorage.getItem("jwt");
+        const token = sessionStorage.getItem("jwt");
         fetch(SERVER_URL + '/api/view_clients', {
-          // headers: { 'Authorization' : token }
+          headers: { 'Authorization' : token }
         })
         .then(response => response.json())
         .then(data => setClients(data))
@@ -63,15 +64,27 @@ function AddClientTraining(props){
       }
 
   const handleClickOpen = () => {
+    if(jwtDecode(sessionStorage.getItem("jwt")).roles.toString() === 'MANAGER'){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+        open: true,
+        severity: 'error',
+        message: 'Недостаточный уровень доступа. Менеджер по клиентам не имеет прав на согласование занятий (исключительно просмотр)',
+      },});
+    }
+    else{
     fetchTrainings();
     fetchClients();
     setOpen(true);
+    }
   };
     
   const handleClose = () => {
     setOpen(false)
     setClientId('')
     setTrainingId('')
+    setValue('')
   };
 
   const handleSave = () => {
@@ -85,9 +98,20 @@ function AddClientTraining(props){
         },});
     }
     else{
-    props.addClientTraining(trainingId, clientId);
+      if(signingsAmountInputValue < 1){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Проверьте корректность ввода данных! Планируемое количество посещений не может принимать значение менее 1',
+        },});
+    }
+  else{
+    props.addClientTraining(trainingId, clientId, signingsAmountInputValue);
     handleClose();
     }
+  }
   }
 
   return (
@@ -99,6 +123,11 @@ function AddClientTraining(props){
       <DialogTitle className='dialog'>Новая продажа услуги</DialogTitle>
       <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
+            <NumberInput
+            label="Планируемое количество посещений"
+            placeholder="Планируемое количество посещений"
+            variant="standard" value={signingsAmountInputValue} 
+            onChange={(event, val) => setValue(val)}/>
             <FormControl fullWidth>
             <Autocomplete
             options={trainings}

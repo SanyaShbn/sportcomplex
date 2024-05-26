@@ -2,7 +2,7 @@ import React from 'react';
 import { MenuItem, FormControl, InputLabel, Select } from '@mui/material';
 
 const MonthsDropdown = ({ onChange }) => {
-  const options = [3, 6, 9, 12]; // Available month options
+  const options = [3, 6, 9, 12]; 
 
   return (
     <FormControl fullWidth>

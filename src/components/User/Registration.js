@@ -60,7 +60,7 @@ const Registration = (props) => {
       handleClickOpen()
     }
     else if(updated_user.status === "active"){
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       updated_user = { ...updated_user, status: "blocked" };
       props.data.row.status = "blocked"
       fetch(SERVER_URL + "/api/account_managing",
@@ -68,7 +68,7 @@ const Registration = (props) => {
           method: 'POST', 
           headers: {
           'Content-Type':  'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
         body: JSON.stringify(updated_user)
       })
@@ -90,7 +90,7 @@ const Registration = (props) => {
       .catch(err => console.error(err))
     }
     else if(updated_user.status === "blocked"){
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       updated_user = { ...updated_user, status: "active" };
       props.data.row.status = "active"
       fetch(SERVER_URL + "/api/account_managing",
@@ -98,7 +98,7 @@ const Registration = (props) => {
           method: 'POST', 
           headers: {
           'Content-Type':  'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
         body: JSON.stringify(updated_user)
       })

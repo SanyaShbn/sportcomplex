@@ -5,14 +5,15 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
-import Select from '@mui/material/Select';
 import { SERVER_URL } from '../../../constants.js';
-import {FormControl, InputLabel, MenuItem} from '@mui/material';
+import {FormControl } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import { useValue } from '../../../context/ContextProvider.js';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import { NumberInput } from '../../../constants.js';
+import { jwtDecode } from 'jwt-decode';
 
 function EditClientTraining(props) {
 
@@ -27,6 +28,7 @@ function EditClientTraining(props) {
     const {
       dispatch,
     } = useValue();
+    const [signingsAmountInputValue, setValue] = useState(null);
 
     const clientsFilterOptions = createFilterOptions({
       matchFrom: 'any',
@@ -45,9 +47,9 @@ function EditClientTraining(props) {
   }, []);
 
   const fetchTrainings = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/view_trainings', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setTrainings(data))
@@ -55,9 +57,9 @@ function EditClientTraining(props) {
   }
 
   const fetchClients = () => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/view_clients', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => response.json())
       .then(data => setClients(data))
@@ -65,6 +67,16 @@ function EditClientTraining(props) {
     }
 
   const handleClickOpen = () => {  
+    if(jwtDecode(sessionStorage.getItem("jwt")).roles.toString() === 'MANAGER'){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+        open: true,
+        severity: 'error',
+        message: 'Недостаточный уровень доступа. Менеджер по клиентам не имеет прав на согласование занятий (исключительно просмотр)',
+      },});
+    }
+    else{
     let id_client = props.data.row.client.slice(props.data.row.client.indexOf("№") + 1, props.data.row.client.indexOf(":"))
     let id_training = props.data.row.training.slice(props.data.row.training.indexOf("№") + 1, props.data.row.training.indexOf("."))
     setClientId(parseInt(id_client))
@@ -73,9 +85,11 @@ function EditClientTraining(props) {
       client: parseInt(id_client),
       training: parseInt(id_training),
      })     
+    setValue(props.data.row.signingsAmount)
     fetchTrainings();
     fetchClients();
     setOpen(true);
+    }
   }
 
   const handleClose = () => {
@@ -95,9 +109,20 @@ function EditClientTraining(props) {
         },});
     }
     else{
-    props.updateClientTraining(props.data.id, trainingId, clientId);
+      if(signingsAmountInputValue < 1){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Проверьте корректность ввода данных! Планируемое количество посещений не может принимать значение менее 1',
+        },});
+    }
+    else{
+    props.updateClientTraining(props.data.id, trainingId, clientId, signingsAmountInputValue);
     handleClose();
     }
+  }
   }
 
   return(
@@ -110,6 +135,11 @@ function EditClientTraining(props) {
           <DialogContent className='dialog'>
         <Stack spacing={2} mt={1}>
         <FormControl fullWidth>
+            <NumberInput
+            label="Планируемое количество посещений"
+            placeholder="Планируемое количество посещений"
+            variant="standard" value={signingsAmountInputValue} 
+            onChange={(event, val) => setValue(val)}/>
             <Autocomplete
             options={trainings}
             noOptionsText="Тренировки не найдены"

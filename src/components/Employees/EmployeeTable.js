@@ -45,9 +45,9 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
     }, []);
   
     const fetchUsers = () => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/users', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => response.json())
       .then(data => {
@@ -67,11 +67,11 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
 
     const handleConfirmDelete  = (url) => {
 
-        // const token = sessionStorage.getItem("jwt");
+        const token = sessionStorage.getItem("jwt");
 
         fetch(url, {
           method: 'DELETE',
-          // headers: { 'Authorization' : token }
+          headers: { 'Authorization' : token }
           })
         .then(response => {
           if (response.ok) {
@@ -88,11 +88,11 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
 
 
     const handleConfirmDeleteCoachOrCleaner = (id, role) => {
-        // const token = sessionStorage.getItem("jwt");
+        const token = sessionStorage.getItem("jwt");
 
         fetch(SERVER_URL + '/api/delete_coach_or_cleaner?employee_id=' + id.slice(id.lastIndexOf('/') + 1), {
           method: 'DELETE',
-          // headers: { 'Authorization' : token }
+          headers: { 'Authorization' : token }
           })
         .then(response => {
           if (response.ok) {
@@ -126,12 +126,12 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
 
     const addEmployee = (user) => {
 
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
 
       fetch(SERVER_URL + '/api/users',
         { method: 'POST', headers: {
           'Content-Type':'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
         body: JSON.stringify(user)
       })
@@ -159,14 +159,14 @@ const EmployeeTable = ({ setSelectedLink, link }) => {
       let url
       user.role === 'MANAGER' ? url = link : 
       url = SERVER_URL + '/api/update_coach_or_cleaner?employee_id=' + link.slice(link.lastIndexOf('/') + 1)
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
 
       fetch(url,
         { 
           method: 'PUT', 
           headers: {
           'Content-Type':  'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
         body: JSON.stringify(user)
       })

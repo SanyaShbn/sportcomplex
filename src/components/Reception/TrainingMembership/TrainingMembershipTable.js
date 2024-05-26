@@ -15,6 +15,7 @@ import { grey } from '@mui/material/colors';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useValue } from '../../../context/ContextProvider.js';
+import { jwtDecode } from 'jwt-decode';
 
 function CustomToolbar() {
   return (
@@ -47,9 +48,9 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
     }, []);
   
     const fetchTrainingMemberships = () => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/trainingMemberships', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => response.json())
       .then(data => {
@@ -61,17 +62,27 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
     }
 
     const onDelClick = (id) => {
-      setDialogOpen(true);
-      setRowIdToDelete(id)
+      if(jwtDecode(sessionStorage.getItem("jwt")).roles.toString() === 'COACH'){
+        dispatch({
+          type: 'UPDATE_ALERT',
+          payload: {
+          open: true,
+          severity: 'error',
+          message: 'Недостаточный уровень доступа. Сотрудник тренерского персонала не имеет прав на редактирование информации о пакетах услуг (исключительно просмотр)',
+        },});
+      }
+      else{
+      setDialogOpen(true)
+      setRowIdToDelete(id)}
     }
 
     const handleConfirmDelete = (id) => {
 
-        // const token = sessionStorage.getItem("jwt");
+        const token = sessionStorage.getItem("jwt");
 
         fetch(SERVER_URL + '/api/deleteTrainingMembership?id=' + id.slice(id.lastIndexOf("/") + 1), {
           method: 'DELETE',
-          // headers: { 'Authorization' : token }
+          headers: { 'Authorization' : token }
           })
         .then(response => {
           if (response.ok) {
@@ -89,12 +100,12 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
 
     const addTrainingMembership = (membership, trainingId, membershipId) => {
 
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
 
       fetch(SERVER_URL + '/api/save_training_membership?trainingId=' + trainingId + "&membershipId=" + membershipId,
         { method: 'POST', headers: {
           'Content-Type':'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
         body: JSON.stringify(membership)
       })
@@ -104,7 +115,18 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
           setAddOpen(true)
         }
         else {
-          dispatch({
+          if(response.status === 400){
+            dispatch({
+              type: 'UPDATE_ALERT',
+              payload: {
+                open: true,
+                severity: 'error',
+                message: 'Выбранная услуга уже включена в выбранный абонемент. Проверьте корректность ввода данных',
+              },
+            });
+          }
+          else{
+            dispatch({
             type: 'UPDATE_ALERT',
             payload: {
               open: true,
@@ -112,6 +134,7 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
               message: 'Не удалось добавить новую запись. Проверьте корректность ввода данных!',
             },});
         }
+      }
       })
       .catch(err => console.error(err))
     }
@@ -119,14 +142,14 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
 
     const updateTrainingMembership = (link, trainingId, membershipId, updatedVisitsAmount) => {
 
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
 
       fetch(link + '?trainingId=' + trainingId + "&membershipId=" + membershipId + "&visitsAmount=" + updatedVisitsAmount,
         { 
           method: 'PUT', 
           headers: {
           'Content-Type':  'application/json',
-          // 'Authorization' : token
+          'Authorization' : token
         },
       })
       .then(response => {
@@ -135,7 +158,18 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
           setEditOpen(true)
         }
         else {
+          if(response.status === 400){
           dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'error',
+              message: 'Выбранная услуга уже включена в выбранный абонемент. Проверьте корректность ввода данных',
+            },
+          });
+        }
+          else{
+            dispatch({
             type: 'UPDATE_ALERT',
             payload: {
               open: true,
@@ -143,16 +177,17 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
               message: 'Не удалось сохранить изменения. Проверьте корректность ввода данных',
             },});
         }
+      }
       })
       .catch(err => console.error(err))
     }
      
     const fetchTrainings = async (url) => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       try {
         const config = {
           headers: {
-            // 'Authorization' : token
+            'Authorization' : token
           }
         };
         const response = await axios.get(url, config);
@@ -165,11 +200,11 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
     };
 
     const fetchMemberships = async (url) => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
         try {
           const config = {
             headers: {
-              // 'Authorization' : token
+              'Authorization' : token
             }
           };
           const response = await axios.get(url, config);

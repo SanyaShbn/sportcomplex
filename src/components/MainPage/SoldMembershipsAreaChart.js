@@ -29,9 +29,9 @@ for (let i = 0; i < months; i++) {
 }
 
 const fetchClientMemberships = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/clientMemberships', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => setClientMemberships(data._embedded.clientMemberships))

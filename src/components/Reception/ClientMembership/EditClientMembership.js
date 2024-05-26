@@ -5,14 +5,14 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
-import Select from '@mui/material/Select';
 import { SERVER_URL } from '../../../constants.js';
-import {FormControl, InputLabel, MenuItem} from '@mui/material';
+import {FormControl } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import { useValue } from '../../../context/ContextProvider.js';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import { jwtDecode } from 'jwt-decode';
 
 function EditClientMembership(props) {
 
@@ -45,9 +45,9 @@ function EditClientMembership(props) {
     }, []);
   
     const fetchClients = () => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/view_clients', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
       })
       .then(response => response.json())
       .then(data => setClients(data))
@@ -55,9 +55,9 @@ function EditClientMembership(props) {
     }
   
     const fetchMemberships = () => {
-      // const token = sessionStorage.getItem("jwt");
+      const token = sessionStorage.getItem("jwt");
       fetch(SERVER_URL + '/api/view_memberships', {
-        // headers: { 'Authorization' : token }
+        headers: { 'Authorization' : token }
        })
       .then(response => response.json())
       .then(data => setMemberships(data))
@@ -65,6 +65,16 @@ function EditClientMembership(props) {
     }
 
     const handleClickOpen = () => {  
+      if(jwtDecode(sessionStorage.getItem("jwt")).roles.toString() === 'COACH'){
+        dispatch({
+          type: 'UPDATE_ALERT',
+          payload: {
+          open: true,
+          severity: 'error',
+          message: 'Недостаточный уровень доступа. Сотрудник тренерского персонала не имеет прав на редактирование информации о продажах абонементов (исключительно просмотр)',
+        },});
+      }
+      else{
       let id_client = props.data.row.client.slice(props.data.row.client.indexOf("№") + 1, props.data.row.client.indexOf(":"))
       let id_membership = props.data.row.sportComplexMembership.slice(props.data.row.sportComplexMembership.indexOf("№") + 1, 
       props.data.row.sportComplexMembership.indexOf(":"))
@@ -75,6 +85,7 @@ function EditClientMembership(props) {
         client: parseInt(id_client),
        })  
       setOpen(true);
+      }
     }
 
   const handleClose = () => {

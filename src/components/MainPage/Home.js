@@ -34,9 +34,9 @@ const Home = ({ setSelectedLink, link }) => {
   const [selectedMonths, setSelectedMonths] = useState(3);
 
   const fetchUsers = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/users', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => {
@@ -49,9 +49,9 @@ const Home = ({ setSelectedLink, link }) => {
     .catch(err => console.error(err));    
   }
   const fetchMemberships = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/sportComplexMemberships', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => {
@@ -61,9 +61,9 @@ const Home = ({ setSelectedLink, link }) => {
     .catch(err => console.error(err));    
   }
   const fetchClients = () => {
-    // const token = sessionStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/clients', {
-      // headers: { 'Authorization' : token }
+      headers: { 'Authorization' : token }
     })
     .then(response => response.json())
     .then(data => {
@@ -81,11 +81,11 @@ const Home = ({ setSelectedLink, link }) => {
 
   return (
     <main className='main-container'>
-    {/* {isLoading ? (
+    {isLoading ? (
       <Backdrop open={true} sx={{ zIndex: (theme) => theme.zIndex.modal + 1 }}>
         <CircularProgress sx={{ color: 'white' }} />
       </Backdrop>
-    ):( */}
+    ):(
         <>
         <div className='main-cards'>
           
@@ -158,7 +158,7 @@ const Home = ({ setSelectedLink, link }) => {
         </Box>
         </div>
         </>
-  {/* )} */}
+  )} 
     </main>
   )
 }

@@ -16,6 +16,7 @@ import {
   usePhoneInput
 } from 'react-international-phone';
 import { PhoneNumberUtil } from 'google-libphonenumber';
+import { jwtDecode } from 'jwt-decode';
 
 function EditClient(props) {
   const [open, setOpen] = useState(false);
@@ -93,6 +94,16 @@ function EditClient(props) {
   const isValid = isPhoneValid(phone);
     
   const handleClickOpen = () => {
+    if(jwtDecode(sessionStorage.getItem("jwt")).roles.toString() === 'COACH'){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+        open: true,
+        severity: 'error',
+        message: 'Недостаточный уровень доступа. Сотрудник тренерского персонала не имеет прав на редактирование данных клиентов (исключительно просмотр)',
+      },});
+    }
+  else{
     setClient({
       firstName: props.data.row.firstName,
       surName: props.data.row.surName,
@@ -102,6 +113,7 @@ function EditClient(props) {
       birthDate: props.data.row.birthDate
      })      
     setOpen(true);
+  }
   }
 
   const handleClose = () => {
