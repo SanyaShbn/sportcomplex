@@ -29,7 +29,6 @@ Font.register({
 const styles = StyleSheet.create({
     page: {
       flexDirection: 'column',
-      backgroundColor: '#E4E4E4',
       alignItems: 'stretch',
       paddingBottom: 60,
       paddingTop: 30

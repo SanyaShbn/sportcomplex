@@ -135,7 +135,9 @@ function EditTraining(props) {
     setIsNameError(false)
   };
   const handleSave = () => {
-    if(training.name.length === 0 | coachId === '' | complexFacilityId === ''){
+    if(training.name.length === 0 | typeof coachId === 'undefined' || typeof complexFacilityId === 'undefined'
+    || coachId === '' || complexFacilityId === ''
+    ){
       dispatch({
         type: 'UPDATE_ALERT',
         payload: {
@@ -213,6 +215,7 @@ function EditTraining(props) {
             <FormControl fullWidth>
             <FormLabel id="demo-radio-buttons-group-label">Тип занятия</FormLabel>
             <RadioGroup
+              required
               aria-labelledby="demo-radio-buttons-group-label"
               value={training.type}
               name="radio-buttons-group"
@@ -231,6 +234,7 @@ function EditTraining(props) {
          <FormControl fullWidth sx={{ m: 1 }}>
          <InputLabel error={isCostError} htmlFor="outlined-adornment-amount">Стоимость (бел.руб.)</InputLabel>
           <OutlinedInput
+            required
             error={isCostError}
             id="outlined-adornment-amount"
             value={costInputValue}
@@ -242,7 +246,6 @@ function EditTraining(props) {
           <FormControl fullWidth>
             <Autocomplete
             options={facilities}
-            
             noOptionsText="Сооружения не найдены"
             getOptionLabel={(option) => "Сооружение №" + option.idComplexFacility + ": " + option.name}
             value={facilities.find(facility => facility.idComplexFacility === complexFacilityId)}
@@ -250,7 +253,7 @@ function EditTraining(props) {
              setComplexFacilityId(newValue?.idComplexFacility);
             }}
             filterOptions={facilitiesFilterOptions}
-            renderInput={(params) => <TextField {...params} label="Место проведения" variant="standard" 
+            renderInput={(params) => <TextField required {...params} label="Место проведения" variant="standard" 
             InputProps={{
               ...params.InputProps,
               style: { width: 'auto', minWidth: '300px' },
@@ -268,7 +271,7 @@ function EditTraining(props) {
              setCoachId(newValue?.userId);
             }}
             filterOptions={coachesFilterOptions}
-            renderInput={(params) => <TextField {...params} label="Тренер" variant="standard" 
+            renderInput={(params) => <TextField required {...params} label="Тренер" variant="standard" 
             InputProps={{
               ...params.InputProps,
               style: { width: 'auto', minWidth: '300px' },

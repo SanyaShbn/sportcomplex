@@ -4,6 +4,14 @@
     width: 90vw;
 }
 
+.dhx_cal_cover {
+    z-index: 9998 !important;
+}
+
+.scheduler_modal_box{
+    z-index: 9999 !important;
+}
+
 .dhtmlx_popup_text {
     width: 500px;
 }
@@ -13,10 +21,6 @@
 .scheduler-alert,
 .dhtmlx-alert {
 width: 500px !important;
-}
-
-.dhtmlx_ok_button {
-    width: 180px !important;
 }
 
 .dhtmlx_cancel_button {

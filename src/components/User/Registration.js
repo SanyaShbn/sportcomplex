@@ -255,7 +255,7 @@ const Registration = (props) => {
             right: 8,
             color: (theme) => theme.palette.grey[500],
           }}
-          onClick={handleClose}
+          onClick={handleCloseAndSwitchOff}
         >
           <Close />
         </IconButton>

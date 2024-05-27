@@ -153,6 +153,16 @@ function UpdateProfile(props){
     }
   };
 
+  const ClearLocalStorage = () => {
+    const reportData = JSON.parse(localStorage.getItem('reportData'));
+    reportData.title = ''
+    reportData.subject = ''
+    reportData.textContent = ''
+    reportData.option = ''
+    localStorage.removeItem('reportData')
+    localStorage.setItem('reportData', JSON.stringify(reportData))
+  }
+
   const updateAdmin = () => {
     if(user.firstName.length === 0 | user.surName.length === 0 | user.patrSurName.length === 0
       | user.email.length === 0){
@@ -213,10 +223,20 @@ function UpdateProfile(props){
         handleClose()
         props.fetchUser()
         if(password !== '' || user.userLogin !== props.data.userLogin){
-        dispatch({ type: 'START_LOADING' });
-        sessionStorage.setItem("jwt", "");
-        navigate("/", { replace: true })
-        dispatch({ type: 'END_LOADING' });
+          dispatch({ type: 'START_LOADING' });
+          sessionStorage.setItem("jwt", "");
+          ClearLocalStorage()
+          navigate("/", { replace: true });
+          dispatch({ type: 'END_LOADING' });
+        }
+        else{
+          dispatch({
+            type: 'UPDATE_ALERT',
+            payload: {
+              open: true,
+              severity: 'success',
+              message: 'Данные учетной записи успешно обновлены',
+            },});
         }
       }
     })

@@ -212,9 +212,12 @@ export default class ScheduleCalendar extends Component {
                     }).catch(error => console.error(error))
                     } else {
                         if (event.data_type === "тренировочное занятие") {
-                            url = SERVER_URL + '/api/view_trainings_for_scheduler';
+                            url = SERVER_URL + '/api/view_trainings_for_scheduler'
                         } else if (event.data_type === "уборка и обслуживание") {
-                            url = SERVER_URL + '/api/view_cleaned_facilities';
+                            url = SERVER_URL + '/api/view_cleaned_facilities'
+                        } else{
+                            event.data_type = "тренировочное занятие"
+                            url = SERVER_URL + '/api/view_trainings_for_scheduler'
                         }
                         fetch(url, {
                             headers: {
@@ -354,7 +357,7 @@ export default class ScheduleCalendar extends Component {
         });
   }
   
-  componentDidMount() {
+  async componentDidMount() {
     const token = sessionStorage.getItem("jwt")
     const decodedToken = jwtDecode(token)
     var events
@@ -444,7 +447,7 @@ export default class ScheduleCalendar extends Component {
             ];
         })
           .catch(err => console.error(err));    
-          })
+        })
     .catch(err => console.error(err));
 
     scheduler.config.header = [

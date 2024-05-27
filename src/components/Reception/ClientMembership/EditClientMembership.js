@@ -93,7 +93,7 @@ function EditClientMembership(props) {
   };
  
   const handleSave = () => {
-    if(clientId === '' | membershipId === ''){
+    if(clientId === '' || membershipId === '' || typeof clientId === 'undefined' || typeof membershipId === 'undefined'){
       dispatch({
         type: 'UPDATE_ALERT',
         payload: {

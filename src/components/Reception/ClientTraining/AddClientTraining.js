@@ -88,7 +88,7 @@ function AddClientTraining(props){
   };
 
   const handleSave = () => {
-    if(clientId === '' | trainingId === ''){
+    if(clientId === '' || trainingId === '' || typeof clientId === 'undefined' || typeof trainingId === 'undefined'){
       dispatch({
         type: 'UPDATE_ALERT',
         payload: {

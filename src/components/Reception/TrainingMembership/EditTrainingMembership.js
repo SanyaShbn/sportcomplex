@@ -95,7 +95,7 @@ function EditTrainingMembership(props) {
   };
  
   const handleSave = () => {
-    if(trainingId === '' | membershipId === ''){
+    if(trainingId === '' || membershipId === '' || typeof membershipId === 'undefined' || typeof trainingId === 'undefined'){
       dispatch({
         type: 'UPDATE_ALERT',
         payload: {

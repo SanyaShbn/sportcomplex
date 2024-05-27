@@ -92,7 +92,7 @@ const trainingsFilterOptions = createFilterOptions({
   };
 
   const handleSave = () => {
-    if(trainingId === '' | membershipId.length === ''){
+    if(trainingId === '' || membershipId === '' || typeof membershipId === 'undefined' || typeof trainingId === 'undefined'){
       dispatch({
         type: 'UPDATE_ALERT',
         payload: {
