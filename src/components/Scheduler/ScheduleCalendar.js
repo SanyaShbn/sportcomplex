@@ -9,7 +9,8 @@ const scheduler = window.scheduler
 scheduler.plugins({
     recurring: true,
     editors: true,
-    readonly: true
+    readonly: true, 
+    collision: true
 });
 
 export default class ScheduleCalendar extends Component {
@@ -22,13 +23,20 @@ export default class ScheduleCalendar extends Component {
 
         const onDataUpdated = this.props.onDataUpdated
         let oldEvent
+        let is_overlapping = false
+
+        scheduler.attachEvent("onEventCollision", function (ev, evs){
+            is_overlapping = true
+            return false; 
+        });
  
         scheduler.attachEvent('onEventAdded', (id, ev) => {
+            scheduler.checkCollision(ev)
             const token = sessionStorage.getItem("jwt");
             if (onDataUpdated) {
                 onDataUpdated('create', ev, id);
             }
-            fetch(SERVER_URL + '/api/events', {
+            fetch(SERVER_URL + '/api/events?confirmOverlapping=' + is_overlapping, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -38,6 +46,7 @@ export default class ScheduleCalendar extends Component {
             })
             .then(response => response.text())
             .then(data => {   
+            is_overlapping = false 
             if (data === "Event duration is overlapping with other events. Cannot save.") {
             scheduler.deleteEvent(id);
             scheduler.message({
@@ -48,11 +57,11 @@ export default class ScheduleCalendar extends Component {
                 expire:30000
             })
             } else if (data !== "Saved"){
-                scheduler.message({
-                    text: "Новое событие не удалось создать. Проверьте корректность ввода данных", 
-                    type: "error",
-                    expire:30000
-                })
+                // scheduler.message({
+                //     text: "Новое событие не удалось создать. Проверьте корректность ввода данных", 
+                //     type: "error",
+                //     expire:30000
+                // })
                 scheduler.deleteEvent(id);
             } else{}
             })
@@ -79,12 +88,14 @@ export default class ScheduleCalendar extends Component {
         });
 
         scheduler.attachEvent('onEventChanged', (id, ev) => {
+            scheduler.checkCollision(ev)
             const token = sessionStorage.getItem("jwt");
             const decodedToken = jwtDecode(token);
             if (onDataUpdated) {
                 onDataUpdated('update', ev, id);
             }
-            fetch(SERVER_URL + '/api/events/' + id + '?userLogin=' + decodedToken.sub, {
+            fetch(SERVER_URL + '/api/events/' + id + '?userLogin=' + decodedToken.sub 
+            + '&confirmOverlapping=' + is_overlapping, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -94,6 +105,7 @@ export default class ScheduleCalendar extends Component {
             })
             .then(response => response.text())
             .then(data => {
+            is_overlapping = false 
             if (data === "Event duration is overlapping with other events. Cannot save.") {
                 scheduler.message({
                     text: "Не удалось сохранить изменения. Тренировочное занятие не может пересекаться по времени с уже существующими"
@@ -113,11 +125,11 @@ export default class ScheduleCalendar extends Component {
                 scheduler.setEvent(oldEvent.id, oldEvent) 
                 scheduler.updateEvent(oldEvent.id)
             } else if (data !== "Updated"){
-                scheduler.message({
-                    text: "Не удалось сохранить изменения. Проверьте корректность ввода данных", 
-                    type: "error",
-                    expire:30000
-                })
+                // scheduler.message({
+                //     text: "Не удалось сохранить изменения. Проверьте корректность ввода данных", 
+                //     type: "error",
+                //     expire:30000
+                // })
             } else{}
             })
             .catch(err => console.error(err))

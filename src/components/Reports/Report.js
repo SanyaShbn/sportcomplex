@@ -199,7 +199,14 @@ const Report = ({ setSelectedButtonLink, link }) => {
   }
   const fetchTrainings = () => {
     const token = sessionStorage.getItem("jwt");
-    fetch(SERVER_URL + '/api/view_trainings', {
+    const decodedToken = jwtDecode(sessionStorage.getItem("jwt"))
+    let url
+    if(decodedToken.roles.toString() !== 'COACH'){
+      url = SERVER_URL + '/api/view_trainings'
+    }else{
+      url = SERVER_URL + '/api/view_coach_trainings?userLogin=' + decodedToken.sub
+    }
+    fetch(url, {
       headers: { 'Authorization' : token }
     })
     .then(response => response.json())
@@ -229,7 +236,14 @@ const Report = ({ setSelectedButtonLink, link }) => {
 
   const fetchEvents = () => {
     const token = sessionStorage.getItem("jwt");
-    fetch(SERVER_URL + '/api/events', {
+    const decodedToken = jwtDecode(sessionStorage.getItem("jwt"))
+    let url
+    if(decodedToken.roles.toString() !== 'COACH'){
+      url = SERVER_URL + '/api/events'
+    }else{
+      url = SERVER_URL + '/api/coach_events?userLogin=' + decodedToken.sub
+    }
+    fetch(url, {
       headers: { 'Authorization' : token }
     })
     .then(response => response.json())
@@ -249,7 +263,14 @@ const Report = ({ setSelectedButtonLink, link }) => {
 
   const fetchClientTrainings = () => {
     const token = sessionStorage.getItem("jwt");
-    fetch(SERVER_URL + '/client_trainings', {
+    const decodedToken = jwtDecode(sessionStorage.getItem("jwt"))
+    let url
+    if(decodedToken.roles.toString() !== 'COACH'){
+      url = SERVER_URL + '/api/all_client_trainings'
+    }else{
+      url = SERVER_URL + '/api/coach_client_trainings?userLogin=' + decodedToken.sub
+    }
+    fetch(url, {
       headers: { 'Authorization' : token }
     })
     .then(response => response.json())
