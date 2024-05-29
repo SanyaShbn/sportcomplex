@@ -20,8 +20,6 @@ function App() {
      <BrowserRouter>
       <Routes>
           <Route path="dashboard/*" element={<Dashboard/>} />
-          {/* <Route path="*" element={<Dashboard/>} /> */}
-
           <Route path="/" element={
           <div key="NavBarAndLogin" className="welcome_page">
           <NavBar/>

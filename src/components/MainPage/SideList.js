@@ -117,6 +117,7 @@ import ReportsButtonsList from "./ReportsButtonsList.js"
     reportData.option = ''
     localStorage.removeItem('reportData')
     localStorage.setItem('reportData', JSON.stringify(reportData))
+    localStorage.setItem('theme', '')
   }
 
 

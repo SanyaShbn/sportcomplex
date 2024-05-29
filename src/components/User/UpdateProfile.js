@@ -161,6 +161,7 @@ function UpdateProfile(props){
     reportData.option = ''
     localStorage.removeItem('reportData')
     localStorage.setItem('reportData', JSON.stringify(reportData))
+    localStorage.setItem('theme', '')
   }
 
   const updateAdmin = () => {

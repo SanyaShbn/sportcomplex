@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import { Brightness4, Brightness7, Menu } from '@mui/icons-material';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import SideList from './SideList';
 import logo from './logo.png'
 import '../CSS/main.css';
@@ -47,6 +47,13 @@ export default function Dashboard() {
     [dark]
   );
 
+  useEffect(() => {
+    const currentTheme = localStorage.getItem('theme')
+    if(currentTheme !== '' && typeof currentTheme !== 'undefined'){
+       currentTheme === 'dark' ? setDark(false) : setDark(true)
+    }
+  }, []);
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -78,7 +85,12 @@ export default function Dashboard() {
             <img src= {logo} className='system_logo' alt=""/>
             <span className='company_title'>BestSports</span>
             </Typography>
-            <IconButton onClick={() => setDark(!dark)}>
+            <IconButton onClick={() =>{
+               setDark(!dark)
+               localStorage.removeItem('theme')
+               dark === true ? localStorage.setItem('theme', 'dark') : localStorage.setItem('theme', 'light')
+               }
+               }>
               {dark ? <Brightness4 /> : <Brightness7 />}
             </IconButton>
           </Toolbar>

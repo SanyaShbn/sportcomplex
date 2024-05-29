@@ -325,10 +325,6 @@ const Report = ({ setSelectedButtonLink, link }) => {
       {data.option === 'sold_memberships' && <SoldMembershipsTable sold_memberships={client_memberships}/>}
       </View>
         <View>
-        {/* <Image
-        style={styles.diagram}
-          src={diagramDataUrl}
-        /> */}
       </View>
          <Text style={styles.footer} fixed>
        Автор: {user.surName + ' ' + user.firstName + ' ' + user.patrSurName} | Дата создания: {new Date().toLocaleDateString()}
