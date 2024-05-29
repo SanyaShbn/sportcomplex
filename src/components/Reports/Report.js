@@ -3,8 +3,6 @@ import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/render
 import logo from "../MainPage/logo.png"
 import { SERVER_URL } from '../../constants.js'
 import { Font } from '@react-pdf/renderer'
-import domToImage from 'dom-to-image'
-import PieMembershipsCost from '../MainPage/PieMembershipsCost.js'
 import ClientsTable from './ClientsTable.js'
 import TrainingsTable from './TrainingsTable.js'
 import FacilitiesTable from './FacilitiesTable.js'

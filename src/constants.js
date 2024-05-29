@@ -30,7 +30,7 @@ export const StyledDataGrid = styled(DataGrid)({
     width: '120vh',
   },
 });
-export const SERVER_URL='http://localhost:8080';
+export const SERVER_URL='https://sportcomplexmanagingsystem.onrender.com';
 
 export const NumberInput = React.forwardRef(function CustomNumberInput(props, ref) {
   return (
