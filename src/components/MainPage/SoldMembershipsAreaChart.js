@@ -1,6 +1,6 @@
 import moment from 'moment';
 import 'moment/locale/ru';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { SERVER_URL } from '../../constants.js';
 import {
   AreaChart,
@@ -14,19 +14,6 @@ import {
 export default function SoldMembershipsAreaChart({ months }) {
 const [client_memberships, setClientMemberships] = useState([]);
 const [data, setData] = useState([]);
-const today = new Date();
-const tempData = [];
-for (let i = 0; i < months; i++) {
-  const date = new Date(
-    today.getFullYear(),
-    today.getMonth() - (months - (i + 1))
-  );
-  tempData.push({
-    date,
-    name: moment(date).locale('ru').format('MMM YYYY'),
-    clientMemberships: 0
-  });
-}
 
 const fetchClientMemberships = () => {
     const token = sessionStorage.getItem("jwt");
@@ -42,19 +29,37 @@ const fetchClientMemberships = () => {
     fetchClientMemberships();
   }, []); 
 
-  useEffect(() => {
+  const tempData = useMemo(() => {
+    const data = [];
+    const today = new Date();
     for (let i = 0; i < months; i++) {
-      tempData[i].clientMemberships = 0;
+      const date = new Date(
+        today.getFullYear(),
+        today.getMonth() - (months - (i + 1))
+      );
+      data.push({
+        date,
+        name: moment(date).locale('ru').format('MMM YYYY'),
+        clientMemberships: 0
+      });
+    }
+    return data;
+  }, [months]);
+  
+  useEffect(() => {
+    const data = [...tempData];
+    for (let i = 0; i < months; i++) {
+      data[i].clientMemberships = 0;
     }
     client_memberships.forEach((client_membership) => {
       for (let i = 0; i < months; i++) {
-        if (moment(tempData[i].date).isSame(client_membership?.soldAt, 'month'))
-          return tempData[i].clientMemberships++;
+        if (moment(data[i].date).isSame(client_membership?.soldAt, 'month'))
+          return data[i].clientMemberships += client_membership.revenue;
       }
     });
-    tempData.sort((a, b) => a.date - b.date);
-    setData([...tempData]);
-  }, [client_memberships, months]);
+    data.sort((a, b) => a.date - b.date);
+    setData(data);
+  }, [client_memberships, months, tempData]);
 
   return (
     <div style={{ width: '100%', height: 300, minWidth: 250 }}>

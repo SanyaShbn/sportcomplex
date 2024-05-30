@@ -27,7 +27,7 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
 
   useEffect(() => {
     setSelectedLink(link);
-  }, []);
+  });
 
     const [memberships, setMemberships] = useState([]);
     const [delOpen, setDelOpen] = useState(false);

@@ -8,7 +8,7 @@ const Scheduler = ({ setSelectedLink, link }) => {
 
     useEffect(() => {
         setSelectedLink(link);
-      }, []);
+      });
     
 	const [currentTimeFormatState, setTimeFormat] = useState(true);
 

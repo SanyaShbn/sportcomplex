@@ -28,7 +28,7 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
 
   useEffect(() => {
     setSelectedLink(link);
-  }, []);
+  });
 
   const {
     dispatch,
@@ -97,7 +97,7 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
             payload: {
               open: true,
               severity: 'info',
-              message: 'Необходимо назначить новые места проведения для занятий, которые планировалось провести в сооружении,' +
+              message: 'Необходимо назначить новые места проведения для занятий, которые планировалось провести в сооружении, ' +
                'запись о котором была вами удалена',
             },});
           }

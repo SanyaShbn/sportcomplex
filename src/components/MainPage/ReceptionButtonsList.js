@@ -20,7 +20,7 @@ import ClientMembershipTable from "../Reception/ClientMembership/ClientMembershi
     
   useEffect(() => {
     setSelectedLink(link);
-  }, []);
+  });
 
     const list = useMemo(
       () => [

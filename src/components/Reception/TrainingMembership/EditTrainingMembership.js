@@ -21,9 +21,6 @@ function EditTrainingMembership(props) {
   const [memberships, setMemberships] = useState([]);
   const [trainings, setTrainings] = useState([]);
   const [open, setOpen] = useState(false);
-  const [training_membership, setTrainingMembership] = useState({
-    visitsAmount: '', sportComplexMembership: '', training: ''
-  });
   const [visitsAmountInputValue, setValue] = React.useState(null);
   const {
     dispatch,
@@ -79,12 +76,7 @@ function EditTrainingMembership(props) {
       props.data.row.sportComplexMembership.indexOf(":"))
       let id_training = props.data.row.training.slice(props.data.row.training.indexOf("№") + 1, props.data.row.training.indexOf("."))
       setMembershipId(parseInt(id_membership))
-      setTrainingId(parseInt(id_training))
-      setTrainingMembership({
-        visitsAmount: props.data.row.visitsAmount,
-        sportComplexMembership: parseInt(id_membership),
-        training: parseInt(id_training),
-      })          
+      setTrainingId(parseInt(id_training))       
       setOpen(true);
       setValue(props.data.row.visitsAmount)
       }

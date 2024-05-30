@@ -1,7 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet } from '@react-pdf/renderer';
-import { Font } from '@react-pdf/renderer';
-
 
 const styles = StyleSheet.create({
     section: {

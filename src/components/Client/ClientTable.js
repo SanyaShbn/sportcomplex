@@ -28,7 +28,7 @@ const ClientTable = ({ setSelectedLink, link }) => {
 
   useEffect(() => {
     setSelectedLink(link);
-  }, []);
+  });
 
   const {
     dispatch,

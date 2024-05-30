@@ -1,4 +1,4 @@
-import {React, useEffect, useState} from 'react'
+import {React, useEffect, useState, useCallback} from 'react'
 import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/renderer'
 import logo from "../MainPage/logo.png"
 import { SERVER_URL } from '../../constants.js'
@@ -119,31 +119,21 @@ const Report = ({ setSelectedButtonLink, link }) => {
 
   useEffect(() => {
     setSelectedButtonLink(link)
-  }, []);
-
-  useEffect(() => {
-    ChooseWichDataToFetch()
-  }, []);
+  }, [setSelectedButtonLink, link]);
   
     const token = sessionStorage.getItem("jwt");
     const decodedToken = jwtDecode(token);
     const [user, setUser] = useState([]);
-
-
-    useEffect(() => {
-      fetchUser();
-    }, []);
   
-    const fetchUser = () => {
-      fetch(SERVER_URL + '/api/user_profile?userLogin=' + decodedToken.sub, {
+    const fetchUser = useCallback(async () => {
+      const response = await fetch(SERVER_URL + '/api/user_profile?userLogin=' + decodedToken.sub, {
         headers: { 'Authorization' : token }
-      })
-      .then(response => response.json())
-      .then(data => {setUser(data)})
-      .catch(err => console.error(err));    
-    }
+      });
+      const data = await response.json();
+      setUser(data);
+    }, [decodedToken.sub, token]);
+
   const data = JSON.parse(localStorage.getItem('reportData'));
-  const diagramDataUrl = JSON.parse(localStorage.getItem('diagramImgUrl'));
   const [clients, setClients] = useState([])
   const [trainings, setTrainings] = useState([])
   const [facilities, setFacilities] = useState([])
@@ -154,7 +144,7 @@ const Report = ({ setSelectedButtonLink, link }) => {
   const [training_memberships, setTrainingMemberships] = useState([])
   const [client_memberships, setClinetMemberships] = useState([])
 
-  const ChooseWichDataToFetch = () =>{
+  const ChooseWichDataToFetch = useCallback(() =>{
     switch (data.option) {
       case 'clients':
         fetchClients()
@@ -185,7 +175,13 @@ const Report = ({ setSelectedButtonLink, link }) => {
         break;
       default: break;
     }
-  }
+  }, [data.option])
+
+  useEffect(() => {
+    fetchUser()
+    ChooseWichDataToFetch()
+  }, [fetchUser, ChooseWichDataToFetch]);
+
   const fetchClients = () => {
     const token = sessionStorage.getItem("jwt")
     fetch(SERVER_URL + '/api/view_clients', {

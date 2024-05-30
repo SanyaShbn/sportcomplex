@@ -1,5 +1,5 @@
 
-import React,  { useEffect, useState } from 'react';
+import React,  { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { SERVER_URL, StyledDataGrid } from '../../constants.js';
 import {ruRU} from '@mui/x-data-grid';
@@ -29,7 +29,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
 
   useEffect(() => {
     setSelectedLink(link);
-  }, []);
+  });
 
     const {
       dispatch,
@@ -47,7 +47,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
   
     useEffect(() => {
       fetchTrainings();
-    }, []);
+    });
   
     const fetchTrainings = () => {
       fetch(SERVER_URL + '/api/trainings', {
@@ -148,36 +148,6 @@ const TrainingTable = ({ setSelectedLink, link }) => {
       })
       .catch(err => console.error(err))
     }
-     
-    const fetchComplexFacility = async (url) => {
-      try {
-        const config = {
-          headers: {
-            'Authorization' : token
-          }
-        };
-        const response = await axios.get(url, config);
-        let id = response.data._links.self.href;
-        return "Сооружение №" + id.slice(id.lastIndexOf("/") + 1) + ": " + response.data.name ;
-      } catch (error) {
-        return 'не установлено';
-      }
-    };
-
-    const fetchCoach = async (url) => {
-      try {
-        const config = {
-          headers: {
-            'Authorization' : token
-          }
-        };
-        const response = await axios.get(url, config);
-        let id = response.data._links.self.href;
-        return "Тренер №" + id.slice(id.lastIndexOf("/") + 1) + ": " + response.data.surName + " " + response.data.firstName;
-      } catch (error) {
-        return 'не назначен';
-      }
-    };
  
     const columns = [
       {field: 'name', headerName: 'Наименование', width: 180},
@@ -237,6 +207,54 @@ const TrainingTable = ({ setSelectedLink, link }) => {
       </div>
       }
     ];
+
+    const fetchComplexFacility = useCallback(async (url) => {
+      try {
+        const config = {
+          headers: {
+            'Authorization' : token
+          }
+        };
+        const response = await axios.get(url, config);
+        let id = response.data._links.self.href;
+        return "Сооружение №" + id.slice(id.lastIndexOf("/") + 1) + ": " + response.data.name ;
+      } catch (error) {
+        return 'не установлено';
+      }
+    }, [token]); 
+    
+    const fetchCoach = useCallback(async (url) => {
+      try {
+        const config = {
+          headers: {
+            'Authorization' : token
+          }
+        };
+        const response = await axios.get(url, config);
+        let id = response.data._links.self.href;
+        return "Тренер №" + id.slice(id.lastIndexOf("/") + 1) + ": " + response.data.surName + " " + response.data.firstName;
+      } catch (error) {
+        return 'не назначен';
+      }
+    }, [token]);
+    
+    useEffect(() => {
+      const updateRows = async () => {
+        const updatedRows = await Promise.all(trainings.map(async training => ({
+          id: training._links.self.href,
+          name: training.name,
+          type: training.type,
+          capacity: training.capacity,
+          clients_amount: training.clients_amount,
+          cost: training.cost,
+          complexFacility: await fetchComplexFacility(training._links.complexFacility.href),
+          coach: await fetchCoach(training._links.coach.href),
+        })));
+        setRows(updatedRows);
+      };
+    
+      updateRows();
+    }, [trainings, fetchCoach, fetchComplexFacility]);
     
     useEffect(() => {
       const updateRows = async () => {
@@ -254,7 +272,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
       };
   
       updateRows();
-    }, [trainings]);
+    }, [trainings, fetchCoach, fetchComplexFacility]);
 
 
   return (

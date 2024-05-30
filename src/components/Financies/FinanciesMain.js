@@ -12,7 +12,7 @@ const FinanciesMain = ({ setSelectedLink, link }) => {
 
   useEffect(() => {
     setSelectedLink(link)
-  }, []);
+  });
 
   const location = useLocation();
   const [selectedMonths, setSelectedMonths] = useState(3);

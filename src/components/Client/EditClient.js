@@ -9,8 +9,6 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
-import { MenuItem, FormControl, InputLabel } from '@mui/material';
-import Select from '@mui/material/Select';
 import { useValue } from '../../context/ContextProvider';
 import {
   usePhoneInput

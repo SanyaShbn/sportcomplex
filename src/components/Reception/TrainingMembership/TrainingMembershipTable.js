@@ -29,7 +29,7 @@ const TrainingMembershipTable = ({ setSelectedButtonLink, link }) => {
 
   useEffect(() => {
     setSelectedButtonLink(link);
-  }, []);
+  });
 
   const {
     dispatch,

@@ -4,12 +4,9 @@ import { useNavigate } from 'react-router-dom'
 import { jwtDecode } from 'jwt-decode'
 
 const ReportForm = ({ setSelectedButtonLink, link }) => {
-    // const token = sessionStorage.getItem("jwt");
-    // const decodedToken = jwtDecode(token);
-    // const [user, setUser] = useState([]);
     useEffect(() => {
       setSelectedButtonLink(link)
-    }, []);
+    });
 
   const current_data = JSON.parse(localStorage.getItem('reportData'))
   const [data, setData] = useState({

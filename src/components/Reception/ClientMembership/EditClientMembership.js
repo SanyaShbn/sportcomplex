@@ -21,9 +21,6 @@ function EditClientMembership(props) {
     const [memberships, setMemberships] = useState([]);
     const [clients, setClients] = useState([]);
     const [open, setOpen] = useState(false);
-    const [client_membership, setClientMembership] = useState({
-      sportComplexMembership: '', client: ''
-    });
     const {
       dispatch,
     } = useValue();
@@ -80,10 +77,6 @@ function EditClientMembership(props) {
       props.data.row.sportComplexMembership.indexOf(":"))
       setMembershipId(parseInt(id_membership))
       setClientId(parseInt(id_client))
-      setClientMembership({
-        sportComplexMembership: parseInt(id_membership),
-        client: parseInt(id_client),
-       })  
       setOpen(true);
       }
     }

@@ -19,7 +19,7 @@ const ReportsButtonsList = ({ open, setSelectedLink, link}) => {
     
   useEffect(() => {
     setSelectedLink(link);
-  }, []);
+  });
 
     const list = useMemo(
       () => [

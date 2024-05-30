@@ -29,7 +29,7 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
 
   useEffect(() => {
     setSelectedButtonLink(link);
-  }, []);
+  });
 
 
     const [client_memberships, setClientMemberships] = useState([]);

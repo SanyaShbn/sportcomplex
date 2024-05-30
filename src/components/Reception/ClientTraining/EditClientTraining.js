@@ -22,9 +22,6 @@ function EditClientTraining(props) {
     const [clients, setClients] = useState([]);
     const [trainings, setTrainings] = useState([]);
     const [open, setOpen] = useState(false);
-    const [client_training, setClientTraining] = useState({
-      client: '', training: ''
-    });
     const {
       dispatch,
     } = useValue();
@@ -80,11 +77,7 @@ function EditClientTraining(props) {
     let id_client = props.data.row.client.slice(props.data.row.client.indexOf("№") + 1, props.data.row.client.indexOf(":"))
     let id_training = props.data.row.training.slice(props.data.row.training.indexOf("№") + 1, props.data.row.training.indexOf("."))
     setClientId(parseInt(id_client))
-    setTrainingId(parseInt(id_training))
-    setClientTraining({
-      client: parseInt(id_client),
-      training: parseInt(id_training),
-     })     
+    setTrainingId(parseInt(id_training))   
     setValue(props.data.row.signingsAmount)
     fetchTrainings();
     fetchClients();
