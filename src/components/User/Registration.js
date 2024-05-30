@@ -52,7 +52,7 @@ const Registration = (props) => {
       initial_check = true;
     }
     setState(prevState => ({...prevState, checked: initial_check}));
-  }, [props.data && props.data.row && props.data.row.status]);
+  }, [props.data, props.data.row, props.data.row.status]);
 
   const handleSwitchClick = () => {
     let updated_user = props.data.row
