@@ -16,7 +16,7 @@ import { jwtDecode } from 'jwt-decode'
 
 Font.register({
   family: 'Pacifico', 
-  src: 'http://fonts.gstatic.com/s/pacifico/v9/fKnfV28XkldRW297cFLeqfesZW2xOQ-xsNqO47m55DA.ttf', 
+  src: 'https://fonts.gstatic.com/s/pacifico/v9/fKnfV28XkldRW297cFLeqfesZW2xOQ-xsNqO47m55DA.ttf', 
 });
 
 Font.register({
