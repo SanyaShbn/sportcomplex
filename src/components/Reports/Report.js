@@ -142,10 +142,10 @@ const Report = ({ setSelectedButtonLink, link }) => {
   const [client_trainings, setClientTrainings] = useState([])
   const [training_memberships, setTrainingMemberships] = useState([])
   const [client_memberships, setClinetMemberships] = useState([])
-  const option = data.option !== '' && data.option.length !== 0 ? data.option : ''
+  const option = data && data.option ? data.option : ''
 
   const ChooseWichDataToFetch = useCallback(() =>{
-    if(option !== '' && option.length !== 0){
+    if(option && option !== '' && option.length !== 0){
     switch (option) {
       case 'clients':
         fetchClients()
@@ -352,7 +352,7 @@ const Report = ({ setSelectedButtonLink, link }) => {
       <Text style={styles.contentText}>{data !== '' && typeof data !== 'undefined' ? data.textContent : ''}</Text> 
       </View>
       <View>
-      {option !== '' && option.length !== 0 && (
+      {option && option !== '' && option.length !== 0 && (
       <>
       {option === 'clients' && <ClientsTable clients={clients} />}
       {option === 'trainings' && <TrainingsTable trainings={trainings} />}
