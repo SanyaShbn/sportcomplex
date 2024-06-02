@@ -332,8 +332,8 @@ const Report = ({ setSelectedButtonLink, link }) => {
   }
 
   return (
-  <Document title={data !== '' && typeof data !== 'undefined' ?
-  data.title : ''} subject={data !== '' && typeof data !== 'undefined' ? data.subject : ''} author={user.surName + ' ' + user.firstName + ' ' + user.patrSurName}>
+  <Document title={data && data.title ?
+  data.title : ''} subject={data && data.subject ? data.subject : ''} author={user.surName + ' ' + user.firstName + ' ' + user.patrSurName}>
   {isLoading ? (
       // If the data is still loading, render a loading message or spinner
       <p></p>
@@ -348,8 +348,8 @@ const Report = ({ setSelectedButtonLink, link }) => {
       </View>
       <View>
       <Text style={styles.title}>ОТЧЕТ</Text>
-      <Text style={styles.subtitle}>{data !== '' && typeof data !== 'undefined' ? data.subject : ''}</Text>
-      <Text style={styles.contentText}>{data !== '' && typeof data !== 'undefined' ? data.textContent : ''}</Text> 
+      <Text style={styles.subtitle}>{data && data.subject ? data.subject : ''}</Text>
+      <Text style={styles.contentText}>{data && data.textContent ? data.textContent : ''}</Text> 
       </View>
       <View>
       {option && option !== '' && option.length !== 0 && (
