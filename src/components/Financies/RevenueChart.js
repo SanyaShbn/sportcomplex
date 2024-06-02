@@ -75,7 +75,7 @@ const fetchClientMemberships = () => {
         >
           <XAxis dataKey="name"/>
           <YAxis />
-          <Tooltip formatter={(value) => `${value} бел.руб.`} />
+          <Tooltip formatter={(value) => `${value}`} />
           <Area
             type="monotone"
             dataKey="clientMemberships"
