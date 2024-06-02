@@ -142,7 +142,7 @@ const Report = ({ setSelectedButtonLink, link }) => {
   const [client_trainings, setClientTrainings] = useState([])
   const [training_memberships, setTrainingMemberships] = useState([])
   const [client_memberships, setClinetMemberships] = useState([])
-  const option = data.option || ''
+  const option = data.option !== '' && typeof data.option !== 'undefined' ? data.option : ''
 
   const ChooseWichDataToFetch = useCallback(() =>{
     if(option !== '' && typeof option !== 'undefined'){
@@ -352,17 +352,17 @@ const Report = ({ setSelectedButtonLink, link }) => {
       <Text style={styles.contentText}>{data !== '' && typeof data !== 'undefined' ? data.textContent : ''}</Text> 
       </View>
       <View>
-      {data.option !== '' && typeof data.option !== 'undefined' && (
+      {option !== '' && typeof option !== 'undefined' && (
       <>
-      {data.option === 'clients' && <ClientsTable clients={clients} />}
-      {data.option === 'trainings' && <TrainingsTable trainings={trainings} />}
-      {data.option === 'facilities' && <FacilitiesTable facilities={facilities} />}
-      {data.option === 'memberships' && <MembershipsTable memberships={memberships} />}
-      {data.option === 'employees' && <EmployeesTable employees={employees}/>}
-      {data.option === 'events' && <EventsTable events={events} />}
-      {data.option === 'service_packages' && <PackagesOfServicesTable service_packages={training_memberships}/>}
-      {data.option === 'trainings_registrations' && <TrainingsRegistrationsTable trainings_registrations={client_trainings} />}
-      {data.option === 'sold_memberships' && <SoldMembershipsTable sold_memberships={client_memberships}/>}
+      {option === 'clients' && <ClientsTable clients={clients} />}
+      {option === 'trainings' && <TrainingsTable trainings={trainings} />}
+      {option === 'facilities' && <FacilitiesTable facilities={facilities} />}
+      {option === 'memberships' && <MembershipsTable memberships={memberships} />}
+      {option === 'employees' && <EmployeesTable employees={employees}/>}
+      {option === 'events' && <EventsTable events={events} />}
+      {option === 'service_packages' && <PackagesOfServicesTable service_packages={training_memberships}/>}
+      {option === 'trainings_registrations' && <TrainingsRegistrationsTable trainings_registrations={client_trainings} />}
+      {option === 'sold_memberships' && <SoldMembershipsTable sold_memberships={client_memberships}/>}
       </>
       )}
       </View>
