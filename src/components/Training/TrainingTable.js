@@ -51,7 +51,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
   
     useEffect(() => {
       fetchTrainings();
-    });
+    }, []);
   
     const fetchTrainings = () => {
       fetch(SERVER_URL + '/api/trainings', {
@@ -81,9 +81,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
         .then(response => {
           if (response.ok) {
             fetchTrainings()
-            setTimeout(() => {
-              setDelOpen(true)
-            }, 3000)
+            setDelOpen(true)
           }
           else {
             if(decodedToken.roles.toString() === "COACH"){
@@ -112,9 +110,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
       .then(response => {
         if (response.ok) {
           fetchTrainings()
-          setTimeout(() => {
-            setAddOpen(true)
-          }, 3000)
+          setAddOpen(true)
         }
         else {
           dispatch({
@@ -143,9 +139,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
       .then(response => {
         if (response.ok) {
           fetchTrainings()
-          setTimeout(() => {
-            setEditOpen(true)
-          }, 3000)
+          setEditOpen(true)
         }
         else {
           dispatch({

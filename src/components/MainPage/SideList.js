@@ -132,7 +132,7 @@ import ReportsButtonsList from "./ReportsButtonsList.js"
 
     useEffect(() => {
       fetchUser();
-    });
+    }, []);
   
     const fetchUser = () => {
       fetch(SERVER_URL + '/api/user_profile?userLogin=' + decodedToken.sub, {

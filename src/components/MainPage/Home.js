@@ -23,7 +23,7 @@ const Home = ({ setSelectedLink, link }) => {
     fetchClients();
     fetchUsers();
     fetchMemberships();
-  });
+  }, [link, setSelectedLink]);
 
   const location = useLocation();
   const [employees, setEmployees] = useState([]);
