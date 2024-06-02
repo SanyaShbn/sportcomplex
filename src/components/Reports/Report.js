@@ -144,6 +144,7 @@ const Report = ({ setSelectedButtonLink, link }) => {
   const [client_memberships, setClinetMemberships] = useState([])
 
   const ChooseWichDataToFetch = useCallback(() =>{
+    if(data.option !== '' && typeof data.option !== 'undefined'){
     switch (data.option) {
       case 'clients':
         fetchClients()
@@ -174,6 +175,7 @@ const Report = ({ setSelectedButtonLink, link }) => {
         break;
       default: break;
     }
+  }
   }, [data.option])
   
   useEffect(() => {

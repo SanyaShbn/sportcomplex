@@ -112,10 +112,10 @@ import ReportsButtonsList from "./ReportsButtonsList.js"
   const ClearLocalStorage = () => {
     const reportData = JSON.parse(localStorage.getItem('reportData'));
     if(reportData !== '' && typeof reportData !== 'undefined'){
-    reportData.title = ''
-    reportData.subject = ''
-    reportData.textContent = ''
-    reportData.option = ''
+    reportData.title !== '' && typeof reportData.title !== 'undefined' ? reportData.title = '' : 
+    reportData.subject !== '' && typeof reportData.subject !== 'undefined' ? reportData.subject = '' : 
+    reportData.textContent !== '' && typeof reportData.textContent !== 'undefined' ? reportData.textContent = '' : 
+    reportData.option !== '' && typeof reportData.option !== 'undefined' ? reportData.option = '' : 
     localStorage.removeItem('reportData')
     localStorage.setItem('reportData', JSON.stringify(reportData))
     }
