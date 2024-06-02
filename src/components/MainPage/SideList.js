@@ -104,23 +104,23 @@ import ReportsButtonsList from "./ReportsButtonsList.js"
     setTimeout(() => {
       dispatch({ type: 'END_LOADING' });
       sessionStorage.setItem("jwt", "");
-      ClearLocalStorage()
+      // ClearLocalStorage()
       navigate("/", { replace: true });
     }, 1000);
     }
   
-  const ClearLocalStorage = () => {
-    const reportData = JSON.parse(localStorage.getItem('reportData'));
-    if(reportData !== '' && typeof reportData !== 'undefined'){
-    reportData.title !== '' && typeof reportData.title !== 'undefined' ? reportData.title = '' : 
-    reportData.subject !== '' && typeof reportData.subject !== 'undefined' ? reportData.subject = '' : 
-    reportData.textContent !== '' && typeof reportData.textContent !== 'undefined' ? reportData.textContent = '' : 
-    reportData.option !== '' && typeof reportData.option !== 'undefined' ? reportData.option = '' : 
-    localStorage.removeItem('reportData')
-    localStorage.setItem('reportData', JSON.stringify(reportData))
-    }
-    localStorage.setItem('theme', '')
-  }
+  // const ClearLocalStorage = () => {
+  //   const reportData = JSON.parse(localStorage.getItem('reportData'));
+  //   if(reportData !== '' && typeof reportData !== 'undefined'){
+  //   reportData.title !== '' && typeof reportData.title !== 'undefined' ? reportData.title = '' : 
+  //   reportData.subject !== '' && typeof reportData.subject !== 'undefined' ? reportData.subject = '' : 
+  //   reportData.textContent !== '' && typeof reportData.textContent !== 'undefined' ? reportData.textContent = '' : 
+  //   reportData.option !== '' && typeof reportData.option !== 'undefined' ? reportData.option = '' : 
+  //   localStorage.removeItem('reportData')
+  //   localStorage.setItem('reportData', JSON.stringify(reportData))
+  //   }
+  //   localStorage.setItem('theme', '')
+  // }
 
 
     const [selectedLink, setSelectedLink] = useState('')

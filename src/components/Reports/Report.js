@@ -351,7 +351,7 @@ const Report = ({ setSelectedButtonLink, link }) => {
       <Text style={styles.contentText}>{data !== '' && typeof data !== 'undefined' ? data.textContent : ''}</Text> 
       </View>
       <View>
-      {data && data.option && (
+      {data.option !== '' && typeof data.option !== 'undefined' && (
       <>
       {data.option === 'clients' && <ClientsTable clients={clients} />}
       {data.option === 'trainings' && <TrainingsTable trainings={trainings} />}

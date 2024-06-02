@@ -153,18 +153,18 @@ function UpdateProfile(props){
     }
   };
 
-  const ClearLocalStorage = () => {
-    const reportData = JSON.parse(localStorage.getItem('reportData'));
-    if(reportData !== '' && typeof reportData !== 'undefined'){
-    reportData.title !== '' && typeof reportData.title !== 'undefined' ? reportData.title = '' : 
-    reportData.subject !== '' && typeof reportData.subject !== 'undefined' ? reportData.subject = '' : 
-    reportData.textContent !== '' && typeof reportData.textContent !== 'undefined' ? reportData.textContent = '' : 
-    reportData.option !== '' && typeof reportData.option !== 'undefined' ? reportData.option = '' : 
-    localStorage.removeItem('reportData')
-    localStorage.setItem('reportData', JSON.stringify(reportData))
-    }
-    localStorage.setItem('theme', '')
-  }
+  // const ClearLocalStorage = () => {
+  //   const reportData = JSON.parse(localStorage.getItem('reportData'));
+  //   if(reportData !== '' && typeof reportData !== 'undefined'){
+  //   reportData.title !== '' && typeof reportData.title !== 'undefined' ? reportData.title = '' : 
+  //   reportData.subject !== '' && typeof reportData.subject !== 'undefined' ? reportData.subject = '' : 
+  //   reportData.textContent !== '' && typeof reportData.textContent !== 'undefined' ? reportData.textContent = '' : 
+  //   reportData.option !== '' && typeof reportData.option !== 'undefined' ? reportData.option = '' : 
+  //   localStorage.removeItem('reportData')
+  //   localStorage.setItem('reportData', JSON.stringify(reportData))
+  //   }
+  //   localStorage.setItem('theme', '')
+  // }
 
   const updateAdmin = () => {
     if(user.firstName.length === 0 | user.surName.length === 0 | user.patrSurName.length === 0
@@ -228,7 +228,7 @@ function UpdateProfile(props){
         if(password !== '' || user.userLogin !== props.data.userLogin){
           dispatch({ type: 'START_LOADING' });
           sessionStorage.setItem("jwt", "");
-          ClearLocalStorage()
+          // ClearLocalStorage()
           navigate("/", { replace: true });
           dispatch({ type: 'END_LOADING' });
         }
