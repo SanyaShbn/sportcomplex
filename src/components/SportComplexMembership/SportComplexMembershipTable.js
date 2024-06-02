@@ -35,6 +35,11 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
     const [editOpen, setEditOpen] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [rowIdToDelete, setRowIdToDelete] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const customLocaleText = {
+      noRowsLabel: loading ? 'Загрузка...' : 'Нет данных',
+    };
+
     const {
       dispatch,
     } = useValue();
@@ -53,6 +58,7 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
         const sortedMemberships = data._embedded.sportComplexMemberships.sort((a, b) => a._links.self.href.slice(a._links.self.href.lastIndexOf('/') + 1) 
         - b._links.self.href.slice(b._links.self.href.lastIndexOf('/') + 1) );
         setMemberships(sortedMemberships)
+        sortedMemberships.length !== 0 ? setLoading(true) : setLoading(false)
     })
       .catch(err => console.error(err));    
     }
@@ -218,7 +224,7 @@ const SportComplexMembershipTable = ({ setSelectedLink, link }) => {
     <React.Fragment>
       <AddSportComplexMembership addMembership={addMembership} />
       <div className="container" style={{ height: 400, width: "100%"}}>
-        <StyledDataGrid localeText={ruRU.components.MuiDataGrid.defaultProps.localeText} className="grid_component" 
+        <StyledDataGrid localeText={{...ruRU.components.MuiDataGrid.defaultProps.localeText, ...customLocaleText}} className="grid_component" 
           columns={columns} 
           rows={memberships} 
           disableSelectionOnClick={true}

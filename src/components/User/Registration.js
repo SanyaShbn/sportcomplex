@@ -188,7 +188,17 @@ const Registration = (props) => {
   const register = () => {
     const password = passwordRef.current.value;
     const confirmPassword = confirmPasswordRef.current.value;
-    if (password !== confirmPassword)
+    if(password === '' || confirmPassword === '' || typeof password === 'undefined' || typeof confirmPassword === 'undefined'){
+      dispatch({
+        type: 'UPDATE_ALERT',
+        payload: {
+          open: true,
+          severity: 'error',
+          message: 'Заполните обязательные поля',
+        },});
+    }
+    else{
+      if (password !== confirmPassword)
       return dispatch({
         type: 'UPDATE_ALERT',
         payload: {
@@ -230,6 +240,7 @@ const Registration = (props) => {
       }
     })
     .catch(err => console.error(err))
+  }
   }
   }
 

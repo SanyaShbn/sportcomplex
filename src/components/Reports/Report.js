@@ -116,21 +116,20 @@ const styles = StyleSheet.create({
   });
 
 const Report = ({ setSelectedButtonLink, link }) => {
-
-  useEffect(() => {
-    setSelectedButtonLink(link)
-  }, [setSelectedButtonLink, link]);
   
     const token = sessionStorage.getItem("jwt");
     const decodedToken = jwtDecode(token);
     const [user, setUser] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
   
     const fetchUser = useCallback(async () => {
+      setIsLoading(true)
       const response = await fetch(SERVER_URL + '/api/user_profile?userLogin=' + decodedToken.sub, {
         headers: { 'Authorization' : token }
       });
       const data = await response.json();
       setUser(data);
+      setIsLoading(false);
     }, [decodedToken.sub, token]);
 
   const data = JSON.parse(localStorage.getItem('reportData'));
@@ -176,22 +175,28 @@ const Report = ({ setSelectedButtonLink, link }) => {
       default: break;
     }
   }, [data.option])
-
+  
   useEffect(() => {
+    setSelectedButtonLink(link)
     fetchUser()
     ChooseWichDataToFetch()
-  }, [fetchUser, ChooseWichDataToFetch]);
+  }, [setSelectedButtonLink, link, fetchUser, ChooseWichDataToFetch]);
 
   const fetchClients = () => {
+    setIsLoading(true)
     const token = sessionStorage.getItem("jwt")
     fetch(SERVER_URL + '/api/view_clients', {
       headers: { 'Authorization' : token }
     })
     .then(response => response.json())
-    .then(data => setClients(data))
+    .then(data => {
+      setClients(data)
+      setIsLoading(false)
+    })
     .catch(err => console.error(err));    
   }
   const fetchTrainings = () => {
+    setIsLoading(true)
     const token = sessionStorage.getItem("jwt");
     const decodedToken = jwtDecode(sessionStorage.getItem("jwt"))
     let url
@@ -204,31 +209,43 @@ const Report = ({ setSelectedButtonLink, link }) => {
       headers: { 'Authorization' : token }
     })
     .then(response => response.json())
-    .then(data => setTrainings(data))
+    .then(data => {
+      setTrainings(data)
+      setIsLoading(false)
+    })
     .catch(err => console.error(err));    
   }
 
   const fetchFacilities = () => {
+    setIsLoading(true)
     const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/view_facilities', {
       headers: { 'Authorization' : token }
     })
     .then(response => response.json())
-    .then(data => setFacilities(data))
+    .then(data => {
+      setFacilities(data)
+      setIsLoading(false)
+  })
     .catch(err => console.error(err));    
   }
 
   const fetchMemberships = () => {
+    setIsLoading(true)
     const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/view_memberships', {
       headers: { 'Authorization' : token }
     })
     .then(response => response.json())
-    .then(data => setMemberships(data))
+    .then(data => {
+      setMemberships(data)
+      setIsLoading(false)
+  })
     .catch(err => console.error(err));    
   }
 
   const fetchEvents = () => {
+    setIsLoading(true)
     const token = sessionStorage.getItem("jwt");
     const decodedToken = jwtDecode(sessionStorage.getItem("jwt"))
     let url
@@ -241,21 +258,29 @@ const Report = ({ setSelectedButtonLink, link }) => {
       headers: { 'Authorization' : token }
     })
     .then(response => response.json())
-    .then(data => setEvents(data))
+    .then(data => {
+      setEvents(data)
+      setIsLoading(false)
+  })
     .catch(err => console.error(err));    
   }
 
   const fetchEmployees = () => {
+    setIsLoading(true)
     const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/api/view_all_employees', {
       headers: { 'Authorization' : token }
     })
     .then(response => response.json())
-    .then(data => setEmployees(data))
+    .then(data =>{
+       setEmployees(data)
+       setIsLoading(false)
+  })
     .catch(err => console.error(err));    
   }
 
   const fetchClientTrainings = () => {
+    setIsLoading(true)
     const token = sessionStorage.getItem("jwt");
     const decodedToken = jwtDecode(sessionStorage.getItem("jwt"))
     let url
@@ -268,32 +293,48 @@ const Report = ({ setSelectedButtonLink, link }) => {
       headers: { 'Authorization' : token }
     })
     .then(response => response.json())
-    .then(data => setClientTrainings(data))
+    .then(data => {
+      setClientTrainings(data)
+      setIsLoading(false)
+  })
     .catch(err => console.error(err));    
   }
 
   const fetchTrainingMemberships = () => {
+    setIsLoading(true)
     const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/training_memberships', {
       headers: { 'Authorization' : token }
     })
     .then(response => response.json())
-    .then(data => setTrainingMemberships(data))
+    .then(data => {
+      setTrainingMemberships(data)
+      setIsLoading(false)
+  })
     .catch(err => console.error(err));    
   }
 
   const fetchClientMemberships = () => {
+    setIsLoading(true)
     const token = sessionStorage.getItem("jwt");
     fetch(SERVER_URL + '/client_memberships', {
       headers: { 'Authorization' : token }
     })
     .then(response => response.json())
-    .then(data => setClinetMemberships(data))
+    .then(data => {
+      setClinetMemberships(data)
+      setIsLoading(false)
+  })
     .catch(err => console.error(err));    
   }
 
   return (
-  <Document title={data.title} subject={data.subject} author={user.surName + ' ' + user.firstName + ' ' + user.patrSurName}>
+  <Document title={data !== '' && typeof data !== 'undefined' ?
+  data.title : ''} subject={data !== '' && typeof data !== 'undefined' ? data.subject : ''} author={user.surName + ' ' + user.firstName + ' ' + user.patrSurName}>
+  {isLoading ? (
+      // If the data is still loading, render a loading message or spinner
+      <p></p>
+    ) : (
     <Page size="A4" style={styles.page} >
       <View style={styles.row}>
         <Image
@@ -304,10 +345,12 @@ const Report = ({ setSelectedButtonLink, link }) => {
       </View>
       <View>
       <Text style={styles.title}>ОТЧЕТ</Text>
-      <Text style={styles.subtitle}>{data.subject}</Text>
-      <Text style={styles.contentText}>{data.textContent}</Text> 
+      <Text style={styles.subtitle}>{data !== '' && typeof data !== 'undefined' ? data.subject : ''}</Text>
+      <Text style={styles.contentText}>{data !== '' && typeof data !== 'undefined' ? data.textContent : ''}</Text> 
       </View>
       <View>
+      {data && data.option && (
+      <>
       {data.option === 'clients' && <ClientsTable clients={clients} />}
       {data.option === 'trainings' && <TrainingsTable trainings={trainings} />}
       {data.option === 'facilities' && <FacilitiesTable facilities={facilities} />}
@@ -317,6 +360,8 @@ const Report = ({ setSelectedButtonLink, link }) => {
       {data.option === 'service_packages' && <PackagesOfServicesTable service_packages={training_memberships}/>}
       {data.option === 'trainings_registrations' && <TrainingsRegistrationsTable trainings_registrations={client_trainings} />}
       {data.option === 'sold_memberships' && <SoldMembershipsTable sold_memberships={client_memberships}/>}
+      </>
+      )}
       </View>
         <View>
       </View>
@@ -327,6 +372,7 @@ const Report = ({ setSelectedButtonLink, link }) => {
        `${pageNumber} / ${totalPages}`
       )} fixed />
     </Page>
+     )}
   </Document>
 )
 }

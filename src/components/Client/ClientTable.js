@@ -40,6 +40,10 @@ const ClientTable = ({ setSelectedLink, link }) => {
     const [delOpen, setDelOpen] = useState(false);
     const [addOpen, setAddOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const customLocaleText = {
+      noRowsLabel: loading ? 'Загрузка...' : 'Нет данных',
+    };
     
 
     useEffect(() => {
@@ -53,9 +57,10 @@ const ClientTable = ({ setSelectedLink, link }) => {
       })
       .then(response => response.json())
       .then(data => {
-        const sortedClietns = data._embedded.clients.sort((a, b) => a._links.self.href.slice(a._links.self.href.lastIndexOf('/') + 1) 
+        const sortedClients = data._embedded.clients.sort((a, b) => a._links.self.href.slice(a._links.self.href.lastIndexOf('/') + 1) 
         - b._links.self.href.slice(b._links.self.href.lastIndexOf('/') + 1) );
-        setClients(sortedClietns)
+        setClients(sortedClients)
+        sortedClients.length !== 0 ? setLoading(true) : setLoading(false)
     })
       .catch(err => console.error(err));    
     }
@@ -233,7 +238,7 @@ const ClientTable = ({ setSelectedLink, link }) => {
     <React.Fragment>
     <AddClient addClient={addClient} />
       <div className="container" style={{ height: 400, width: "100%"}}>
-        <StyledDataGrid  localeText={ruRU.components.MuiDataGrid.defaultProps.localeText} className="grid_component" 
+        <StyledDataGrid  localeText={{...ruRU.components.MuiDataGrid.defaultProps.localeText, ...customLocaleText}} className="grid_component" 
           columns={columns} 
           rows={clients} 
           disableSelectionOnClick={true}

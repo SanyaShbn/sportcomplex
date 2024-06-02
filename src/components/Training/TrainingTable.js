@@ -41,6 +41,10 @@ const TrainingTable = ({ setSelectedLink, link }) => {
     const [editOpen, setEditOpen] = useState(false);
     const [rows, setRows] = useState([]);
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const customLocaleText = {
+      noRowsLabel: loading ? 'Загрузка...' : 'Нет данных',
+    };
 
     const token = sessionStorage.getItem("jwt")
     const decodedToken = jwtDecode(token)
@@ -58,6 +62,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
         const sortedTrainings = data._embedded.trainings.sort((a, b) => a._links.self.href.slice(a._links.self.href.lastIndexOf('/') + 1) 
         - b._links.self.href.slice(b._links.self.href.lastIndexOf('/') + 1) );
         setTrainings(sortedTrainings)
+        sortedTrainings.length !== 0 ? setLoading(true) : setLoading(false)
     })
       .catch(err => console.error(err)); 
   }
@@ -75,8 +80,10 @@ const TrainingTable = ({ setSelectedLink, link }) => {
           })
         .then(response => {
           if (response.ok) {
-            fetchTrainings();
-            setDelOpen(true);
+            fetchTrainings()
+            setTimeout(() => {
+              setDelOpen(true)
+            }, 3000)
           }
           else {
             if(decodedToken.roles.toString() === "COACH"){
@@ -104,8 +111,10 @@ const TrainingTable = ({ setSelectedLink, link }) => {
       })
       .then(response => {
         if (response.ok) {
-          fetchTrainings();
-          setAddOpen(true)
+          fetchTrainings()
+          setTimeout(() => {
+            setAddOpen(true)
+          }, 3000)
         }
         else {
           dispatch({
@@ -133,8 +142,10 @@ const TrainingTable = ({ setSelectedLink, link }) => {
       })
       .then(response => {
         if (response.ok) {
-          fetchTrainings();
-          setEditOpen(true)
+          fetchTrainings()
+          setTimeout(() => {
+            setEditOpen(true)
+          }, 3000)
         }
         else {
           dispatch({
@@ -252,24 +263,6 @@ const TrainingTable = ({ setSelectedLink, link }) => {
         })));
         setRows(updatedRows);
       };
-    
-      updateRows();
-    }, [trainings, fetchCoach, fetchComplexFacility]);
-    
-    useEffect(() => {
-      const updateRows = async () => {
-        const updatedRows = await Promise.all(trainings.map(async training => ({
-          id: training._links.self.href,
-          name: training.name,
-          type: training.type,
-          capacity: training.capacity,
-          clients_amount: training.clients_amount,
-          cost: training.cost,
-          complexFacility: await fetchComplexFacility(training._links.complexFacility.href),
-          coach: await fetchCoach(training._links.coach.href),
-        })));
-        setRows(updatedRows);
-      };
   
       updateRows();
     }, [trainings, fetchCoach, fetchComplexFacility]);
@@ -293,7 +286,7 @@ const TrainingTable = ({ setSelectedLink, link }) => {
     <React.Fragment>
       <AddTraining addTraining={addTraining} />
       <div className="container" style={{ height: 400, width: "100%"}}>
-        <StyledDataGrid localeText={ruRU.components.MuiDataGrid.defaultProps.localeText} className="grid_component" 
+        <StyledDataGrid localeText={{...ruRU.components.MuiDataGrid.defaultProps.localeText, ...customLocaleText}} className="grid_component" 
           columns={columns} 
           rows={rows} 
           disableSelectionOnClick={true}

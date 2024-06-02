@@ -42,6 +42,10 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
     const [rowIdToDelete, setRowIdToDelete] = useState([]);
     const [rowTrainingsAmount, setRowTrainingsAmount] = useState([]);
     const [rows, setRows] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const customLocaleText = {
+      noRowsLabel: loading ? 'Загрузка...' : 'Нет данных',
+    };
   
     useEffect(() => {
       fetchFacilities();
@@ -57,6 +61,7 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
         const sortedFacilities = data._embedded.complexFacilities.sort((a, b) => a._links.self.href.slice(a._links.self.href.lastIndexOf('/') + 1) 
         - b._links.self.href.slice(b._links.self.href.lastIndexOf('/') + 1) );
         setFacilities(sortedFacilities)
+        sortedFacilities.length !== 0 ? setLoading(true) : setLoading(false)
     })
       .catch(err => console.error(err));    
     }
@@ -272,7 +277,7 @@ const ComplexFacilityTable = ({ setSelectedLink, link }) => {
     <React.Fragment>
       <AddFacility addFacility={addFacility} />
       <div className="container" style={{ height: 400, width: "100%"}}>
-        <StyledDataGrid localeText={ruRU.components.MuiDataGrid.defaultProps.localeText} className="grid_component" 
+        <StyledDataGrid localeText={{...ruRU.components.MuiDataGrid.defaultProps.localeText, ...customLocaleText}} className="grid_component" 
           columns={columns} 
           rows={rows} 
           disableSelectionOnClick={true}

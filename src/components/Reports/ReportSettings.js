@@ -10,10 +10,10 @@ const ReportForm = ({ setSelectedButtonLink, link }) => {
 
   const current_data = JSON.parse(localStorage.getItem('reportData'))
   const [data, setData] = useState({
-    title: current_data.title,
-    subject: current_data.subject,
-    textContent: current_data.textContent,
-    option: current_data.option
+    title: current_data !== '' && typeof current_data !== 'undefined' ? current_data.title : '',
+    subject: current_data !== '' && typeof current_data !== 'undefined' ? current_data.subject : '',
+    textContent: current_data !== '' && typeof current_data !== 'undefined' ? current_data.textContent : '',
+    option: current_data !== '' && typeof current_data !== 'undefined' ? current_data.option : ''
   });
   const navigate = useNavigate()
   const token = sessionStorage.getItem("jwt");

@@ -42,6 +42,10 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
     const {
       dispatch,
     } = useValue();
+    const [loading, setLoading] = useState(true);
+    const customLocaleText = {
+      noRowsLabel: loading ? 'Загрузка...' : 'Нет данных',
+    };
   
     useEffect(() => {
       fetchClientMemberships();
@@ -57,6 +61,7 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
         const sortedClientMemberships = data._embedded.clientMemberships.sort((a, b) => a._links.self.href.slice(a._links.self.href.lastIndexOf('/') + 1) 
         - b._links.self.href.slice(b._links.self.href.lastIndexOf('/') + 1) );
         setClientMemberships(sortedClientMemberships)
+        sortedClientMemberships.length !== 0 ? setLoading(true) : setLoading(false)
     })
       .catch(err => console.error(err));    
     }
@@ -281,7 +286,7 @@ const ClientMembershipTable = ({ setSelectedButtonLink, link }) => {
     <React.Fragment>
       <AddClientMembership addClientMembership={addClientMembership} />
       <div className="container" style={{ height: 400, width: "100%"}}>
-        <StyledDataGrid localeText={ruRU.components.MuiDataGrid.defaultProps.localeText} className="grid_component" 
+        <StyledDataGrid localeText={{...ruRU.components.MuiDataGrid.defaultProps.localeText, ...customLocaleText}} className="grid_component" 
           columns={columns} 
           rows={rows} 
           disableSelectionOnClick={true}

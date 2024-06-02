@@ -54,7 +54,7 @@ const fetchClientMemberships = () => {
     client_memberships.forEach((client_membership) => {
       for (let i = 0; i < months; i++) {
         if (moment(data[i].date).isSame(client_membership?.soldAt, 'month'))
-          return data[i].clientMemberships += client_membership.revenue;
+          return data[i].clientMemberships++;
       }
     });
     data.sort((a, b) => a.date - b.date);
