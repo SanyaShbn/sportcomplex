@@ -7,12 +7,12 @@ const ReportForm = ({ setSelectedButtonLink, link }) => {
     useEffect(() => {
       setSelectedButtonLink(link)
     });
-
+  const current_data = JSON.parse(localStorage.getItem('reportData'))
   const [data, setData] = useState({
-    title: '',
-    subject: '',
-    textContent: '',
-    option: ''
+    title: current_data && current_data.title ? current_data.title : '',
+    subject: current_data && current_data.subject ? current_data.subject : '',
+    textContent: current_data && current_data.textContent ? current_data.textContent : '',
+    option: current_data && current_data.option ? current_data.option : ''
   });
   const navigate = useNavigate()
   const token = sessionStorage.getItem("jwt");
@@ -38,20 +38,20 @@ const ReportForm = ({ setSelectedButtonLink, link }) => {
   return (
     <form onSubmit={handleSubmit}>
     <Stack direction="row" spacing={2} mt={1}>
-      <TextField name="title" label="Заголовок" value={data.title !== '' && typeof data.title !== 'undefined' ? 
+      <TextField name="title" label="Заголовок" value={data && data.title ? 
       data.title : ''} required onChange={handleChange} />
-      <TextField name="subject" label="Тема" value={data.subject !== '' && typeof data.subject !== 'undefined' ? 
+      <TextField name="subject" label="Тема" value={data && data.subject ? 
       data.subject : ''} required onChange={handleChange} />
     </Stack>
     <Stack mt={3}>
-      <TextField name="textContent" label="Текстовое содержание отчета" multiline maxRows={50}  value={data.textContent !== '' && 
-      typeof data.textContent!== 'undefined' ? data.textContent : ''} onChange={handleChange} />
+      <TextField name="textContent" label="Текстовое содержание отчета" multiline maxRows={50}  value={data && 
+      data.textContent ? data.textContent : ''} onChange={handleChange} />
     </Stack>
     <Stack direction="row" spacing={2} mt={1}>
     </Stack>
     <FormControl component="fieldset">
       <FormLabel >Табличные данные</FormLabel>
-        <RadioGroup name="option" value={data.option  !== '' && typeof data.option !== 'undefined' ? 
+        <RadioGroup name="option" value={data && data.option ? 
         data.option : ''} onChange={handleChange}>
         <Grid container>
         <Grid item xs={xs} sm={sm}>
