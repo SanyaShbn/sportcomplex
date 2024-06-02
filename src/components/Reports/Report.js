@@ -142,10 +142,11 @@ const Report = ({ setSelectedButtonLink, link }) => {
   const [client_trainings, setClientTrainings] = useState([])
   const [training_memberships, setTrainingMemberships] = useState([])
   const [client_memberships, setClinetMemberships] = useState([])
+  const option = data.option || ''
 
   const ChooseWichDataToFetch = useCallback(() =>{
-    if(data.option !== '' && typeof data.option !== 'undefined'){
-    switch (data.option) {
+    if(option !== '' && typeof option !== 'undefined'){
+    switch (option) {
       case 'clients':
         fetchClients()
         break;
@@ -176,7 +177,7 @@ const Report = ({ setSelectedButtonLink, link }) => {
       default: break;
     }
   }
-  }, [data.option])
+  }, [option])
   
   useEffect(() => {
     setSelectedButtonLink(link)

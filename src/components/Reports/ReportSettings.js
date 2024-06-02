@@ -39,17 +39,21 @@ const ReportForm = ({ setSelectedButtonLink, link }) => {
   return (
     <form onSubmit={handleSubmit}>
     <Stack direction="row" spacing={2} mt={1}>
-      <TextField name="title" label="Заголовок" value={data.title} required onChange={handleChange} />
-      <TextField name="subject" label="Тема" value={data.subject} required onChange={handleChange} />
+      <TextField name="title" label="Заголовок" value={current_data.title !== '' && typeof current_data.title !== 'undefined' ? 
+      data.title : ''} required onChange={handleChange} />
+      <TextField name="subject" label="Тема" value={current_data.subject !== '' && typeof current_data.subject !== 'undefined' ? 
+      data.subject : ''} required onChange={handleChange} />
     </Stack>
     <Stack mt={3}>
-      <TextField name="textContent" label="Текстовое содержание отчета" multiline maxRows={50}  value={data.textContent} onChange={handleChange} />
+      <TextField name="textContent" label="Текстовое содержание отчета" multiline maxRows={50}  value={current_data.textContent !== '' && 
+      typeof current_data.textContent!== 'undefined' ? data.textContent : ''} onChange={handleChange} />
     </Stack>
     <Stack direction="row" spacing={2} mt={1}>
     </Stack>
     <FormControl component="fieldset">
       <FormLabel >Табличные данные</FormLabel>
-        <RadioGroup name="option" value={data.option} onChange={handleChange}>
+        <RadioGroup name="option" value={current_data.option  !== '' && typeof current_data.option !== 'undefined' ? 
+        data.option : ''} onChange={handleChange}>
         <Grid container>
         <Grid item xs={xs} sm={sm}>
           <FormControlLabel value="clients" control={<Radio />} label="Клиенты" />
