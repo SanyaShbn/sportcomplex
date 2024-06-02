@@ -352,7 +352,7 @@ const Report = ({ setSelectedButtonLink, link }) => {
       <Text style={styles.contentText}>{data !== '' && typeof data !== 'undefined' ? data.textContent : ''}</Text> 
       </View>
       <View>
-      {option !== '' && typeof option !== 'undefined' && (
+      {/* {option !== '' && typeof option !== 'undefined' && (
       <>
       {option === 'clients' && <ClientsTable clients={clients} />}
       {option === 'trainings' && <TrainingsTable trainings={trainings} />}
@@ -364,7 +364,7 @@ const Report = ({ setSelectedButtonLink, link }) => {
       {option === 'trainings_registrations' && <TrainingsRegistrationsTable trainings_registrations={client_trainings} />}
       {option === 'sold_memberships' && <SoldMembershipsTable sold_memberships={client_memberships}/>}
       </>
-      )}
+      )} */}
       </View>
         <View>
       </View>
