@@ -8,12 +8,11 @@ const ReportForm = ({ setSelectedButtonLink, link }) => {
       setSelectedButtonLink(link)
     });
 
-  const current_data = JSON.parse(localStorage.getItem('reportData'))
   const [data, setData] = useState({
-    title: current_data.title !== '' && typeof current_data.title !== 'undefined' ? current_data.title : '',
-    subject: current_data.subject !== '' && typeof current_data.subject !== 'undefined' ? current_data.subject : '',
-    textContent: current_data.textContent !== '' && typeof current_data.textContent !== 'undefined' ? current_data.textContent : '',
-    option: current_data.option !== '' && typeof current_data.option !== 'undefined' ? current_data.option : ''
+    title: '',
+    subject: '',
+    textContent: '',
+    option: ''
   });
   const navigate = useNavigate()
   const token = sessionStorage.getItem("jwt");
